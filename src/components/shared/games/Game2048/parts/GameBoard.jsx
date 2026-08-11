@@ -1,7 +1,6 @@
 import isNil from "lodash/isNil";
 import styled from "styled-components";
 import {GameTile} from "./GameTile";
-import {GameTile2} from "./GameTile2";
 import {CONTAINER_SIZE, TILE_COUNT_PER_DIMENSION} from '../constants';
 import { useSizeRatio } from "../../../../../hooks/useSizeRatio";
 
@@ -24,13 +23,12 @@ const Tiles = styled.div`
     bottom: var(--spacing_x2);
 `
 
-export function GameBoard({ className, tiles, isRules, isV2 }) {
+export function GameBoard({ className, tiles, isRules }) {
     const sizeRatio = useSizeRatio();
 
-    const TileComponent = isV2 ? GameTile2 : GameTile;
     const renderTiles = () => {
         return tiles.filter((tile) => !isNil(tile?.id)).map((tile) => (
-            <TileComponent isRules={isRules} key={tile.id} {...tile} />
+            <GameTile isRules={isRules} key={tile.id} {...tile} />
         ));
     };
 

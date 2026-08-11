@@ -57,7 +57,8 @@ const INITIAL_USER = {
     seenStartInfo: false,
 
     coins: INITIAL_COINS,
-    progressWeek: 1, //на какой ща неделе
+    //На какой ща неделе
+    progressWeek: 1, 
     //Выбранные клетки по неделям
     cells: [],
     regDate: '',
@@ -66,7 +67,9 @@ const INITIAL_USER = {
     //Прибавка в начале недели
     newWeekCoins: 0,
     //Количество ходов
-    weekTurns: [MAX_TURNS_PER_WEEK, MAX_TURNS_PER_WEEK, MAX_TURNS_PER_WEEK, MAX_TURNS_PER_WEEK],
+    turns: MAX_TURNS_PER_WEEK,
+    //Последняя открытая клетка
+    lastOpenedCell: '',
 };
 
 const getMoscowTime = (date) => {

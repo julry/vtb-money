@@ -7,7 +7,7 @@ export const SCREENS = {
     LOBBY: 'LOBBY',
     STORE: 'STORE',
     AWARDS: 'AWARDS',
-    ACHIEVES: 'ACHIEVES',
+    RULES: 'RULES',
     GAMES: 'GAMES',
     GAMEDOODLE: 'GAMEDOODLE',
     GAME2048: 'GAME2048',

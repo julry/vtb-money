@@ -3,7 +3,7 @@ import { CommonModal, Modal } from "../../../modals";
 import { useGame } from "../useGame";
 import { noop } from "lodash";
 import finger from '../../../../../assets/images/2048/finger.webp';
-import { GameController } from "../../GameController";
+import { GameController } from "./GameController";
 import { GameBoard } from "./GameBoard";
 import { useSizeRatio } from "../../../../../hooks/useSizeRatio";
 import { useEffect, useState } from "react";

@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from "react";
-import {useClickListener} from "../../../hooks/useClickListener";
+import {useClickListener} from "../../../../../hooks/useClickListener";
 
 export function GameController({ active, children, onMoveUp, onMoveDown, onMoveLeft, onMoveRight }) {
     const [startX, setStartX] = useState(0);

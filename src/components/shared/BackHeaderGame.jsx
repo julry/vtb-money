@@ -6,6 +6,7 @@ import { useSizeRatio } from "../../hooks/useSizeRatio";
 import { useProgress } from "../../contexts/ProgressContext";
 import { useTimer } from "../../hooks/useTimer";
 import { CommonModal } from "./modals";
+import {CloseIcon} from './CloseIcon';
 
 const Header = styled.div`
     display: flex;
@@ -109,10 +110,6 @@ export const BackHeaderGame = ({ className, isHidden, onBack, timerData, current
     const coins = user.coins.toLocaleString();
     const ratio = useSizeRatio();
 
-    const getCoinsButtonLength = () => {
-       return Math.max(115 + (10 * (coins.length - 5)), 100);
-    }
-
     const onButtonClick = (callback) => (e) => {
         e?.stopPropagation();
         callback?.();
@@ -122,10 +119,7 @@ export const BackHeaderGame = ({ className, isHidden, onBack, timerData, current
         <>
             <Header className={className} $isHidden={isHidden}>
                 <ExitButton $ratio={ratio} onPointerDown={e => e?.stopPropagation} onClick={onButtonClick(onBack)} width={90}>
-                    <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6.99912 7.1427L6.2036 7.93817L20.3462 22.0798L21.1417 21.2844L21.9372 20.4889L7.79464 6.34723L6.99912 7.1427Z" fill="white"/>
-                        <path d="M7.00107 21.1427L6.20555 20.3472L20.3477 6.206L21.1432 7.00147L21.9388 7.79694L7.79659 21.9382L7.00107 21.1427Z" fill="white"/>
-                    </svg>
+                    <CloseIcon />
                 </ExitButton>
                 
                 <RulesButton $ratio={ratio} onPointerDown={e => e?.stopPropagation} type="transparent" width={85} onClick={onButtonClick(onRulesClick)}>

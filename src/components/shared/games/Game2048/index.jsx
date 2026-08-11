@@ -5,7 +5,7 @@ import { useSizeRatio } from "../../../../hooks/useSizeRatio";
 import { useCallbackRef } from "../../../../hooks/useCallbackRef";
 import { BackHeaderGame } from '../../BackHeaderGame';
 import { CommonModal } from "../../modals/CommonModal";
-import { GameController } from '../GameController';
+import { GameController } from './parts/GameController';
 import { useGame } from "./useGame";
 import { GameBoard, RulesModal, Start2048Modal } from "./parts";
 import { ACTIONS, CONTAINER_SIZE } from './constants';
@@ -58,7 +58,7 @@ const Subtitle = styled.p`
 const TRIES_AMOUNT = 3;
 
 function Game2048({isFirst, isGameMode, lobbyScreen, day}) {
-    const { endGame, registrateAchieve, user, updateUser, openedModal, handleOpenModal } = useProgress();
+    const { endGame, user, updateUser, openedModal, handleOpenModal } = useProgress();
     const ratio = useSizeRatio();
     const isFirstTime = !user?.hasSeen2048Rules;
 

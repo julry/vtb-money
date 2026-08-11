@@ -7,7 +7,7 @@ const Wrapper = styled.button`
     justify-content: center;
     background: ${({$type}) => 'var(--btn-bg-' + $type + ')'};
     color: ${({$type}) => 'var(--btn-color-' + $type + ')'};
-    font-size: var(--font_xl); 
+    font-size: ${({$ratio}) => $ratio * 17}px;
 
     padding: ${({$ratio}) => $ratio * 6}px;
     width: 100%;
