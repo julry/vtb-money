@@ -1,0 +1,16 @@
+@font-face {
+    font-family: 'VTBGroupUI';
+    src: url('../assets/fonts/VTBGroupUI-regular.otf') format('opentype'),
+    local('VTBGroupUI'), local('VTBGroupUIRegular'), local('VTBGroupUI-Regular'), local('VTBGroupUI-regular');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'VTBGroupUI';
+    src: url('../assets/fonts/VTBGroupUI-Medium.otf') format('opentype'),
+    local('VTBGroupUIMedium'), local('VTBGroupUI-Medium'), local('VTBGroupUI-medium');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}

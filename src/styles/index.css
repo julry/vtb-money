@@ -1,0 +1,73 @@
+@import "fonts.css";
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  font-family: 'VTBGroupUI', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --color-accent: #004CDA;
+  --color-blue-light: rgba(0, 76, 218, 0.5);
+  --color-red: #FF4053;
+  --color-blue: #00AAFF;
+  --color-purple: #965EEB;
+  --color-green: #04E061;
+  --color-gray: #868686;
+  --color-light-gray: #B4B4B4;
+  --modal-z-index: 100;
+  --header-z-index: 20;
+
+  --btn-bg-main: var(--color-accent);
+  --btn-bg-secondary: rgba(0, 127,255, 0.1);
+  --btn-bg-transparent: rgba(255, 255, 255, 0.4);
+  --btn-color-main: #ffffff;
+  --btn-color-secondary: var(--color-accent);
+  --btn-color-transparent: var(--color-accent);
+  --btn-color-secondary-disabled: var(--color-light-gray);
+  --btn-color-disabled: #ffffff;
+  --btn-bg-disabled: #BDBDBD
+}
+
+
+button {
+  font-family: 'VTBGroupUI', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  cursor: pointer;
+  outline: none;
+  border: none;
+}
+
+#root {
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+p, span, a, h3, h2, h1, h4, h5, button{
+  letter-spacing: -0.04em;
+  line-height: 100%;
+}
+
+input {
+  font-family: 'VTBGroupUI', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+}
+
+a {
+  color: inherit;
+}
+
+a:visited {
+  color: inherit;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}

@@ -1,0 +1,1 @@
+export const getCellInfoToBd = (cell) => `w${cell.week}_${cell.cellType}_${cell.shortName}`;
