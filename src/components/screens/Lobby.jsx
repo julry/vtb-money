@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { useMemo } from "react";
 import { FlexWrapper } from "../shared/ContentWrapper";
 import { IconButton } from "../shared/Button";
-import { useProgress } from "../../contexts/ProgressContext";
+import { useProgress } from "../../hooks/useProgress";
 import { NewAchieveModal } from "../shared/modals";
 import { SCREENS } from "../../constants/screens";
 import { useSizeRatio } from "../../hooks/useSizeRatio";

@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
+import {AnimatePresence} from 'framer-motion';
 import styled from 'styled-components';
 import { SizeRatioContextProvider } from '../contexts/SizeRatioContext';
-import WebApp from '@twa-dev/sdk';
-import { CookieInfo } from './shared/CookieInfo';
+// import WebApp from '@twa-dev/sdk';
+// import { CookieInfo } from './shared/CookieInfo';
 import { useImagePreloader } from '../hooks/useImagePreloader';
 import { commonImages } from '../constants/preloads';
-import { useProgress } from '../contexts/ProgressContext';
+import { useProgress } from '../hooks/useProgress';
 import { SCREENS } from '../constants/screens';
-import {CommonModal} from './shared/modals/CommonModal';
-import {AnimatePresence} from 'framer-motion';
 
 export const TARGET_WIDTH = 375;
 export const TARGET_HEIGHT = 677;

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { CommonModal } from "../shared/modals";
-import { useProgress } from "../../contexts/ProgressContext";
+import { useProgress } from "../../hooks/useProgress";
 import { Button, IconButton } from "../shared/Button";
 import styled from "styled-components";
 import { Lobby1 } from "./week1";

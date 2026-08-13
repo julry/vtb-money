@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { useProgress } from "../../contexts/ProgressContext";
+import { useProgress } from "../../hooks/useProgress";
 import { BrightScreen } from "../shared/BrightScreen";
 import { useSizeRatio } from "../../hooks/useSizeRatio";
 import { MarkeredText, PurpleText } from "../shared/Texts";

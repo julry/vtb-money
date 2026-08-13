@@ -4,7 +4,7 @@ import { Title } from "../shared/Title"
 import { useSizeRatio } from "../../hooks/useSizeRatio";
 import { Text } from "../shared/Text";
 import { Button } from "../shared/Button";
-import { useProgress } from "../../contexts/ProgressContext";
+import { useProgress } from "../../hooks/useProgress";
 import { RuleTextModal } from '../shared/modals/RuleTextModal';
 import { rulesTexts } from '../../constants/rulesTexts';
 import { RulePrizeModal } from "../shared/modals/RulePrizeModal";

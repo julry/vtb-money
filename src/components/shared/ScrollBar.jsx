@@ -31,7 +31,7 @@ const Track = styled.div`
   bottom: ${({ $bottom }) => $bottom}px;
   width: ${({ $width }) => $width}px;
    background: rgba(0, 0, 0, 0.004);
-    border: 0.581478px solid rgba(0, 76, 218, 0.5);
+    border: 0.5px solid rgba(0, 76, 218, 0.5);
     box-shadow: inset 1.55061px 1.55061px 1.55061px rgba(0, 40, 130, 0.3);
     border-radius: 16.7466px;
   z-index: 4;
@@ -41,16 +41,16 @@ const Track = styled.div`
 `;
 
 const Thumb = styled.div`
-  position: absolute;
-  top: 0;
-  left: ${({ $dragging }) => ($dragging ? '-1px' : '0')};
-  width: ${({ $dragging }) => ($dragging ? '8px' : '100%')};
-   background: var(--color-accent);
-    background: linear-gradient(165.33deg, rgba(173, 207, 245, 0.8) 10.37%, rgba(95, 131, 255, 0.8) 37.88%, rgba(0, 76, 218, 0.8) 76.25%);
-    border: 0.581478px solid rgba(0, 76, 218, 0.5);
-    border-radius: 16.7466px;
-  min-height: ${({ $minHeight }) => $minHeight}px;
-  transition: background 0.15s ease, width 0.15s ease, left 0.15s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--color-accent);
+    background: ${({$isSimple}) => $isSimple ? 'var(--color-accent)' : 'linear-gradient(165.33deg, rgba(173, 207, 245, 0.8) 10.37%, rgba(95, 131, 255, 0.8) 37.88%, rgba(0, 76, 218, 0.8) 76.25%)'};
+    border: 0.5px solid rgba(0, 76, 218, 0.5);
+    border-radius: 16px;
+    min-height: ${({ $minHeight }) => $minHeight}px;
+    transition: background 0.15s ease, width 0.15s ease, left 0.15s ease;
 `;
 
 /* ========== Component ========== */
@@ -63,7 +63,8 @@ export function Scrollbar({
     top = 8,                 // отступ трека сверху (px)
     bottom = 8,              // отступ трека снизу (px)
     width = 6,               // ширина трека (px)
-    minThumbHeight = 40,     // минимальная высота ползунка (px)
+    minThumbHeight = 40, 
+    isSimple,   
 }) {
     const viewportRef = useRef(null);
     const trackRef = useRef(null);
@@ -90,8 +91,6 @@ export function Scrollbar({
         if (!viewport || !track || !thumb) return;
 
         const scrollable = viewport.scrollHeight - viewport.clientHeight > 5;
-        console.log(viewport.scrollHeight)
-        console.log(viewport.clientHeight)
         setHasScroll(scrollable);
 
         if (!scrollable) return;
@@ -192,6 +191,7 @@ export function Scrollbar({
             >
                 <Thumb
                     ref={thumbRef}
+                    $isSimple={isSimple}
                     $dragging={isDragging}
                     $minHeight={minThumbHeight}
                 />

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useProgress } from "../../contexts/ProgressContext";
+import { useProgress } from "../../hooks/useProgress";
 import { RedStroke1Line } from "../shared/RedStrokes";
 import { NewAchieveModal } from "../shared/modals";
 import { BrightScreen } from "../shared/BrightScreen";

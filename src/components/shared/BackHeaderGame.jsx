@@ -3,7 +3,7 @@ import { Button } from "./Button";
 import coinIcon from '../../assets/images/coinImg.webp';
 import questionIcon from '../../assets/images/question.webp';
 import { useSizeRatio } from "../../hooks/useSizeRatio";
-import { useProgress } from "../../contexts/ProgressContext";
+import { useProgress } from "../../hooks/useProgress";
 import { useTimer } from "../../hooks/useTimer";
 import { CommonModal } from "./modals";
 import {CloseIcon} from './CloseIcon';
@@ -21,19 +21,15 @@ const Header = styled.div`
     transform: opacity 0.25s;
 `;
 
-//TODO: чекнуть стили 
 const ExitButton = styled(Button)`
-    margin-left: -35px;
     justify-content: flex-end;
     flex-shrink: 0;
     max-height: 42px;
-    width: ${({$ratio}) => $ratio * 90}px;
-`;
-
-const CoinsButton = styled(Button)`
-    transform: translateX(17px);
-    font-size: ${({$ratio}) => $ratio * 17}px;
-    justify-content: flex-start;
+    height: 42px;
+    margin-left: -1px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    width: ${({$ratio}) => $ratio * 49}px;
 `;
 
 const CoinIcon = styled.img`
@@ -59,30 +55,21 @@ const AdditionalBlock = styled.div`
     border-radius: var(--border-radius-md);
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    font-size: ${({$ratio}) => $ratio * 34}px;
-    height: ${({$ratio}) => $ratio * 54}px;
+    font-size: ${({$ratio, $isLarge}) => $ratio * ($isLarge ? 34 : 27)}px;
+    height: ${({$ratio, $isLarge}) => $ratio * ($isLarge ? 51 : 41)}px;
     flex-shrink: 0;
     color: var(--color-accent);
 `;
 
 const TimerBlock = styled(AdditionalBlock)`
-    width: ${({$ratio}) => $ratio * 110}px;
+    width: ${({$ratio,  $isLarge}) => $ratio * ($isLarge ? 98 : 79)}px;
 `
 
 const CurrentPointsBlock = styled(AdditionalBlock)`
-    min-width: ${({$ratio}) => $ratio * 85}px;
+    min-width: ${({$ratio,  $isLarge}) => $ratio * ($isLarge ? 98 : 79)}px;
     width: fit-content;
-    padding:  ${({$ratio}) => $ratio * 10}px  ${({$ratio}) => $ratio * 16}px  ${({$ratio}) => $ratio * 13}px ${({$ratio}) => $ratio * 10}px;
+    padding:  ${({$ratio}) => $ratio * 10}px  ${({$ratio}) => $ratio * 5}px  ${({$ratio}) => $ratio * 13}px;
 `
-
-// const RulesButton = styled(Button)`
-//     position: absolute;
-//     top: calc(var(--spacing_x7) + var(--spacing_x1) / 2 + ${({$ratio}) => $ratio * 57}px);
-//     right: -21px;
-//     padding-left: var(--spacing_x4);
-//     justify-content: flex-start;
-//     z-index: var(--header-z-index);
-// `;
 
 const RulesButton = styled(Button)`
     padding-left: var(--spacing_x4);
@@ -103,11 +90,9 @@ const InfoWrapper = styled.div`
     }
 `;
 
-export const BackHeaderGame = ({ className, isHidden, onBack, timerData, currentPoints, onRulesClick, scoreElementRef }) => {
-    const { user, handleOpenModal } = useProgress();
+export const BackHeaderGame = ({ className, isHidden, isLarge, onBack, timerData, currentPoints, onRulesClick, scoreElementRef }) => {
     const { getSeconds } = useTimer(timerData ?? {});
 
-    const coins = user.coins.toLocaleString();
     const ratio = useSizeRatio();
 
     const onButtonClick = (callback) => (e) => {
@@ -125,28 +110,20 @@ export const BackHeaderGame = ({ className, isHidden, onBack, timerData, current
                 <RulesButton $ratio={ratio} onPointerDown={e => e?.stopPropagation} type="transparent" width={85} onClick={onButtonClick(onRulesClick)}>
                     <QuestionIcon $ratio={ratio} src={questionIcon} alt="" />
                 </RulesButton>
-                {/* <CoinsButton $ratio={ratio} onPointerDown={e => e?.stopPropagation} onClick={onButtonClick(() => handleOpenModal({Component: <CommonModal />}))} width={getCoinsButtonLength()}>
-                    <CoinIcon $ratio={ratio} src={coinIcon} alt="" />
-                    <p>{coins.toLocaleString()}</p>
-                </CoinsButton> */}
             </Header>
             <InfoWrapper $ratio={ratio} $isHidden={isHidden}>
                 {timerData !== undefined && (
-                    <TimerBlock $ratio={ratio}>
+                    <TimerBlock $ratio={ratio} $isLarge={isLarge}>
                         <p>0:{getSeconds()}</p>
                     </TimerBlock>
                 )}
                 {currentPoints !== undefined && (
-                    <CurrentPointsBlock $ratio={ratio}>
+                    <CurrentPointsBlock $ratio={ratio} $isLarge={isLarge}>
                         <CoinIcon $ratio={ratio} src={coinIcon} alt="" />
                         <p ref={scoreElementRef}>{currentPoints}</p>
                     </CurrentPointsBlock>
                 )}
             </InfoWrapper>
-            
-            {/* <RulesButton $ratio={ratio} onPointerDown={e => e?.stopPropagation} type="transparent" width={85} onClick={onButtonClick(onRulesClick)}>
-                <QuestionIcon $ratio={ratio} src={questionIcon} alt="" />
-            </RulesButton> */}
         </>
 )
 }

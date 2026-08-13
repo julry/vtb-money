@@ -9,7 +9,8 @@ const Wrapper = styled.button`
     color: ${({$type}) => 'var(--btn-color-' + $type + ')'};
     font-size: ${({$ratio}) => $ratio * 17}px;
 
-    padding: ${({$ratio}) => $ratio * 6}px;
+    padding: ${({$ratio}) => $ratio * 6}px ${({$ratio}) => $ratio * 8}px;
+    margin-top: ${({$mt}) => typeof $mt === 'number' ? $mt + 'px' : $mt};
     width: 100%;
     max-width: ${({$width, $ratio}) => $width ? $ratio * $width + 'px' : 'var(--content-width)'};
     min-height: ${({$ratio}) => $ratio * 42}px;
@@ -41,10 +42,10 @@ const IconWrapper = styled(Wrapper)`
     }
 `;
 
-export const Button = ({type = 'main', width, ...props}) => {
+export const Button = ({type = 'main', width, mt, ...props}) => {
     const ratio = useSizeRatio();
 
-    return <Wrapper {...props} $type={type} $width={width} $ratio={ratio}/>
+    return <Wrapper {...props} $type={type} $mt={mt} $width={width} $ratio={ratio}/>
 }
 
 export const IconButton = ({icon = {}, type = 'main', ...props}) => {

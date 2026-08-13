@@ -1,9 +1,10 @@
 import styled from "styled-components";
 import { Button } from "./Button";
 import coinIcon from '../../assets/images/coinImg.webp';
+import ticket from '../../assets/images/ticket.webp';
 import questionIcon from '../../assets/images/question.webp';
 import { useSizeRatio } from "../../hooks/useSizeRatio";
-import { useProgress } from "../../contexts/ProgressContext";
+import { useProgress } from "../../hooks/useProgress";
 import { useTimer } from "../../hooks/useTimer";
 import { CommonModal } from "./modals";
 import { CloseIcon } from "./CloseIcon";
@@ -38,6 +39,7 @@ const CoinsButton = styled(Button)`
     transform: translateX(17px);
     font-size: ${({$ratio}) => $ratio * 17}px;
     justify-content: flex-start;
+    max-height: ${({$ratio}) => $ratio * 42}px;
 `;
 
 const CoinIcon = styled.img`
@@ -47,14 +49,28 @@ const CoinIcon = styled.img`
     margin-right: 3px;
 `;
 
-export const BackHeader = ({ className, onBack, isShownExit = true, isShownCoins }) => {
+const TicketIcon = styled.img`
+    width: ${({$ratio}) => $ratio * 40}px;
+    height: ${({$ratio}) => $ratio * 40}px;
+    object-fit: contain;
+    margin-left: ${({$ratio}) => $ratio * 5}px;
+    margin-top: ${({$ratio}) => $ratio * 2}px;
+    margin-right: ${({$ratio}) => $ratio * 5}px;
+`;
+
+export const BackHeader = ({ className, onBack, isShownExit = true, isShownTickets, isShownCoins }) => {
     const { user, handleOpenModal } = useProgress();
 
-    const coins = user.coins.toLocaleString();
+    const coins = user.totalCoins.toLocaleString();
+    const tickets = (user.bilets ?? 0).toLocaleString();
     const ratio = useSizeRatio();
 
     const getCoinsButtonLength = () => {
        return Math.max(115 + (10 * (coins.length - 5)), 100);
+    }
+
+    const getTicketsButtonLength = () => {
+       return Math.max(105 + (10 * (coins.length - 5)), 105);
     }
 
     //TODO: сделать компонент для монет чтобы выделялась сама кнопка
@@ -81,7 +97,13 @@ export const BackHeader = ({ className, onBack, isShownExit = true, isShownCoins
                 {isShownCoins && (
                     <CoinsButton $ratio={ratio} onClick={handleOpenCoinsModal} width={getCoinsButtonLength()}>
                         <CoinIcon $ratio={ratio} src={coinIcon} alt="" />
-                        <p>{coins.toLocaleString()}</p>
+                        <p>{coins}</p>
+                    </CoinsButton>
+                )}
+                {isShownTickets && (
+                    <CoinsButton $ratio={ratio} width={getTicketsButtonLength()}>
+                        <TicketIcon $ratio={ratio} src={ticket} alt="" />
+                        <p>{tickets}</p>
                     </CoinsButton>
                 )}
             </Header>
