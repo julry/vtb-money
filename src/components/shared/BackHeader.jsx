@@ -10,6 +10,7 @@ import { CommonModal } from "./modals";
 import { CloseIcon } from "./CloseIcon";
 import {RuleTextModal} from './modals/RuleTextModal';
 import {rulesTexts} from '../../constants/rulesTexts';
+import { Logo } from "./Logo";
 
 const Header = styled.div`
     display: flex;
@@ -17,7 +18,7 @@ const Header = styled.div`
     justify-content: space-between;
     align-items: flex-start;
     position: absolute;
-    top: calc(var(--spacing_x7) + var(--spacing_x1) / 2);
+    top: calc(var(--spacing_x6) / 1.6);
     left: 0;
     z-index: var(--header-z-index);
     opacity: ${({$isHidden}) => $isHidden ? 0 : 1};
@@ -58,6 +59,10 @@ const TicketIcon = styled.img`
     margin-right: ${({$ratio}) => $ratio * 5}px;
 `;
 
+const LogoWrapper = styled.div`
+  padding-left:  ${({$ratio}) => $ratio * 13}px; 
+`;
+
 export const BackHeader = ({ className, onBack, isShownExit = true, isShownTickets, isShownCoins }) => {
     const { user, handleOpenModal } = useProgress();
 
@@ -88,10 +93,14 @@ export const BackHeader = ({ className, onBack, isShownExit = true, isShownTicke
     return (
         <>
             <Header className={className}>
-                {isShownExit && (
+                {isShownExit ?  (
                     <ExitButton $ratio={ratio} onClick={onBack} width={65}>
                         <CloseIcon />
                     </ExitButton>
+                ) : (
+                    <LogoWrapper $ratio={ratio}>
+                        <Logo isWhiteVersion/>
+                    </LogoWrapper>
                 )}
                 
                 {isShownCoins && (

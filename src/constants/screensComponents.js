@@ -12,9 +12,16 @@ const RegScreen = React.lazy(() => import("../components/screens/Registration"))
 const SexScreen = React.lazy(() => import("../components/screens/SexScreen"));
 const WaitingGameScreen = React.lazy(() => import("../components/screens/Waiting"));
 const ProfileScreen = React.lazy(() => import("../components/screens/ProfileScreen"));
+const ShopScreen = React.lazy(() => import("../components/screens/ShopScreen"));
+const IntroScreen = React.lazy(() => import("../components/screens/Intro"));
+const IntroRegScreen = React.lazy(() => import("../components/screens/IntroReg"));
+const MiniGamesScreen = React.lazy(() => import("../components/screens/MiniGamesScreen"));
+const LobbyScreen = React.lazy(() => import("../components/screens/Lobby"));
 
 
 export const screens = {
+    [SCREENS.INTRO]: IntroScreen,
+    [SCREENS.INTROREG]: IntroRegScreen,
     [SCREENS.GAME2048]: Game2048,
     [SCREENS.GAMEMATCH3]: GameMatch3,
     [SCREENS.GAMERUNNER]: GameRunner,
@@ -25,4 +32,7 @@ export const screens = {
     [SCREENS.SEX]: SexScreen,
     [SCREENS.WAITING]: WaitingGameScreen,
     [SCREENS.PROFILE]: ProfileScreen,
+    [SCREENS.STORE]: ShopScreen,
+    [SCREENS.MINIGAMES]: MiniGamesScreen,
+    [SCREENS.LOBBY]: LobbyScreen,
 };

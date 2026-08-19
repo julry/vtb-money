@@ -85,6 +85,7 @@ export default function GameCrossRoad() {
         resetGame();
         handleOpenModal({
             Component: <StartCrossModal />,
+            isBlurTransitionDisabled: true,
             closeCallback: () => setIsRules(true),
         })
     }, []);

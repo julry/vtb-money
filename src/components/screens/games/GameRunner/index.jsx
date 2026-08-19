@@ -77,6 +77,7 @@ function GameRunner({ className }) {
         handleOpenModal(
             {
                 Component: <StartRunnerModal />,
+                isBlurTransitionDisabled: true,
             });
     }, []);
 

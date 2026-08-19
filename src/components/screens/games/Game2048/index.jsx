@@ -13,7 +13,6 @@ import { EndModal } from "../../../shared/modals/EndModal";
 
 const Wrapper = styled.div`
     height: 100%;
-    padding-top: ${({$ratio}) => $ratio * 155}px;
 `;
 
 const WrapperInner = styled.div`
@@ -22,7 +21,8 @@ const WrapperInner = styled.div`
     align-items: center;
     margin: auto;
     height: 100%;
-`
+    padding-top: ${({$ratio}) => $ratio * 155}px;
+`;
 
 const PointsWrapper = styled.div`
     display: flex;
@@ -93,10 +93,7 @@ function Game2048({isFirst, isGameMode, lobbyScreen, day}) {
 
     return (
         <Wrapper $ratio={ratio}>
-            <BackHeaderGame 
-                onRulesClick={() => handleOpenModal({Component: <RulesModal />, isBlurTransitionDisabled: true})}
-                onBack={() => handleOpenModal({Component: <CommonModal />})}
-            />
+            
                 <GameController
                     active={isGameActive}
                     onMoveUp={() => moveTiles(ACTIONS.MOVE_UP)}
@@ -106,6 +103,10 @@ function Game2048({isFirst, isGameMode, lobbyScreen, day}) {
                 >
                     {(ref) => (
                         <WrapperInner ref={ref} $ratio={ratio}>
+                            <BackHeaderGame 
+                                onRulesClick={() => handleOpenModal({Component: <RulesModal />, isBlurTransitionDisabled: true})}
+                                onBack={() => handleOpenModal({Component: <CommonModal />})}
+                            />
                             <GameBoard tiles={getTiles()}/>
                             <PointsWrapper  $ratio={ratio}>
                                 <Aim $ratio={ratio}>

@@ -92,6 +92,7 @@ const GameMatch3 = () => {
         handleOpenModal(
             {
                 Component: <StartMatch3Modal />,
+                isBlurTransitionDisabled: true,
                 nextOpenedModalProps: {
                     component: <RulesMatch3Modal />,
                     isBlurTransitionDisabled: true,

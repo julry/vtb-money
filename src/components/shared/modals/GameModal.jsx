@@ -4,7 +4,7 @@ import { useSizeRatio } from "../../../hooks/useSizeRatio";
 import { SCREENS } from "../../../constants/screens";
 
 const TitleStyled = styled.h4`
-    font-size: var(--font_lg);
+    font-size: ${({$ratio}) => $ratio * 28}px;
     font-weight: ${({$isBold}) => $isBold ? 500 : 400};
     text-align: center;
     color: var(--color-accent);

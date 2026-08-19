@@ -1,4 +1,4 @@
-import { FlexWrapper } from '../shared/ContentWrapper';
+import {FlexWrapper, FlexRowWrapper} from '../shared/ContentWrapper';
 import styled from 'styled-components';
 import { useSizeRatio } from '../../hooks/useSizeRatio';
 import { BackHeader } from '../shared/BackHeader';
@@ -11,6 +11,10 @@ import avatar from '../../assets/images/person/persProfile.webp';
 import avatarF from '../../assets/images/person/persProfileF.webp';
 import { Button } from '../shared/Button';
 import { ProfileModal } from '../shared/modals/ProfileModal';
+import { AnimatePresence } from 'framer-motion';
+import {MovingBlock} from '../shared/MovingBlock';
+import {SubscribeModal} from '../shared/modals/SubscribeModal';
+import { ItemsModal } from '../shared/modals/ItemsModal';
 
 const Wrapper = styled(FlexWrapper)`
     padding: calc(var(--spacing_x4) * 4) ${({ $ratio }) => 25 * $ratio}px ${({ $ratio }) => 45 * $ratio}px;
@@ -57,6 +61,14 @@ const TextWrapper = styled.div`
     padding:  ${({ $ratio }) => 9 * $ratio}px  ${({ $ratio }) => 9 * $ratio}px  ${({ $ratio }) => 10 * $ratio}px ${({ $ratio }) => 16 * $ratio}px;
 `;
 
+const RefLinkWrapper = styled(FlexRowWrapper)`
+    margin-top: calc(var(--spacing_x4) - 1px);
+
+    & p {
+        width: fit-content;
+    }
+`;
+
 const Subtite = styled(Text)`
     text-align: left;
     width: 100%;
@@ -80,6 +92,10 @@ const ButtonStyled = styled(Button)`
     max-width: unset;
 `;
 
+const TitleStyled = styled(Title)`
+    font-size: ${({ $ratio }) => 30 * $ratio}px;
+`;
+
 const ProfileScreen = ({ onClose }) => {
     const { user, next, tgInfo, handleOpenModal, updateUser } = useProgress();
     const ratio = useSizeRatio();
@@ -87,6 +103,7 @@ const ProfileScreen = ({ onClose }) => {
     const [isSuccessCopy, setIsSuccessCopy] = useState(false);
 
     const refLink = `https://tasks.fut.ru/people/${tgInfo?.tgUserId ?? ''}`;
+
     const handleCopy = () => {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(refLink).then(() => {
@@ -130,7 +147,7 @@ const ProfileScreen = ({ onClose }) => {
     return (
         <Wrapper $ratio={ratio}>
             <BackHeader onBack={handleClose} isShownTickets/>
-            <Title>Профиль</Title>
+            <TitleStyled $ratio={ratio}>Профиль</TitleStyled>
             <PersonalInfo>
                 <Avatar $ratio={ratio}>
                     <img src={avatar} alt="" />
@@ -166,15 +183,34 @@ const ProfileScreen = ({ onClose }) => {
                 akondrashov@futuretoday.ru
             </TextWrapper>
             <FullWidthDiv ref={linkRef}>
-                <Subtite>Реферальная ссылка</Subtite>
-                <TextWrapper $ratio={ratio}>
+                <RefLinkWrapper $gap={8 * ratio} onClick={handleCopy}>
+                    <Subtite $isFirst>Реферальная ссылка</Subtite>
+                    <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="11" height="11" rx="3" fill="#004CDA"/>
+                        <rect x="3.5" y="2.5" width="10" height="10" rx="2.5" stroke="#004CDA"/>
+                    </svg>
+                </RefLinkWrapper>
+               
+                <TextWrapper $ratio={ratio} onClick={handleCopy}>
                     {refLink}
                 </TextWrapper>
             </FullWidthDiv>
             <ButtonsWrapper $ratio={ratio}>
-                <ButtonStyled>Подписаться на канал</ButtonStyled>
-                <Button>Заказы в магазине</Button>
+                <ButtonStyled onClick={() => handleOpenModal({Component: <SubscribeModal />})}>Подписаться на канал</ButtonStyled>
+                <Button 
+                    onClick={() => handleOpenModal({Component: <ItemsModal />})} 
+                    // disabled={user?.shop?.length < 1}
+                >
+                    Заказы в магазине
+                </Button>
             </ButtonsWrapper>
+            <AnimatePresence>
+                {isSuccessCopy && (
+                    <MovingBlock top={444} right={-30} width={205}>
+                        <p>Скопировано</p>
+                    </MovingBlock>
+                )}
+            </AnimatePresence>
         </Wrapper>
     )
 };

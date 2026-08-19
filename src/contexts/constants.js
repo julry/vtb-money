@@ -1,5 +1,5 @@
-import {SCREENS} from '../constants/screens';
-import {GENDERS} from '../constants/genders';
+import { SCREENS } from '../constants/screens';
+import { GENDERS } from '../constants/genders';
 
 export const GAME_COINS_INFO = {
     coins: 0, // клеточные за все врем
@@ -17,13 +17,14 @@ export const INITIAL_USER = {
     email: '',
     university: '',
     faculty: '',
+    facId: '',
     isTargeted: false,
     seenStartInfo: false,
     gender: GENDERS.Female,
 
     totalCoins: INITIAL_COINS,
     //На какой ща неделе
-    progressWeek: 1, 
+    progressWeek: 1,
     //Выбранные клетки по неделям
     cells: [],
     regDate: '',
@@ -48,9 +49,15 @@ export const INITIAL_USER = {
 };
 
 export const INITIAL_STATE = {
-    currentScreen: SCREENS.RULES,
+    currentScreen: SCREENS.INTRO,
     points: 0,
     weekPoints: 0,
     user: INITIAL_USER,
     passedWeeks: [],
 }
+
+
+export const MAX_RETRIES = 3;
+export const RETRY_DELAY = 1000;
+export const BASE_LOCK_TIMEOUT = 5000;
+export const MAX_LOCK_TIMEOUT = 15000; 

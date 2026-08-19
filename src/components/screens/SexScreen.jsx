@@ -9,6 +9,8 @@ import { FlexWrapper } from "../shared/ContentWrapper";
 import { LogoOutlined } from "../shared/LogoOutlined";
 import { Title } from "../shared/Title";
 import { Button } from "../shared/Button";
+import { useProgress } from "../../hooks/useProgress";
+import { SCREENS } from "../../constants/screens";
 
 const CARDS = [
     {
@@ -79,6 +81,7 @@ const TitleStyled = styled(Title)`
 
 const SexScreen = () => {
     const ratio = useSizeRatio();
+    const { next } = useProgress();
     const [[currentIndex, direction], setCurrentIndex] = useState([0, 0]);
 
     const nextSlide = () => {
@@ -143,7 +146,7 @@ const SexScreen = () => {
                     </CardStyled>
                 </AnimatePresence>
             </Wrapper>
-            <Button width={275}>Выбрать</Button>
+            <Button width={275 * ratio} onClick={() => next(SCREENS.WAITING)}>Выбрать</Button>
         </FlexWrapper>
     )
 };

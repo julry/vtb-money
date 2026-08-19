@@ -1,9 +1,10 @@
-import { Suspense, useMemo } from "react";
+import { useState, useEffect, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useProgress } from "../hooks/useProgress";
 import { FlexWrapper } from "./shared/ContentWrapper";
 import { screens } from "../constants/screensComponents";
 import { Loading } from "./Loading";
+import {DelayedSuspenseWithPrevious} from './DelayedSuspenseWithPrevious'
 
 const Wrapper = styled.div`
     position: relative;
@@ -13,6 +14,7 @@ const Wrapper = styled.div`
     ${({$isBlured, $blurSize = 20}) => $isBlured ? 'filter: blur(' + $blurSize +'px)' : ''};
     ${({$isBlurTransitionDisabled}) => $isBlurTransitionDisabled ? '' : 'transition: filter 0.3s;'};
 `;
+
 
 export function ScreenContent() {
     const { isLoading, tgError, openedModal, currentScreen } = useProgress();
@@ -27,15 +29,23 @@ export function ScreenContent() {
 
     if (isLoading) return <Loading />
 
-    // const Screen = typeof screen === 'function' ? screen : null;
-
     return(
-        <Suspense fallback={<Loading />}>
+        <>
         {Screen && (
-            <Wrapper $blurSize={openedModal?.blurSize} $isBlured={openedModal?.isOpen} $isBlurTransitionDisabled={openedModal?.isBlurTransitionDisabled}>
-                <Screen />
+            <Wrapper 
+                $blurSize={openedModal?.blurSize} 
+                $isBlured={openedModal?.isOpen} 
+                $isBlurTransitionDisabled={openedModal?.isBlurTransitionDisabled}
+            >
+                <DelayedSuspenseWithPrevious
+                    fallback={<Loading />} 
+                    delay={900}
+                    currentKey={currentScreen}
+                >
+                    <Screen />
+                </DelayedSuspenseWithPrevious>
             </Wrapper>
         )}
-        </Suspense>
+        </>
     )
 }

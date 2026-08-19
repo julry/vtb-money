@@ -8,20 +8,16 @@ import { useTimer } from "../../hooks/useTimer";
 import { CommonModal } from "./modals";
 import {CloseIcon} from './CloseIcon';
 
-const Header = styled.div`
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: flex-start;
+const HeaderButton = styled(Button)`
     position: absolute;
     top: calc(var(--spacing_x7) + var(--spacing_x1) / 2);
-    left: 0;
     z-index: var(--header-z-index);
     opacity: ${({$isHidden}) => $isHidden ? 0 : 1};
     transform: opacity 0.25s;
 `;
 
-const ExitButton = styled(Button)`
+const ExitButton = styled(HeaderButton)`
+    left: 0;
     justify-content: flex-end;
     flex-shrink: 0;
     max-height: 42px;
@@ -71,8 +67,9 @@ const CurrentPointsBlock = styled(AdditionalBlock)`
     padding:  ${({$ratio}) => $ratio * 10}px  ${({$ratio}) => $ratio * 5}px  ${({$ratio}) => $ratio * 13}px;
 `
 
-const RulesButton = styled(Button)`
+const RulesButton = styled(HeaderButton)`
     padding-left: var(--spacing_x4);
+    right: 0;
     justify-content: flex-start;
     transform: translateX(25px);
 `;
@@ -102,15 +99,13 @@ export const BackHeaderGame = ({ className, isHidden, isLarge, onBack, timerData
 
     return (
         <>
-            <Header className={className} $isHidden={isHidden}>
-                <ExitButton $ratio={ratio} onPointerDown={e => e?.stopPropagation} onClick={onButtonClick(onBack)} width={90}>
-                    <CloseIcon />
-                </ExitButton>
-                
-                <RulesButton $ratio={ratio} onPointerDown={e => e?.stopPropagation} type="transparent" width={85} onClick={onButtonClick(onRulesClick)}>
-                    <QuestionIcon $ratio={ratio} src={questionIcon} alt="" />
-                </RulesButton>
-            </Header>
+            <ExitButton $ratio={ratio} $isHidden={isHidden} onPointerDown={e => e?.stopPropagation} onClick={onButtonClick(onBack)} width={90}>
+                <CloseIcon />
+            </ExitButton>
+            
+            <RulesButton $ratio={ratio} $isHidden={isHidden} onPointerDown={e => e?.stopPropagation} type="transparent" width={85} onClick={onButtonClick(onRulesClick)}>
+                <QuestionIcon $ratio={ratio} src={questionIcon} alt="" />
+            </RulesButton>
             <InfoWrapper $ratio={ratio} $isHidden={isHidden}>
                 {timerData !== undefined && (
                     <TimerBlock $ratio={ratio} $isLarge={isLarge}>

@@ -15,6 +15,7 @@ const InputStyled = styled.input`
     outline: none;
     background: transparent;
     width: 100%;
+    color: ${({$isCorrect}) => $isCorrect ? '#004CDA': '#B90000'};
 
     &::placeholder {
         color: ${({$isCorrect}) => $isCorrect ? 'rgba(0,76,218,0.5)': 'rgba(185,0,0,0.5)'};

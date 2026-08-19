@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { useSizeRatio } from "../../hooks/useSizeRatio";
+import pic from '../../assets/images/waiting.webp';
 // import WebApp from "@twa-dev/sdk";
 import { FlexWrapper } from "../shared/ContentWrapper";
 import { LogoOutlined } from "../shared/LogoOutlined";
@@ -7,14 +8,6 @@ import {Block} from '../shared/Block';
 import { Title } from "../shared/Title";
 import { Text } from "../shared/Text";
 import { Button } from "../shared/Button";
-
-const Picture = styled.div`
-    position: absolute;
-    top: ${({$ratio}) => $ratio * -65}px;
-    width: ${({$ratio}) => $ratio * 241}px;
-    height: ${({$ratio}) => $ratio * 103}px;
-    left: ${({$ratio}) => $ratio * 68}px;
-`;
 
 const ContentWrapper = styled(Block)`
     position: absolute;
@@ -59,7 +52,9 @@ const WaitingGameScreen = () => {
                 <Text>
                     Осталось совсем немного:{'\n'}игра откроется 7 сентября.{'\n'}Мы пришлём напоминание{'\n'}в боте в день старта
                 </Text>
-                <ImageWrapper  $ratio={ratio}></ImageWrapper>
+                <ImageWrapper  $ratio={ratio}>
+                    <img src={pic} alt="" />
+                </ImageWrapper>
                 <Button>Перейти в бота</Button>
            </ContentWrapper>
         </FlexWrapper>

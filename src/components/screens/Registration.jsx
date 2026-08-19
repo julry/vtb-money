@@ -204,8 +204,8 @@ const Registration = () => {
     
     const handleChangeSurname = (e) => {
         if (isSending) return;
-        setIsNameCorrect(true);
-        setName(e.target.value);
+        setIsSurnameCorrect(true);
+        setSurname(e.target.value);
     };
 
     const handleFacPick = (id, name) => {
@@ -344,7 +344,7 @@ const Registration = () => {
                             </a>.
                         </span>
                     </RadioButtonLabel>
-                    <Button mt={15 * ratio}>Готово</Button>
+                    <Button mt={15 * ratio} onClick={() => next()}>Готово</Button>
             </BlockStyled>
         </FlexWrapper>
     )

@@ -28,7 +28,7 @@ export const FIGURE_SIZE = 120;
 export const TRASH_WIDTH = 120;
 export const COIN_SIZE = 120;
 
-export const BASE_SPEED = 3.5;
+export const BASE_SPEED = 4.8;
 export const MAX_SPEED = 6;
 export const ACCELERATION_DISTANCE = 6000;
 

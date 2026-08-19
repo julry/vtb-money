@@ -13,3 +13,9 @@ export const FlexWrapper = styled(ContentWrapper)`
     align-items: center;
     justify-content: ${({$justify = 'flex-start'}) => $justify};
 `;
+
+export const FlexRowWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    gap: ${({$gap = 0}) => $gap}px;
+`;

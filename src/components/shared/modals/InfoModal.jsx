@@ -27,6 +27,12 @@ const CloseButton = styled(Button)`
     width: ${({$ratio}) => $ratio * 42}px;
     height: ${({$ratio}) => $ratio * 42}px;
     z-index: 2;
+    padding: 0;
+
+    & svg {
+        margin-top: 2px;
+        margin-left: 2px;
+    }
 `;
 
 const Title = styled.h4`

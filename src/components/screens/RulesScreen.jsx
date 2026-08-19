@@ -9,6 +9,8 @@ import { RuleTextModal } from '../shared/modals/RuleTextModal';
 import { rulesTexts } from '../../constants/rulesTexts';
 import { RulePrizeModal } from "../shared/modals/RulePrizeModal";
 import { RuleIncomeModal } from '../shared/modals/RuleIncomeModal';
+import { shopInfo } from "../../constants/shopInfo";
+import { SCREENS } from "../../constants/screens";
 
 const Wrapper = styled.div`
     padding: ${({ $ratio }) => $ratio * 64}px ${({ $ratio }) => $ratio * 25}px;
@@ -27,11 +29,11 @@ const ButtonsWrapper = styled.div`
 
 const RulesScreen = () => {
     const ratio = useSizeRatio();
-    const { handleOpenModal } = useProgress();
+    const { handleOpenModal, next } = useProgress();
 
     return (
         <>
-            <BackHeader />
+            <BackHeader onBack={() => next(SCREENS.LOBBY)}/>
             <Wrapper $ratio={ratio}>
                 <Title>Правила</Title>
                 <TextStyled $ratio={ratio}>Здесь ты можешь узнать, как играть в игру и участвовать в розыгрыше.{'\n'}Жми на нужный раздел</TextStyled>

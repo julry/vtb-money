@@ -5,6 +5,7 @@ import { useSizeRatio } from '../../../hooks/useSizeRatio';
 import { useState } from 'react';
 import { useProgress } from '../../../hooks/useProgress';
 import {Text} from '../Text';
+import {FlexRowWrapper} from '../ContentWrapper';
 
 const Description = styled(motion.div)`
     position: absolute;
@@ -29,7 +30,13 @@ const InfoWrapper = styled.div`
     top: ${({$top}) => $top}px;
     left: ${({$left}) => $left}px;
     width: calc(100% - ${({$left}) => 2 * $left}px);
+    padding-top: calc(var(--spacing_x4) - 1px);
+    
+    & p {
+        width: fit-content;
+    }
 `;
+
 
 const TextWrapper = styled.div`
     background: rgba(0, 0, 0, 0.004);
@@ -53,7 +60,6 @@ const Subtite = styled(Text)`
     width: 100%;
     color: white;
     font-size: var(--font_sm);
-    margin-top: ${({ $isFirst }) => $isFirst ? 0 : 'calc(var(--spacing_x4) - 1px)'};
 `;
 
 
@@ -79,7 +85,14 @@ export const ProfileModal = ({linkRef, refLink}) => {
                 </p>
             </Description>
             <InfoWrapper $top={linkRef?.current?.offsetTop} $left={linkRef?.current?.offsetLeft}>
-                <Subtite>Реферальная ссылка</Subtite>
+                <FlexRowWrapper $gap={8 * ratio}>
+                    <Subtite>Реферальная ссылка</Subtite>
+                    <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="11" height="11" rx="3" fill="white"/>
+                        <rect x="3.5" y="2.5" width="10" height="10" rx="2.5" stroke="white"/>
+                    </svg>
+                </FlexRowWrapper>
+
                 <TextWrapper $ratio={ratio} >{refLink}</TextWrapper>
             </InfoWrapper>
         </Modal>

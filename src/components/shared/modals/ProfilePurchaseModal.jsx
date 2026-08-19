@@ -1,5 +1,14 @@
+import { useProgress } from "../../../hooks/useProgress";
+import { Modal } from "./Modal";
+
 const ProfilePurchaseModal = () => {
-    const {user}
+    const {user} = useProgress();
+
+    return (
+        <Modal>
+            
+        </Modal>
+    )
 };
 
 export default ProfilePurchaseModal;

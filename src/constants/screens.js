@@ -1,5 +1,6 @@
 export const SCREENS = {
     INTROREG: 'INTROREG',
+    INTRO: 'INTRO',
     REG: 'REG',
     WAITING: 'WAITING',
     INTRO_RULES: 'INTRO_RULES',
@@ -18,8 +19,11 @@ export const SCREENS = {
     FINISH: 'FINISH',
     PLUG: 'PLUG',
     SEX: 'SEX',
+    MINIGAMES: 'MINIGAMES'
 }
 
 export const NEXT_SCREENS = {
+    [SCREENS.INTRO]: SCREENS.INTROREG,
     [SCREENS.INTROREG]: SCREENS.REG,
+    [SCREENS.REG]: SCREENS.SEX,
 }

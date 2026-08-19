@@ -46,7 +46,7 @@ const Content = styled.div`
     --spacing_x7: ${({$sizeRatio}) => $sizeRatio * 28}px;
     --spacing_x8: ${({$sizeRatio}) => $sizeRatio * 32}px;
     --spacing_x10: ${({$sizeRatio}) => $sizeRatio * 40}px;
-    --font_xl:  ${({$sizeRatio}) => $sizeRatio * 30}px;
+    --font_xl:  ${({$sizeRatio}) => $sizeRatio * 26}px;
     --font_lg:  ${({$sizeRatio}) => $sizeRatio * 24}px;
     --font_md:  ${({$sizeRatio}) => $sizeRatio * 16}px;
     --font_sm:  ${({$sizeRatio}) => $sizeRatio * 14}px;
@@ -92,7 +92,7 @@ export function ScreenTemplate(props) {
         //     cookieAgree = localStorage.getItem('vtb_cookie2026') === 'true';
         // }
 
-        if (cookieAgree) return;
+        // if (cookieAgree) return;
 
         setIsShowCookies(true);
     }, []);

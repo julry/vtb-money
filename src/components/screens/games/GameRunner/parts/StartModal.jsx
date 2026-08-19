@@ -10,7 +10,7 @@ const ImageWrapper = styled.div`
 
     & img {
         position: absolute;
-        top: ${({$ratio}) => $ratio * 95}px;
+        top: ${({$ratio}) => $ratio * 45}px;
         left: ${({$ratio}) => $ratio * -3}px;
         right: ${({$ratio}) => $ratio * -3}px;
         width: calc(100% + ${({$ratio}) => $ratio * 6}px);

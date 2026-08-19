@@ -22,8 +22,7 @@ const Wrapper = styled.button`
     transition: background 0.3s, color 0.3s;
 
     &:disabled {
-        background: var(--btn-bg-disabled);
-        color: var(--btn-color-disabled);
+       opacity: 0.5;
     }
 `;
 
