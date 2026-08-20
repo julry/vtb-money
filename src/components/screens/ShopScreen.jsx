@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useProgress } from "../../hooks/useProgress";
 import styled from "styled-components";
 import { useSizeRatio } from "../../hooks/useSizeRatio";
@@ -11,7 +11,8 @@ import {Text} from '../shared/Text';
 import { Scrollbar } from "../shared/ScrollBar";
 import { CURRENT_WEEK } from "../../contexts/ProgressProvider";
 import {SCREENS} from '../../constants/screens';
-import { shopInfo } from "../../constants/shopInfo";
+import { Select } from "../shared/Select";
+import { faculties, universities } from "../../constants/universities";
 
 const Wrapper = styled.div`
     padding-top: ${({$ratio}) => $ratio * 64}px;
@@ -53,6 +54,15 @@ const TitleStyled = styled(Title)`
     font-size: ${({ $ratio }) => 30 * $ratio}px;
 `;
 
+const SelectWrapper = styled.div`
+    position: absolute;
+    top: 16px;
+    left: 45%;
+    width: 200px;
+    transform: translateX(-50%);
+    z-index: 30;
+`;
+
 const WEEK_TO_DATE = {
     2: '14 сентября',
     3: '21 сентября',
@@ -61,20 +71,24 @@ const WEEK_TO_DATE = {
 
 const ShopScreen = () => {
     const ratio = useSizeRatio();
+    const facultiesData = useMemo(() => 
+        faculties?.map((fac) => ({...fac, name: (universities.find(un => un.id === fac.university)?.name ?? 'Другое') + '-' + fac?.name}))
+    , [])
+    const [facId, setFacId] = useState(facultiesData[0]);
 
     const { updateShopItems, shopItems, next } = useProgress();
-
    
     useEffect(() => {
-        // shopInfo.forEach((info, index) => setTimeout(() => update(info), index * 5000));
-        const res = updateShopItems(shopInfo[9].id);
-        console.log(res);
-        // update(shopInfo[0]);
-    }, []);
+        updateShopItems(facId.id);
+    }, [facId]);
+
 
     return (
         <Wrapper $ratio={ratio}> 
             <BackHeader isShownCoins onBack={() => next(SCREENS.LOBBY)}/>
+                <SelectWrapper>
+                    <Select options={facultiesData} value={facId.name} onChoose={(id, name) => setFacId({id, name})} zIndex={30}/>
+                </SelectWrapper>
             <Scrollbar offset={4}>
                 <TitleStyled>Магазин</TitleStyled>
                 <InnerWrapper $ratio={ratio}>

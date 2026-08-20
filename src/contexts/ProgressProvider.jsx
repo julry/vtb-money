@@ -187,7 +187,6 @@ export function ProgressProvider(props) {
     }
 
     const setUserInfo = (userInfo) => {
-        console.log('setUserInfo', userInfo);
         setUser(prev => ({ ...prev, ...userInfo }));
     }
 
@@ -518,7 +517,24 @@ export function ProgressProvider(props) {
     }
 
     return { isError: true, message: 'Превышено количество попыток' };
-};
+    };
+
+    const openCell = async (cellId, cellData = {}) => {
+        updateUser({lastOpenedCell: cellId, cells: [...(user.cells ?? []), {name: cellId, start: true, ...cellData}]});
+    }
+
+    const finishCell = async (cellId, cellData = {}, changedCoins = 0, additionalData) => {
+        const cells = [...(user.cells ?? [])];
+        let coins = Math.max(0, user.totalCoins + changedCoins);
+
+        const index = cells.findIndex(cell => cell.id === cellId);
+
+        if (index !== -1) {
+            cells[index] = { ...cells[index], ...cellData, finish: true };
+        }
+
+        updateUser({cells, lastOpenedCell: undefined, totalCoins: coins, ...additionalData});
+    }
 
     const state = {
         currentScreen,
@@ -540,7 +556,8 @@ export function ProgressProvider(props) {
         updateShopItems,
         shopItems,
         prevScreen,
-        changeShopItems
+        openCell,
+        finishCell,
     }
  
     return (

@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { CommonModal } from "./CommonModal";
 import { useSizeRatio } from "../../../hooks/useSizeRatio";
 import { SCREENS } from "../../../constants/screens";
+import { useProgress } from "../../../hooks/useProgress";
 
 const TitleStyled = styled.h4`
     font-size: ${({$ratio}) => $ratio * 28}px;
@@ -11,7 +12,8 @@ const TitleStyled = styled.h4`
 `;
 
 export const GameModal = ({ title, btnText = 'Окей', isBoldTitle, children, secondBtnText }) => {
-    const {ratio, next} = useSizeRatio();
+    const ratio = useSizeRatio();
+    const { next } = useProgress();
 
     return (
         <CommonModal btnText={btnText} isDisabledAnimation secondBtnText={secondBtnText} onSecondBtnClick={() => next(SCREENS.LOBBY)}>
