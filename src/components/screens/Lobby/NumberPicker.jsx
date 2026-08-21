@@ -20,10 +20,13 @@ const PickerContainer = styled(Block)`
     border-bottom-right-radius: 0;
     user-select: none;
     z-index: 10;
+    overflow: hidden;
     ${({$isBlured}) => $isBlured ? 'filter: blur(5px)' : ''};
 `;
 
 const PickerTitle = styled(Title)`
+    position: relative;
+    z-index: 13;
   font-size: var(--font_md);
   margin-bottom: var(--spacing_x2);
 `;
@@ -37,16 +40,12 @@ const PickerWrapper = styled.div`
 
 const Indicator = styled.div`
   position: absolute;
-  top: 0;
+  top: var(--spacing_x3);
   left: 50%;
   transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 12px solid #1e40af;
-  z-index: 10;
-  filter: drop-shadow(0 2px 2px rgba(30, 64, 175, 0.3));
+  width: 22px;
+  height: 20px;
+  z-index: 20;
 `;
 
 const Stage = styled.div`
@@ -93,7 +92,7 @@ const Blur = styled.div`
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 40%;
+    width: calc(50% - 20px);
     left: 0;
     z-index: 9;
     background: linear-gradient(90deg,rgba(172, 192, 253, 1) 0%, rgba(172, 192, 253, 0) 100%);
@@ -105,7 +104,7 @@ const BlurRight = styled(Blur)`
     left: auto;
 `
 
-const NumberPicker = ({ value = 3, onChange, isBlured }) => {
+const NumberPicker = ({ value = 3, onChange, isBlured, disabledPick, ...props }) => {
     const ratio = useSizeRatio();
     const [currentIndex, setCurrentIndex] = useState(
         Math.max(0, numbers.indexOf(value))
@@ -117,11 +116,14 @@ const NumberPicker = ({ value = 3, onChange, isBlured }) => {
     const updateIndex = (newIndex) => {
         if (newIndex < 0 || newIndex >= numbers.length) return;
         setCurrentIndex(newIndex);
-        // onChange?.(numbers[newIndex]);
     };
 
 
     const pickNumber = (index) => {
+        if (disabledPick) {
+            return;
+        }
+
         if (index === currentIndex) {
             onChange?.(numbers[index]);
             return;
@@ -131,6 +133,9 @@ const NumberPicker = ({ value = 3, onChange, isBlured }) => {
 
     // Свайп
     const handleTouchStart = (e) => {
+        if (disabledPick) {
+            return;
+        }
         startX.current = e.touches[0].clientX;
         isDragging.current = true;
     };
@@ -149,6 +154,9 @@ const NumberPicker = ({ value = 3, onChange, isBlured }) => {
 
     // Колёсико
     const handleWheel = (e) => {
+        if (disabledPick) {
+            return;
+        }
         e.preventDefault();
         if (e.deltaY > 0) updateIndex(currentIndex + 1);
         else if (e.deltaY < 0) updateIndex(currentIndex - 1);
@@ -189,7 +197,9 @@ const NumberPicker = ({ value = 3, onChange, isBlured }) => {
     };
 
     return (
-        <PickerContainer $ratio={ratio} $isBlured={isBlured}>
+        <PickerContainer $ratio={ratio} $isBlured={isBlured} {...props}>
+            <Blur />
+            <BlurRight />
             <PickerTitle>
                 На сколько шагов
                 <br />
@@ -201,9 +211,26 @@ const NumberPicker = ({ value = 3, onChange, isBlured }) => {
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
             >
-                <Blur />
-                <BlurRight />
-                <Indicator />
+                <Indicator>
+                    <svg width="100%" height="100%" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g filter="url(#filter0_i_1025_11143)">
+                        <path d="M8.84378 17.1875C9.64566 18.5764 11.6503 18.5764 12.4522 17.1875L19.9698 4.16667C20.7717 2.77778 19.7693 1.04167 18.1656 1.04167H3.13043C1.52667 1.04167 0.524327 2.77778 1.3262 4.16667L8.84378 17.1875Z" fill="#004CDA"/>
+                        </g>
+                        <path d="M8.39258 17.4482C9.39495 19.1841 11.9009 19.1841 12.9033 17.4482L20.4209 4.42676C21.4229 2.69082 20.1704 0.520818 18.166 0.520508H3.13086C1.12629 0.520508 -0.12702 2.6907 0.875 4.42676L8.39258 17.4482Z" stroke="white" stroke-width="1.04167"/>
+                        <defs>
+                        <filter id="filter0_i_1025_11143" x="0" y="0" width="22.3385" height="19.9653" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dx="1.04167" dy="0.694444"/>
+                        <feGaussianBlur stdDeviation="0.694444"/>
+                        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0"/>
+                        <feBlend mode="normal" in2="shape" result="effect1_innerShadow_1025_11143"/>
+                        </filter>
+                        </defs>
+                    </svg>
+                </Indicator>
                 <Stage>
                     {numbers.map((num, index) => (
                         <Item

@@ -5,6 +5,7 @@ import {MovingBlock} from '../MovingBlock';
 import { useProgress } from '../../../hooks/useProgress';
 import { Modal } from './Modal';
 import turns from '../../../assets/images/turns.webp';
+import NumberPicker from '../../screens/Lobby/NumberPicker';
 
 const TitleStyled = styled.h3`
     font-size: ${({$ratio}) => $ratio * 28}px;
@@ -29,6 +30,10 @@ const TurnsButton = styled(Button)`
     }
 `;
 
+const PickerStyled = styled(NumberPicker)`
+    box-shadow: 0px 0px 10px #FFFFFF;
+`;
+
 export const TurnsInfoModal = () => {
     const { handleCloseModal, user } = useProgress();
     const ratio = useSizeRatio();
@@ -45,6 +50,7 @@ export const TurnsInfoModal = () => {
                 <br />
                 <p>Нажимай на цифру снизу, она равняется количеству клеток, на которое ты шагнёшь вперёд</p>
             </MovingBlock>
+            <PickerStyled disabledPick/>
         </Modal>
     )
 }
