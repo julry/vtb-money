@@ -12,10 +12,9 @@ const Wrapper = styled(motion.div)`
     justify-content: center;
 `;
 
-export const Modal = ({ isDarken, isOpen, isDisabledAnimation, ...props }) => (
+export const Modal = ({ isDisabledAnimation, ...props }) => (
     <Wrapper
         {...props}
-        $isDarken={isDarken}
         initial={{
             opacity: isDisabledAnimation ? 1 : 0,
         }}

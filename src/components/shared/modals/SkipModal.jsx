@@ -25,7 +25,7 @@ export const SkipModal = ({ isOpen, onClose, onExit }) => {
     const ratio = useSizeRatio();
 
     return (
-    <ModalStyled isDarken isOpen={isOpen}>
+    <ModalStyled isOpen={isOpen}>
     </ModalStyled>
 );
 

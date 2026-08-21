@@ -2,20 +2,16 @@ import styled from "styled-components";
 import { Button } from "./Button";
 import coinIcon from '../../assets/images/coinImg.webp';
 import ticket from '../../assets/images/ticket.webp';
-import questionIcon from '../../assets/images/question.webp';
 import { useSizeRatio } from "../../hooks/useSizeRatio";
 import { useProgress } from "../../hooks/useProgress";
-import { useTimer } from "../../hooks/useTimer";
-import { CommonModal } from "./modals";
 import { CloseIcon } from "./CloseIcon";
-import {RuleTextModal} from './modals/RuleTextModal';
-import {rulesTexts} from '../../constants/rulesTexts';
 import { Logo } from "./Logo";
+import { CoinsInfoModal } from "./modals/CoinsInfoModal";
 
 const Header = styled.div`
     display: flex;
     width: 100%;
-    justify-content: space-between;
+    justify-content: ${({$isOnlyRight}) => $isOnlyRight ? 'flex-end' : 'space-between'};
     align-items: flex-start;
     position: absolute;
     top: calc(var(--spacing_x6) / 1.6);
@@ -63,7 +59,7 @@ const LogoWrapper = styled.div`
   padding-left:  ${({$ratio}) => $ratio * 13}px; 
 `;
 
-export const BackHeader = ({ className, onBack, isShownExit = true, isShownTickets, isShownCoins }) => {
+export const BackHeader = ({ className, isDisabledBtns, onBack, isShownExit = true, isHiddenLogo, isShownTickets, isShownCoins }) => {
     const { user, handleOpenModal } = useProgress();
 
     const coins = (user.totalCoins ?? 0).toLocaleString();
@@ -78,33 +74,43 @@ export const BackHeader = ({ className, onBack, isShownExit = true, isShownTicke
        return Math.max(105 + (10 * (coins.length - 5)), 105);
     }
 
-    //TODO: сделать компонент для монет чтобы выделялась сама кнопка
     const handleOpenCoinsModal = () => {
+        if (isDisabledBtns) {
+            return;
+        }
+
         handleOpenModal({
             Component: (
-                <RuleTextModal
-                    title="Коины"
-                    text={rulesTexts.coins}
-                />
-            )
+                <CoinsInfoModal />
+            ),
+            isBlurTransitionDisabled: true,
+            blurSize: 5,
         })
+    }
+
+    const handleBack = () => {
+        if (isDisabledBtns) {
+            return;
+        }
+
+        onBack?.();
     }
 
     return (
         <>
-            <Header className={className}>
-                {isShownExit ?  (
-                    <ExitButton $ratio={ratio} onClick={onBack} width={65}>
+            <Header className={className} $isOnlyRight={!isShownExit && isHiddenLogo}>
+                {isShownExit ? (
+                    <ExitButton $ratio={ratio} onClick={handleBack} width={65}>
                         <CloseIcon />
                     </ExitButton>
-                ) : (
+                ) : !isHiddenLogo && (
                     <LogoWrapper $ratio={ratio}>
                         <Logo isWhiteVersion/>
                     </LogoWrapper>
                 )}
                 
                 {isShownCoins && (
-                    <CoinsButton $ratio={ratio} width={getCoinsButtonLength()}>
+                    <CoinsButton $ratio={ratio} width={getCoinsButtonLength()} onClick={handleOpenCoinsModal}>
                         <CoinIcon $ratio={ratio} src={coinIcon} alt="" />
                         <p>{coins}</p>
                     </CoinsButton>

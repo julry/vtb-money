@@ -16,6 +16,7 @@ import NumberPicker from "./NumberPicker";
 import { GAME_CELLS } from "./constants";
 import {UnfinishedModal} from './UnfinishedModal';
 import { CellModal } from "../../shared/modals/CellModal";
+import { TurnsInfoModal } from "../../shared/modals/TurnsInfoModal";
 
 const ButtonStyled = styled(Button)`
     position: absolute;
@@ -81,7 +82,7 @@ const Lobby = () => {
     const handleClose = () => {
         const lastCell = GAME_CELLS.find(({id}) => id === user.lastOpenedCell);
         setGameState(lastCell);
-        
+
         handleOpenModal({
             Component: <CellModal cell={lastCell} />
         });
@@ -98,10 +99,18 @@ const Lobby = () => {
         setCellIndex(prev => prev + number)
     }
 
+    const handleOpenTurnInfo = () => {
+        handleOpenModal({
+            Component: <TurnsInfoModal />,
+            blurSize: 5,
+            isBlurTransitionDisabled: true,
+        });
+    }
+
     return (
         <FlexWrapper>
             <BackHeader isShownExit={false} isShownCoins/>
-            <TurnsButton $ratio={ratio} width={user.turns > 9 ? 80 : 65}>
+            <TurnsButton $ratio={ratio} width={user.turns > 9 ? 80 : 65} onClick={handleOpenTurnInfo}>
                 <img src={turns} alt="Ходов"/>
                 <p>{user.turns}</p>
             </TurnsButton>
