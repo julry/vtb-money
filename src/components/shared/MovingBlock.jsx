@@ -43,17 +43,17 @@ const CloseButton = styled(Button)`
 `;
 
 
-export const MovingBlock = ({children, onClose, top = 326, right = -89, width = 394, ...props}) => {
+export const MovingBlock = ({children, isInitial = true, onClose, top = 326, right = -89, width = 394, ...props}) => {
     const ratio = useSizeRatio();
 
     return (
         <Description 
             $ratio={ratio} 
-            initial={{x: width * ratio}}
+            initial={isInitial ? {x: width * ratio} : {}}
             $width={width}
             $top={top}
             $right={right}
-            animate={{x: 0}} 
+            animate={isInitial ? {x: 0} : {}} 
             exit={{x: width * ratio}}
             transition={{duration: 0.25}}
             {...props}

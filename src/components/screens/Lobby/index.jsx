@@ -19,6 +19,7 @@ import { CellModal } from "../../shared/modals/CellModal";
 import { TurnsInfoModal } from "../../shared/modals/TurnsInfoModal";
 import { SettingsModal } from "../../shared/modals/SettingsModal";
 import { OnBoardingModal } from "../../shared/modals/OnboardingModal";
+import { FinishedTurnsModal } from "./FinishedTurnsModal";
 
 const ButtonStyled = styled(Button)`
     position: absolute;
@@ -46,7 +47,8 @@ const TurnsButton = styled(Button)`
     border-bottom-right-radius: 0;
     justify-content: flex-start;
     max-height: ${({$ratio}) => $ratio * 42}px;
-    z-index: var(--header-z-index);
+    z-index: calc(var(--header-z-index) + 1);
+
 
     & img {
         width:${({$ratio}) => $ratio * 37}px;
@@ -57,6 +59,7 @@ const TurnsButton = styled(Button)`
 //TODO: kill after test
 const SettingsButton = styled(TurnsButton)`
     top: ${({$ratio}) => 125 * $ratio}px;
+   z-index: calc(var(--header-z-index) + 1);
 
     & svg {
         width:${({$ratio}) => $ratio * 30}px;
@@ -66,7 +69,7 @@ const SettingsButton = styled(TurnsButton)`
 
 const Lobby = () => {
     const ratio = useSizeRatio();
-    const { next, user, handleOpenModal, updateUser, setGameState, isMapHidden } = useProgress();
+    const { next, user, handleOpenModal, updateUser, setGameState, isMapHidden, isFinishedTurnsModal } = useProgress();
     //мб перенести в отдельный стейт
     const lastCell = useMemo(() => {
         if (user.lastOpenedCell) {
@@ -90,6 +93,7 @@ const Lobby = () => {
         
         return () => document.body.removeEventListener('touchmove', preventDefault);
     }, []);
+
 
     useEffect(() => {
         if (!user.seenStartInfo) {
@@ -135,6 +139,9 @@ const Lobby = () => {
         });
     }
 
+    const handleCheckTurns = () => {
+    }
+
     return (
         <FlexWrapper>
             <BackHeader isShownExit={false} isShownCoins/>
@@ -161,11 +168,16 @@ const Lobby = () => {
             <ButtonStyled $ratio={ratio}  $top={(user.isTargeted ? 260 : 199) * ratio} type="transparent" onClick={() => next(SCREENS.RULES)}>
                 <img src={rules} alt="Правила"/>
             </ButtonStyled>
-            {!isMapHidden && <PathMap isBlured={isUnfinishedModal} centerCellId={lastCell} cellIndex={cellIndex}/>}
+            {!isMapHidden && <PathMap onCheckTurns={handleCheckTurns} isBlured={isUnfinishedModal} centerCellId={lastCell} cellIndex={cellIndex}/>}
             <NumberPicker isBlured={isUnfinishedModal} onChange={handleMakeTurn}/>
             {isUnfinishedModal && (
                 <UnfinishedModal lastOpenedCell={user.lastOpenedCell} onClose={handleClose}/>
             )}
+            {
+                isFinishedTurnsModal && (
+                    <FinishedTurnsModal />
+                )
+            }
         </FlexWrapper>
     )
 };

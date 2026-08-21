@@ -14,19 +14,15 @@ const TitleStyled = styled.h3`
     margin-bottom: ${({$ratio}) => $ratio * 10}px;
 `;
 
-const ButtonStyled = styled(Button)`
-    color: white;
-`
 
-export const UnfinishedModal = ({onClose}) => {
+export const FinishedTurnsModal = () => {
     const ratio = useSizeRatio();
 
     return (
         <ModalStyled>
-            <MovingBlock top={366} right={-80}>
-                <TitleStyled $ratio={ratio}>Поле неактивно</TitleStyled>
-                <p>Чтобы продвигаться по полю дальше, тебе нужно согласиться или отказаться от условий клетки</p>
-                <ButtonStyled type="transparent" mt={"var(--spacing_x5)"} onClick={onClose}>Сделать выбор</ButtonStyled>
+            <MovingBlock isInitial={false} top={366} right={-80}>
+                <TitleStyled $ratio={ratio}>5 ходов сделаны! </TitleStyled>
+                <p>Приходи на следующей неделе делать новые. Пока можешь поиграть в бесконечные мини‑игры по кнопке джойстика</p>
             </MovingBlock>
         </ModalStyled>
     )

@@ -9,6 +9,7 @@ import { useCallback } from 'react';
 import { BASE_LOCK_TIMEOUT, INITIAL_STATE, INITIAL_USER, MAX_LOCK_TIMEOUT, MAX_RETRIES, MAX_TURNS_PER_WEEK, RETRY_DELAY } from './constants';
 import { ProgressContext } from './ProgressContext';
 import { GENDERS } from '../constants/genders';
+import turns from '../assets/images/turns.webp';
 
 const getMoscowTime = (date) => {
     const dateNow = date ?? new Date();
@@ -51,6 +52,7 @@ export function ProgressProvider(props) {
     const [isMapHidden, setIsMapHidden] = useState(false);
     const [shopItems, setShopItems] = useState([]);
     const [tgError, setTgError] = useState({isError: false, message: ''});
+    const [isFinishedTurnsModal, setFinishedTurnsModal] = useState(!user.lastOpenedCell && user.turns < 1);
 
     const client = useRef();
     const clientShop = useRef();
@@ -96,6 +98,7 @@ export function ProgressProvider(props) {
             if (data?.email && !data.weekEnter[`week${CURRENT_WEEK}`]) {
                 const newCoins = data.totalCoins + data.newWeekCoins;
                 const coinsKoefed = newCoins * data.coinsKoefs;
+                //TODO: пересмотреть концепцию выдачи ходов
                 const newTurns = data.turns + MAX_TURNS_PER_WEEK;
                 const newWeekEnter = {...data.weekEnter, [`week${CURRENT_WEEK}`]: true}
                 const updatedData = {
@@ -562,6 +565,9 @@ export function ProgressProvider(props) {
             cells[index] = { ...cells[index], ...cellData, finish: true };
         }
 
+        if (user.turns < 1) {
+            setFinishedTurnsModal(true);
+        }
         updateUser({cells, lastOpenedCell: null, totalCoins: coins, ...additionalData});
     }
 
@@ -591,6 +597,7 @@ export function ProgressProvider(props) {
         isFemale,
         setIsMapHidden,
         isMapHidden,
+        isFinishedTurnsModal
     }
  
     return (
