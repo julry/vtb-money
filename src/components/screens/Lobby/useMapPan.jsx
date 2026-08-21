@@ -23,6 +23,7 @@ export function useMapPan({
   const offsetRef = useRef({ x: 0, y: 0 });
   const isDragging = useRef(false);
   const lastPos = useRef({ x: 0, y: 0 });
+  const hasCenteredOnce = useRef(false);
   const rafId = useRef(0);
   const lastVisibleUpdate = useRef(0);
 
@@ -103,33 +104,53 @@ export function useMapPan({
   );
 
   const centerOnCell = useCallback(
-    (cellId) => {
-      const cell = cells.find((c) => c.id === cellId);
-      if (!cell || !viewportRef.current) return;
+  (cellId, { instant = false } = {}) => {
+    if (isDragging.current) return;
 
-      const { clientWidth: vw, clientHeight: vh } = viewportRef.current;
+    const cell = cells.find((c) => c.id === cellId);
+    if (!cell || !viewportRef.current) return;
 
-      const w = cell.width ?? cellWidth;
-      const h = cell.height ?? cellHeight;
+    const { clientWidth: vw, clientHeight: vh } = viewportRef.current;
+    const { mapW: w, mapH: h } = mapSizeRef.current;
 
-      const cellCenterX = cell.x * cellWidth + w / 2 + (cell.marginLeft ?? 0);
-      const cellCenterY = cell.y * cellHeight + h / 2 + (cell.marginTop ?? 0);
+    const cellW = cell.width ?? cellWidth;
+    const cellH = cell.height ?? cellHeight;
 
-      const desired = {
-        x: vw / 2 - cellCenterX,
-        y: vh / 2 - cellCenterY,
-      };
+    const cellCenterX = cell.x * cellWidth + cellW / 2 + (cell.marginLeft ?? 0);
+    const cellCenterY = cell.y * cellHeight + cellH / 2 + (cell.marginTop ?? 0);
 
-      const clamped = applyTransform(desired.x, desired.y, { clamp: true });
-      animateTo(clamped.x, clamped.y);
-    },
-    [cells, cellWidth, cellHeight, viewportRef, applyTransform, animateTo]
-  );
+    let targetX = vw / 2 - cellCenterX;
+    let targetY = vh / 2 - cellCenterY;
 
-  useEffect(() => {
-    const t = setTimeout(() => centerOnCell(centerCellId), 0);
-    return () => clearTimeout(t);
-  }, [centerCellId, centerOnCell]);
+    if (w > 0 && h > 0 && vw > 0 && vh > 0) {
+      const clamped = clampOffset(targetX, targetY, w, h, vw, vh, paddingRef.current);
+      targetX = clamped.x;
+      targetY = clamped.y;
+    }
+
+    // первое центрирование — мгновенно
+    if (instant || !hasCenteredOnce.current) {
+      hasCenteredOnce.current = true;
+      applyTransform(targetX, targetY);
+      setOffset({ x: targetX, y: targetY });
+      return;
+    }
+
+    // дальше — только анимация
+    animateTo(targetX, targetY);
+  },
+  [cells, cellWidth, cellHeight, viewportRef, applyTransform, animateTo]
+);
+const centerOnCellRef = useRef(centerOnCell);
+centerOnCellRef.current = centerOnCell;
+
+useEffect(() => {
+  const t = setTimeout(() => {
+    // на маунте instant = true, потом обычная анимация
+    centerOnCellRef.current(centerCellId, { instant: !hasCenteredOnce.current });
+  }, 0);
+  return () => clearTimeout(t);
+}, [centerCellId]);
 
   useEffect(() => {
     if (!mapW || !mapH || !viewportRef.current) return;

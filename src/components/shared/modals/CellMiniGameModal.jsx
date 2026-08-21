@@ -11,6 +11,10 @@ import { useProgress } from "../../../hooks/useProgress";
 const BlockStyled = styled(Block)`
     position: relative;
     padding: ${({$ratio}) => $ratio * 20}px ${({$ratio}) => $ratio * 23}px ${({$ratio}) => $ratio * 23}px;
+    & button {
+        position: relative;
+        z-index: 2;
+    }
 `;
 
 const TextWrapper = styled.div`

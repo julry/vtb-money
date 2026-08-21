@@ -20,6 +20,7 @@ const PickerContainer = styled(Block)`
     border-bottom-right-radius: 0;
     user-select: none;
     z-index: 10;
+    ${({$isBlured}) => $isBlured ? 'filter: blur(5px)' : ''};
 `;
 
 const PickerTitle = styled(Title)`
@@ -104,7 +105,7 @@ const BlurRight = styled(Blur)`
     left: auto;
 `
 
-const NumberPicker = ({ value = 3, onChange }) => {
+const NumberPicker = ({ value = 3, onChange, isBlured }) => {
     const ratio = useSizeRatio();
     const [currentIndex, setCurrentIndex] = useState(
         Math.max(0, numbers.indexOf(value))
@@ -188,7 +189,7 @@ const NumberPicker = ({ value = 3, onChange }) => {
     };
 
     return (
-        <PickerContainer $ratio={ratio}>
+        <PickerContainer $ratio={ratio} $isBlured={isBlured}>
             <PickerTitle>
                 На сколько шагов
                 <br />

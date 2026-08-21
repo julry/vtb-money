@@ -39,7 +39,7 @@ const World = styled.div`
 `;
 
 export default function GameDoodle() {
-  const { handleOpenModal } = useProgress();
+  const { handleOpenModal, gameState, finishCell} = useProgress();
   const {
     containerRef, handlePointerDown, handlePointerMove, handlePointerUp,
     worldRef, characterRef, togglePause, scoreElementRef,
@@ -67,6 +67,9 @@ export default function GameDoodle() {
 
   const handleFinish = useCallback(() => {
     forceGameOver();
+    if (gameState?.id) {
+        finishCell(gameState?.id);
+    } 
     handleOpenModal({
         Component: <EndModal title={"Ура! Ты достиг\nвершины"} subTitle={`и заработал ${getPluralCoins(stateRef?.current?.coinsCollected ?? 0)}`} />,
     })
@@ -76,6 +79,10 @@ export default function GameDoodle() {
     if (!gameOver) {
         return;
     }
+
+    if (gameState?.id) {
+        finishCell(gameState?.id);
+    } 
 
      handleOpenModal({
         Component: <EndModal title={"О нет, ты улетел!"} subTitle={`Но ничего страшного, ты успел заработать ${getPluralCoins(stateRef?.current?.coinsCollected ?? 0)}`} />,

@@ -11,6 +11,8 @@ import { Title } from "../shared/Title";
 import { Button } from "../shared/Button";
 import { useProgress } from "../../hooks/useProgress";
 import { SCREENS } from "../../constants/screens";
+import { CURRENT_WEEK } from "../../contexts/ProgressProvider";
+import { GENDERS } from "../../constants/genders";
 
 const CARDS = [
     {
@@ -81,7 +83,7 @@ const TitleStyled = styled(Title)`
 
 const SexScreen = () => {
     const ratio = useSizeRatio();
-    const { next } = useProgress();
+    const { next, registrateUser } = useProgress();
     const [[currentIndex, direction], setCurrentIndex] = useState([0, 0]);
 
     const nextSlide = () => {
@@ -115,6 +117,18 @@ const SexScreen = () => {
         })
     };
 
+    const handleClick = () => {
+        registrateUser({gender: currentIndex === 0 ? GENDERS.Female : GENDERS.Male});
+
+        if (CURRENT_WEEK < 1) {
+            next(SCREENS.WAITING);
+
+            return;
+        }
+
+        next(SCREENS.LOBBY);
+    }
+
     return (
         <FlexWrapper>
             <LogoOutlined />
@@ -146,7 +160,7 @@ const SexScreen = () => {
                     </CardStyled>
                 </AnimatePresence>
             </Wrapper>
-            <Button width={275 * ratio} onClick={() => next(SCREENS.WAITING)}>Выбрать</Button>
+            <Button width={275 * ratio} onClick={handleClick}>Выбрать</Button>
         </FlexWrapper>
     )
 };

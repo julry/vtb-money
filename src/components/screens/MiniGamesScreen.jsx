@@ -21,6 +21,9 @@ const Wrapper = styled(Modal)`
 const ContentWrapper = styled.div`
     height: 100%;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: ${({$ratio}) => $ratio * 64}px  ${({$ratio}) => $ratio * 25}px ${({$ratio}) => $ratio * 25}px;
 `;
 
@@ -49,35 +52,37 @@ const Image = styled.img`
     z-index: ${({$zIndex}) => $zIndex ?? 1};
 `;
 
-const Collectables = styled(Image)`
-    transform: translate(-50%, -50%) rotate(45deg);
-`;
-
-
 const FlexRowWrapperStyled = styled(FlexRowWrapper)`
     justify-content: space-between;
     margin-top: var(--spacing_x3);
+    width: 100%;
+    max-width: ${({$ratio}) => $ratio * 350}px;
 `;
 
 const MiniGamesScreen = () => {
-    const { handleOpenModal, next, handleCloseModal } = useProgress();
+    const { handleOpenModal, next, handleCloseModal, setGameState } = useProgress();
     const ratio = useSizeRatio();
+
+    const handleClick = (screen) => {
+        setGameState({isInfinite: true});
+        next(screen);
+    }
 
     useLayoutEffect(() => {
         handleOpenModal({
             Component: (
                 <Wrapper>
-                    <BackHeader onBack={() => next(SCREENS.LOBBY)}/>
+                    <BackHeader onBack={() => handleClick(SCREENS.LOBBY)}/>
                     <ContentWrapper $ratio={ratio}>
                         <Title>Мини-игры</Title>
-                        <FlexRowWrapperStyled>
-                            <div onClick={() => next(SCREENS.GAMEMATCH3)}>
+                        <FlexRowWrapperStyled $ratio={ratio}>
+                            <div onClick={() => handleClick(SCREENS.GAMEMATCH3)}>
                                 <Text>Три в ряд</Text>
                                 <GameInfo $ratio={ratio}>
                                     <Image src={match3} alt=""/>
                                 </GameInfo>
                             </div>
-                            <div onClick={() => next(SCREENS.GAMERUNNER)}>
+                            <div onClick={() => handleClick(SCREENS.GAMERUNNER)}>
                                 <Text>Раннер</Text>
                                 <GameInfo $ratio={ratio}>
                                     <Image src={runner} alt="" $width={196 * ratio} $height={157 * ratio}/>
@@ -86,21 +91,21 @@ const MiniGamesScreen = () => {
                                 </GameInfo>
                             </div>
                         </FlexRowWrapperStyled>
-                        <FlexRowWrapperStyled>
+                        <FlexRowWrapperStyled $ratio={ratio}>
                             <div>
                                 <Text>???</Text>
                                 <GameInfo $ratio={ratio}>
                                 </GameInfo>
                             </div>
-                            <div onClick={() => next(SCREENS.GAME2048)}>
+                            <div onClick={() => handleClick(SCREENS.GAME2048)}>
                                 <Text>2048</Text>
                                 <GameInfo $ratio={ratio}>
                                     <Image src={numbers} $top={'60%'} $width={212 * ratio} $height={183 * ratio} alt=""/>
                                 </GameInfo>
                             </div>
                         </FlexRowWrapperStyled>
-                        <FlexRowWrapperStyled>
-                            <div onClick={() => next(SCREENS.GAMECROSS)}>
+                        <FlexRowWrapperStyled $ratio={ratio}>
+                            <div onClick={() => handleClick(SCREENS.GAMECROSS)}>
                                 <Text>Crossy Road</Text>
                                 <GameInfo $ratio={ratio} >
                                     <Image src={cross} $width={131 * ratio} $height={124 * ratio} alt=""/>

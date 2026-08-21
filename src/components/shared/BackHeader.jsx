@@ -66,7 +66,7 @@ const LogoWrapper = styled.div`
 export const BackHeader = ({ className, onBack, isShownExit = true, isShownTickets, isShownCoins }) => {
     const { user, handleOpenModal } = useProgress();
 
-    const coins = user.totalCoins.toLocaleString();
+    const coins = (user.totalCoins ?? 0).toLocaleString();
     const tickets = (user.bilets ?? 0).toLocaleString();
     const ratio = useSizeRatio();
 
@@ -104,7 +104,7 @@ export const BackHeader = ({ className, onBack, isShownExit = true, isShownTicke
                 )}
                 
                 {isShownCoins && (
-                    <CoinsButton $ratio={ratio} onClick={handleOpenCoinsModal} width={getCoinsButtonLength()}>
+                    <CoinsButton $ratio={ratio} width={getCoinsButtonLength()}>
                         <CoinIcon $ratio={ratio} src={coinIcon} alt="" />
                         <p>{coins}</p>
                     </CoinsButton>

@@ -8,6 +8,7 @@ import { DESCRIPTION_EXIT_DURATION } from '../constants';
 import { useProgress } from "../../../../../hooks/useProgress";
 import { motion } from "framer-motion";
 import {Board} from './Board';
+import { MovingBlock } from "../../../../shared/MovingBlock";
 
 const ModalStyled = styled(Modal)`
     padding: ${({$ratio}) => $ratio * 155}px ${({ $ratio }) => $ratio * 25}px 0;
@@ -41,12 +42,11 @@ const FingerMoving = styled(motion.img)`
     z-index: 2;
 `;
 
-export const RulesMatch3Modal = () => {
+export const RulesMatch3Modal = ({onFinish}) => {
     const ratio = useSizeRatio();
     const [isClosing, setIsClosing] = useState(false);
     const { handleCloseModal } = useProgress();
     const { selected, board, handleCellClick, handleTouchStart, handleTouchEnd, touchStartRef } = useGame({isRules: true});
-
 
     const handleClick = (r, c) => {
         handleCellClick(r, c);
@@ -76,11 +76,17 @@ export const RulesMatch3Modal = () => {
             return;
         } 
 
-        setIsClosing(true);
         handleTouchEnd(e);
+        console.log(onFinish);
+        onFinish?.();
+        closeModal();
+    };
+
+    const closeModal = () => {
+        setIsClosing(true);
 
         setTimeout(() => handleCloseModal?.(), 500);
-    };
+    }
 
     return (
         <ModalStyled $ratio={ratio} isDisabledAnimation>
@@ -105,7 +111,7 @@ export const RulesMatch3Modal = () => {
                     transition={{repeatType: 'reverse', repeat: Infinity, duration: 0.7}}
                 />
             )}
-            <Description $ratio={ratio} animate={isClosing ? {x: 330} : {}} transition={{duration: DESCRIPTION_EXIT_DURATION / 1000}}>
+            <MovingBlock top={390} $ratio={ratio} onClose={closeModal}>
                 <p>
                     Тапни по активу и свайпни его на соседнюю клетку, чтобы поменять их местами
                 </p>
@@ -113,7 +119,7 @@ export const RulesMatch3Modal = () => {
                 <p>
                     Собери 3 и больше одинаковых элементов в ряд!
                 </p>
-            </Description>
+            </MovingBlock>
         </ModalStyled>
     )
 }

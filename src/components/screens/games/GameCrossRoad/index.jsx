@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import {LANE_HEIGHT, START_LANE, COLORS, PERS_IMAGES, TRASH_IMAGES, PERSON_HEIGHT, PERSON_WIDTH, TILE_SIZE} from './constants';
+import {PERS_IMAGES, PERSON_HEIGHT, PERSON_WIDTH, TILE_SIZE, PERS_IMAGES_F} from './constants';
 import { useGame } from './useGame';
 import { useLayoutEffect, memo, useRef, useState, useCallback, useMemo } from 'react';
 import { BackHeaderGame } from '../../../shared/BackHeaderGame';
@@ -7,6 +7,11 @@ import { useProgress } from '../../../../hooks/useProgress';
 import { StartCrossModal } from './parts/StartModal';
 import { RulesModal } from './parts/RulesModal';
 import { Lane } from './parts/Lane';
+import { WEEK_TO_TIMER, MAX_INFINITE } from '../constants';
+import { CURRENT_WEEK } from '../../../../contexts/ProgressProvider';
+import { EndModal } from '../../../shared/modals/EndModal';
+import { getPluralCoins } from '../../../../utils/getPluralCoins';
+import { SCREENS } from '../../../../constants/screens';
 
 const GameContainer = styled.div`
   position: relative;
@@ -38,7 +43,6 @@ const PlayerDiv = styled.div`
   height: ${PERSON_HEIGHT}px;
   border-radius: 8px;
   z-index: 50;
-  /* box-shadow: inset 0 0 3px 1px red; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -48,7 +52,7 @@ const PlayerDiv = styled.div`
 
   & img {
     position: absolute;
-    top: calc(-1 * (105px - ${PERSON_HEIGHT}px));
+    top: calc(-1 * (125px - ${PERSON_HEIGHT}px));
     left: calc(-1.2 * ${PERSON_WIDTH / 2}px);
     transform: rotate(-10deg);
     width: 52px;
@@ -60,7 +64,56 @@ const PlayerDiv = styled.div`
 
 export default function GameCrossRoad() {
     const [isRules, setIsRules] = useState(false);
-    const { handleOpenModal } = useProgress();
+    const { handleOpenModal, gameState, user, next, updateUser, finishCell, isFemale } = useProgress();
+
+    const finishGame = useCallback(({isFromGame, score}) => {
+        let coins = 0;
+        const newInfiniteCoins = [...(user.infiniteCoins ?? [])];
+        const newGameInfo = { ...(user.crossyroad ?? {}), hasPlayed: true };
+
+        if (gameState?.incomes?.length > 0) {
+            let coinsIndex = 0;
+
+            if (score >= 31) {
+                coinsIndex = 1;
+            }
+
+            if (score > 50) {
+                coinsIndex = 2;
+            }
+
+            coins = gameState.incomes[coinsIndex];
+            newGameInfo.coins = newGameInfo.coins + coins;
+        } else {
+            if (score >= 30 && user.infiniteCoins[CURRENT_WEEK - 1] < MAX_INFINITE) {
+                coins = 10;
+                newInfiniteCoins[CURRENT_WEEK - 1] += 10;
+                newGameInfo.coinsInfinity = newGameInfo.coinsInfinity + coins;
+            }
+        }
+
+        if (gameState?.id) {
+            finishCell(gameState?.id, { coinsAdd: coins, score }, coins, {crossyroad: newGameInfo});
+        } else {
+            updateUser({ totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, crossyroad: newGameInfo })
+        }
+        //TODO: нужно ?? sex message
+        const title = isFromGame ? 'Траты не обошли тебя стороной' : `Ты преодолел путь`;
+        const subTitle = `${isFromGame ? 'Но это не страшно:\nты ' : 'и '}заработал ${getPluralCoins(coins)}`;
+
+        const isGameMode = gameState?.isInfinite;
+        handleOpenModal({
+            Component: (
+                <EndModal 
+                    onClose={isGameMode ? resetGame : next(SCREENS.LOBBY)} 
+                    isGameMode={isGameMode} 
+                    title={title} 
+                    subTitle={subTitle} 
+                />
+            )
+        })
+    }, []);
+
     const {
         onTouchStart,
         onTouchEnd,
@@ -79,7 +132,7 @@ export default function GameCrossRoad() {
         pauseGame,
         playerYRef,
         heightRef
-    } = useGame();
+    } = useGame({onDie: finishGame});
 
     useLayoutEffect(() => {
         resetGame();
@@ -105,33 +158,45 @@ export default function GameCrossRoad() {
         pauseGame();
     }, [isRules]);
 
-  return (
-    <>
-      <BackHeaderGame onRulesClick={handleToggleRules} isHidden={isRules} timerData={{isStart: gameStarted, initialTime: 50, onFinish: die}} currentPoints={score}/>
-      <GameContainer onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        <RotatedWorld ref={worldRef} $scale={coverScale}>
-          {visibleLanes.map((lane, index) => (
-            <Lane
-              key={lane.index}
-              lane={lane}
-              registerLane={registerLane}
-              registerEntity={registerEntity}
-              isBlured={isRules && 
-                (
-                    index > Math.floor((heightRef.current - playerYRef.current) / TILE_SIZE) + 1
-                    || index < Math.floor((heightRef.current - playerYRef.current) / TILE_SIZE) - 1
-                )}
-            />
-          ))}
+    const images = useMemo(() => isFemale ? PERS_IMAGES_F : PERS_IMAGES, []);
 
-          <PlayerDiv ref={playerRef}>
-              <img src={PERS_IMAGES[userImg]} alt="" />
-          </PlayerDiv>
-        </RotatedWorld>
-      </GameContainer>
-      {isRules && (
-        <RulesModal onClose={handleCloseRules} />
-      )}
-    </>
-  );
+    const currentLaneIndex = Math.floor(
+        (heightRef.current - playerYRef.current) / TILE_SIZE
+    ) - 1;
+
+    return (
+        <>
+            <BackHeaderGame
+                onRulesClick={handleToggleRules}
+                isHidden={isRules}
+                timerData={{ isStart: gameStarted, initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK], onFinish: die }}
+                currentPoints={score > 99 ? score : score > 9 ? `0${score}` : `00${score}`}
+                shouldShowCoinIcon={false}
+            />
+            <GameContainer onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+                <RotatedWorld ref={worldRef} $scale={coverScale}>
+                    {visibleLanes.map((lane, index) => (
+                        <Lane
+                            key={lane.index}
+                            lane={lane}
+                            registerLane={registerLane}
+                            registerEntity={registerEntity}
+                            isBlured={isRules &&
+                                (
+                                    index > currentLaneIndex + 2
+                                    || index < currentLaneIndex
+                                )}
+                        />
+                    ))}
+
+                    <PlayerDiv ref={playerRef} style={{zIndex: 15 - (currentLaneIndex % 10 === 9 ? -1 : currentLaneIndex % 10)}}>
+                        <img src={images[userImg]} alt="" />
+                    </PlayerDiv>
+                </RotatedWorld>
+            </GameContainer>
+            {isRules && (
+                <RulesModal onClose={handleCloseRules} />
+            )}
+        </>
+    );
 }

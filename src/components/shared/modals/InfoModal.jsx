@@ -13,7 +13,6 @@ const ModalStyled = styled(Modal)`
     align-items: center;
 `;
 
-
 const ContentWrapper = styled(Block)`
     max-height: calc(100% - ${({$ratio}) => $ratio * 128}px);
     max-width: ${({$ratio}) => $ratio * 325}px;

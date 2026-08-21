@@ -6,8 +6,9 @@ import { SCREENS, NEXT_SCREENS } from "../constants/screens";
 import { screens } from "../constants/screensComponents";
 import { getUrlParam } from "../utils/getUrlParam";
 import { useCallback } from 'react';
-import { BASE_LOCK_TIMEOUT, INITIAL_STATE, INITIAL_USER, MAX_LOCK_TIMEOUT, MAX_RETRIES, RETRY_DELAY } from './constants';
+import { BASE_LOCK_TIMEOUT, INITIAL_STATE, INITIAL_USER, MAX_LOCK_TIMEOUT, MAX_RETRIES, MAX_TURNS_PER_WEEK, RETRY_DELAY } from './constants';
 import { ProgressContext } from './ProgressContext';
+import { GENDERS } from '../constants/genders';
 
 const getMoscowTime = (date) => {
     const dateNow = date ?? new Date();
@@ -43,9 +44,10 @@ export function ProgressProvider(props) {
     const { children } = props
     const [isLoading, setIsLoading] = useState();
     const [currentScreen, setCurrentScreen] = useState(getUrlParam('screen') ?? SCREENS.INTRO);
-    const [prevScreen, setPrevScreen] = useState(getUrlParam('screen') ?? SCREENS.INTRO);
     const [openedModal, setOpenedModal] = useState();
     const [user, setUser] = useState(INITIAL_STATE.user);
+    const [isFemale, setIsFemale] = useState(true);
+    const [gameState, setGameState] = useState({});
     const [shopItems, setShopItems] = useState([]);
     const [tgError, setTgError] = useState({isError: false, message: ''});
 
@@ -81,11 +83,36 @@ export function ProgressProvider(props) {
 
             setUserBdData(info ?? {});
 
-            // if (info.facId) {
-                
-            // }
-
             const {data = {}} = info ?? {};
+
+            setIsFemale(data.gender === GENDERS.Female);
+
+            if (data.facId) {
+                updateShopItems(data.facId);
+            }
+
+            // check enter on new week
+            if (data?.email && !data.weekEnter[`week${CURRENT_WEEK}`]) {
+                const newCoins = data.totalCoins + data.newWeekCoins;
+                const coinsKoefed = newCoins * data.coinsKoefs;
+                const newTurns = data.turns + MAX_TURNS_PER_WEEK;
+                const newWeekEnter = {...data.weekEnter, [`week${CURRENT_WEEK}`]: true}
+                const updatedData = {
+                    totalCoins: coinsKoefed,
+                    turns: newTurns,
+                    weekEnter: newWeekEnter,
+                };
+
+                updateUser(updatedData);
+            }
+
+            const urlScreen = getUrlParam('screen');
+
+            if (urlScreen) {
+                setCurrentScreen(urlScreen);
+
+                return;
+            }
 
             // if (CURRENT_WEEK > 4 || data.gameProgress?.['12']?.isCompleted) {
             //     if (data.email) {
@@ -97,16 +124,13 @@ export function ProgressProvider(props) {
             //     setCurrentScreen(SCREENS.PLUG);
             // };
 
-            // if (!data.email) {
-            //     setCurrentScreen(INITIAL_STATE.currentScreen);
-            //     return;
-            // } else if (!data.seenStartInfo) {
-            //     setCurrentScreen(CURRENT_WEEK > 0 ? SCREENS.INTRO_RULES : SCREENS.WAITING);
-
-            //     return;
-            // } else {
-            //     setCurrentScreen(SCREENS[`LOBBY${Math.max(data.currentWeek, 1)}`]);
-            // }
+            
+            if (!data.email) {
+                setCurrentScreen(INITIAL_STATE.currentScreen);
+                return;
+            } else {
+                setCurrentScreen(SCREENS.LOBBY);
+            }
         } catch (e) {
             setTgError({isError: true, message: e.message});
         } finally {
@@ -125,7 +149,7 @@ export function ProgressProvider(props) {
             API_SHOP_NAME
         );
 
-        // initProject().catch((e) => console.log(e));
+        initProject().catch((e) => console.log(e));
 
         // if (WebApp) {
         //     WebApp.ready();
@@ -135,17 +159,18 @@ export function ProgressProvider(props) {
     }, []);
 
     const loadRecord = () => {
-        // const webApp = window?.Telegram?.WebApp;
-        // let webAppInitData = webApp?.initData;
-        // let initData = WebApp.initData;
+        const webApp = window?.Telegram?.WebApp;
+        let webAppInitData = webApp?.initData;
+        let initData = WebApp.initData;
 
-        //TODO: remove
+        // return { data: INITIAL_USER };
+
+        if (window?.location?.hostname === 'localhost' || !!getUrlParam('login')) {
+            const login = getUrlParam('login') ?? DEV_ID;
+            return client.current.findRecord('gameId', login);
+        } 
+
         return { data: INITIAL_USER };
-
-        // if (window?.location?.hostname === 'localhost' || !!getUrlParam('login')) {
-        //     const login = getUrlParam('login') ?? DEV_ID;
-        //     return client.current.findRecord('id', login);
-        // } 
 
         if (
             WebApp?.platform?.toLowerCase()?.includes('web') || WebApp?.platform?.toLowerCase()?.includes('desktop')
@@ -155,6 +180,7 @@ export function ProgressProvider(props) {
 
                 return {};
         }
+
     
         if (webAppInitData) {
             return client.current.getTgRecord(webAppInitData);
@@ -182,7 +208,6 @@ export function ProgressProvider(props) {
             return
         }
 
-        setPrevScreen(currentScreen);
         setCurrentScreen(nextScreen);
     }
 
@@ -199,28 +224,10 @@ export function ProgressProvider(props) {
         hour12: false
     }).format(date).replace(',', '');
 
-    const endGame = async ({ week, level, achieve, isEndWeek}) => {
-        const hasAchieve = achieve !== undefined;
-
-        const achieveCost = hasAchieve ? 5 : 0;
-        const totalGamePoints = user?.isTargeted ? 10 : 0;
-
-        if (user.gameProgress?.[level]?.isCompleted) return;
-
-        const endTimeMsc = getMoscowTime();
-    
-
-        // await updateUser(
-        //     {            }
-        // );
-
-    }
-
-
     const updateUser = async (changed) => {
         setUserInfo(changed);
 
-        // return patchData(changed);
+        return patchData(changed);
     }
 
     const patchData = async (changed) => {
@@ -239,33 +246,43 @@ export function ProgressProvider(props) {
 
     const registrateUser = async (args) => {
         const regDate = formatDate(getMoscowTime());
-        let id = uid(8);
+        let gameId = uid(8).toLocaleUpperCase();
 
         if (window?.location?.hostname === 'localhost' || !!getUrlParam('login')) {
-            id = getUrlParam('login') ?? DEV_ID;
+            gameId = getUrlParam('login') ?? DEV_ID;
         }
-
-        const checkDay = getMoscowTime().getDay();
-
-        const hasGivenEnterPoints = args.isTargeted && CURRENT_WEEK > 0;
 
         const data = {
             ...user,
             achieves: [],
             regPoints: 10,
             passedWeeks: [],
-            id,
+            gameId,
             regDate,
-            currentWeek: 1,
+            progressWeek: 1,
+            weekEnter: {
+                ...user.weekEnter,
+                [`week${CURRENT_WEEK}`]: true,
+            },
             ...args,
         }
+        
+        setIsFemale(data.gender === GENDERS.Female);
 
         setUser(data);
 
         try {
-            const record = await client?.current?.patchRecord(recordId.current, data);
+            if (!recordId.current) {
+                const record = await client?.current?.createRecord(data);
+                recordId.current = record.id;
 
-            return record; 
+                return record;
+            } else {
+                const record = await client?.current?.patchRecord(recordId.current, data);
+
+                return record; 
+            }
+            
         } catch (e) {
             return {isError: true}
         }
@@ -294,22 +311,25 @@ export function ProgressProvider(props) {
 
     const updateShopItems = async (facId, info) => {
         try {
-            const result = await clientShop.current.findRecord('id', facId ?? user.facId);
+            if (!clientShop?.current) {
+                return {};
+            }
+            const result = await clientShop?.current?.findRecord('id', facId ?? user.facId);
 
             // await new Promise(resolve => setTimeout(resolve, 1000));
 
             // await clientShop.current.updateRecord(result.id, info);
 
-            
             const { items } = result?.data ?? [];
 
-            if (!result || !items?.length) {
+            if (!result || !items.length) {
                 setShopItems([]);
-                return { items: [], isClosed: true, recordId: result.id }
+                return { items: [], isClosed: result && !items.length, recordId: result?.id }
             }
             
-            return checkShopItems(items, result.id);
+            return checkShopItems(items, result?.id);
         } catch (e) {
+            console.log(e);
             return ({ 
                 items: [], isClosed: true, isError: true,
             })
@@ -317,38 +337,42 @@ export function ProgressProvider(props) {
     };
 
     const checkShopItems = (items, recordId) => {
-        if (!items.length || items.filter(({ week, amount }) => week === CURRENT_WEEK && amount > 0).length < 1) {
+        if (!items.length || items.filter(({ week, testAmount }) => week === CURRENT_WEEK && testAmount > 0).length < 1) {
             setShopItems(items);
 
             return { items: items, isClosed: true, recordId }
         }
 
         setShopItems(items);
-        return { items: items, isClosed: true, recordId };
+        return { items: items, isClosed: false, recordId };
     }
 
     const buyItem = async (itemId, facId) => {
         const { id: userId } = user;
 
-          // Максимальный таймаут 15 секунд
+        // Максимальный таймаут 15 секунд
 
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             console.log(`Попытка ${attempt} из ${MAX_RETRIES}`);
 
         const { isClosed, items, recordId, isError } = await updateShopItems(facId);
         
+
         if (isClosed || isError) {
+            console.log(`попали на isClosed ${isClosed} || isError ${isError}`,);
             return { isClosed: true, isError };
         }
 
         const itemIndex = items.findIndex(({ id }) => id === itemId);
         if (itemIndex === -1) {
+            console.log(`попали на itemIndex || isError`);
+
             return { isError: true, message: 'Товар не найден' };
         }
 
         const item = items[itemIndex];
         
-        if (item.amount < 1) {
+        if (item.testAmount < 1) {
             return { isEmpty: true };
         }
 
@@ -469,7 +493,7 @@ export function ProgressProvider(props) {
         }
 
         // ===== ШАГ 5: ЕЩЁ РАЗ ПРОВЕРЯЕМ НАЛИЧИЕ =====
-        if (freshItem.amount < 1) {
+        if (freshItem.testAmount < 1) {
             const unlockedItems = freshItems.map((it) => {
                 if (it.id === itemId) {
                     const { lockedBy, lockedAt, lockTimeout, ...rest } = it;
@@ -487,7 +511,7 @@ export function ProgressProvider(props) {
                 const { lockedBy, lockedAt, lockTimeout, ...rest } = it;
                 return {
                     ...rest,
-                    amount: rest.amount - 1
+                    testAmount: rest.testAmount - 1
                 };
             }
             return it;
@@ -505,9 +529,16 @@ export function ProgressProvider(props) {
             }
 
             const purchasedItem = updatedItems.find(({ id }) => id === itemId);
+
+            const newShop = [...user.shop, purchasedItem];
+            const newCoins = user.totalCoins - purchasedItem.cost;
+
+
+            await updateUser({shop: newShop, totalCoins: newCoins});
+            //TODO: поменять на обычный amount по всему магаизну
             return { 
                 success: true, 
-                remainingAmount: purchasedItem?.amount ?? 0 
+                remainingAmount: purchasedItem?.testAmount ?? 0 
             };
 
         } catch (e) {
@@ -527,13 +558,13 @@ export function ProgressProvider(props) {
         const cells = [...(user.cells ?? [])];
         let coins = Math.max(0, user.totalCoins + changedCoins);
 
-        const index = cells.findIndex(cell => cell.id === cellId);
+        const index = cells.findIndex(cell => cell.name === cellId);
 
         if (index !== -1) {
             cells[index] = { ...cells[index], ...cellData, finish: true };
         }
 
-        updateUser({cells, lastOpenedCell: undefined, totalCoins: coins, ...additionalData});
+        updateUser({cells, lastOpenedCell: null, totalCoins: coins, ...additionalData});
     }
 
     const state = {
@@ -541,7 +572,6 @@ export function ProgressProvider(props) {
         next,
         setUserInfo,
         user,
-        endGame,
         updateUser,
         registrateUser,
         isLoading,
@@ -555,9 +585,12 @@ export function ProgressProvider(props) {
         openedModal,
         updateShopItems,
         shopItems,
-        prevScreen,
         openCell,
         finishCell,
+        buyItem,
+        setGameState,
+        gameState,
+        isFemale,
     }
  
     return (

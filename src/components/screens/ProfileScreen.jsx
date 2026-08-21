@@ -15,6 +15,7 @@ import { AnimatePresence } from 'framer-motion';
 import {MovingBlock} from '../shared/MovingBlock';
 import {SubscribeModal} from '../shared/modals/SubscribeModal';
 import { ItemsModal } from '../shared/modals/ItemsModal';
+import { GENDERS } from '../../constants/genders';
 
 const Wrapper = styled(FlexWrapper)`
     padding: calc(var(--spacing_x4) * 4) ${({ $ratio }) => 25 * $ratio}px ${({ $ratio }) => 45 * $ratio}px;
@@ -97,12 +98,13 @@ const TitleStyled = styled(Title)`
 `;
 
 const ProfileScreen = ({ onClose }) => {
-    const { user, next, tgInfo, handleOpenModal, updateUser } = useProgress();
+    const { user, next, isFemale, handleOpenModal, updateUser } = useProgress();
     const ratio = useSizeRatio();
     const linkRef = useRef();
     const [isSuccessCopy, setIsSuccessCopy] = useState(false);
+    const isTargeted = user.isTargeted;
 
-    const refLink = `https://tasks.fut.ru/people/${tgInfo?.tgUserId ?? ''}`;
+    const refLink = `https://tasks.fut.ru/people/${user?.gameId ?? ''}`;
 
     const handleCopy = () => {
         if (navigator.clipboard) {
@@ -146,41 +148,35 @@ const ProfileScreen = ({ onClose }) => {
     // Убрать кнопку, если нет товаров (?)
     return (
         <Wrapper $ratio={ratio}>
-            <BackHeader onBack={handleClose} isShownTickets/>
+            <BackHeader onBack={handleClose} isShownTickets={isTargeted}/>
             <TitleStyled $ratio={ratio}>Профиль</TitleStyled>
             <PersonalInfo>
                 <Avatar $ratio={ratio}>
-                    <img src={avatar} alt="" />
+                    <img src={isFemale ? avatarF : avatar} alt="" />
                 </Avatar>
                 <FullWidthDiv>
                     <TextWrapper $isFirst $ratio={ratio}>
                         {user.name ?? ''}
-                        Артем
                     </TextWrapper>
                     <TextWrapper $ratio={ratio}>
                         {user.surname ?? ''}
-                        Кондрашов
                     </TextWrapper>
                     <TextWrapper $ratio={ratio}>
-                        ID: 'XXXXXXXXX'
-                        {/* {user.id} */}
+                        ID: {user.gameId}
                     </TextWrapper>
                 </FullWidthDiv>
             </PersonalInfo>
             <Subtite $isFirst>Вуз</Subtite>
             <TextWrapper $ratio={ratio}>
-                {/* {user.university} */}
-                 НИУ ВШЭ Москва
+                {user.university}
             </TextWrapper>
             <Subtite>Факультет</Subtite>
             <TextWrapper $ratio={ratio}>
-                {/* {user.faculty} */}
-                Факультет мировой экономики и мировой политики
+                {user.faculty}
             </TextWrapper>
              <Subtite>E-mail</Subtite>
             <TextWrapper $ratio={ratio}>
                 {user.email}
-                akondrashov@futuretoday.ru
             </TextWrapper>
             <FullWidthDiv ref={linkRef}>
                 <RefLinkWrapper $gap={8 * ratio} onClick={handleCopy}>
@@ -197,12 +193,12 @@ const ProfileScreen = ({ onClose }) => {
             </FullWidthDiv>
             <ButtonsWrapper $ratio={ratio}>
                 <ButtonStyled onClick={() => handleOpenModal({Component: <SubscribeModal />})}>Подписаться на канал</ButtonStyled>
-                <Button 
+                {isTargeted && <Button 
                     onClick={() => handleOpenModal({Component: <ItemsModal />})} 
-                    // disabled={user?.shop?.length < 1}
+                    disabled={user?.shop?.length < 1}
                 >
                     Заказы в магазине
-                </Button>
+                </Button>}
             </ButtonsWrapper>
             <AnimatePresence>
                 {isSuccessCopy && (

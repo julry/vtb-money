@@ -25,17 +25,29 @@ const ContentWrapper = styled(Block)`
     padding: ${({$ratio}) => $ratio * 25}px;
 `;
 
-export const CommonModal = ({onClose, children, isDisabledAnimation, secondBtnText, onSecondBtnClick, btnText = 'Далее', ...props }) => {
+export const CommonModal = ({onClose, customClose = false, children, buttonsDisabled, isDisabledAnimation, secondBtnText, onSecondBtnClick, btnText = 'Далее', ...props }) => {
     const ratio = useSizeRatio();
     const { handleCloseModal } = useProgress();
+
+    const handleClickSecondBtn = () => {
+        handleCloseModal();
+        onSecondBtnClick?.();
+    }
+
+    const handleClickButton = () => {
+        if (!customClose) {
+            handleCloseModal();
+        }
+        onClose?.();
+    }
 
     return (
         <ModalStyled isDisabledAnimation={isDisabledAnimation} {...props}>
             <ContentWrapper $ratio={ratio}>
                 {children}
-                <ButtonStyled onClick={handleCloseModal}>{btnText}</ButtonStyled>
+                <ButtonStyled disabled={buttonsDisabled} onClick={handleClickButton}>{btnText}</ButtonStyled>
                 {secondBtnText?.length > 0 && (
-                    <ButtonStyled type="secondary" onClick={onSecondBtnClick}>
+                    <ButtonStyled disabled={buttonsDisabled} type="secondary" onClick={handleClickSecondBtn}>
                         {secondBtnText}
                     </ButtonStyled>
                 )}

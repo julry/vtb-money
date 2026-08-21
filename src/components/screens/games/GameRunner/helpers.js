@@ -94,3 +94,17 @@ export function generateChunk(chunkIndex, gap) {
 
     return { index: chunkIndex, trashes, figures };
 }
+
+export function getDistance(distance) {
+    if (distance > 999) {
+        return distance;
+    }
+    if (distance > 99) {
+        return `0${distance}`;
+    }
+    if (distance > 9) {
+        return `00${distance}`;
+    }
+
+    return `000${distance}`;
+}

@@ -10,6 +10,9 @@ import { useGame } from "./useGame";
 import { GameBoard, RulesModal, Start2048Modal } from "./parts";
 import { ACTIONS, CONTAINER_SIZE } from './constants';
 import { EndModal } from "../../../shared/modals/EndModal";
+import { MAX_INFINITE, WEEK_TO_TIMER } from "../constants";
+import { CURRENT_WEEK } from "../../../../contexts/ProgressProvider";
+import { SCREENS } from "../../../../constants/screens";
 
 const Wrapper = styled.div`
     height: 100%;
@@ -57,10 +60,10 @@ const Subtitle = styled.p`
 
 const TRIES_AMOUNT = 3;
 
-function Game2048({isFirst, isGameMode, lobbyScreen, day}) {
-    const { endGame, user, updateUser, openedModal, handleOpenModal } = useProgress();
+function Game2048({isFirst, lobbyScreen, day}) {
+    const { finishCell, gameState, user, next, updateUser, openedModal, handleOpenModal } = useProgress();
     const ratio = useSizeRatio();
-    const isFirstTime = !user?.hasSeen2048Rules;
+    const isFirstTime = !user['2048'].hasPlayed;
 
     const isGameActive = useMemo(
         () => !openedModal?.isOpen,
@@ -69,31 +72,77 @@ function Game2048({isFirst, isGameMode, lobbyScreen, day}) {
 
     const handleResultRef = useCallbackRef(handleResult);
 
-    const {startGame, getTiles, moveTiles, score} = useGame(handleResultRef, handleResultRef, false);
+    const {startGame, restartGame, getTiles, moveTiles, score} = useGame(handleResultRef, handleResultRef, false);
 
     function handleResult() {
-        handleOpenModal({Component: <EndModal title={"Ура, капитал собран!"} isGameMode={isGameMode} coins={"[уточняется]"}/>});
+        let coins = 0;
+        const newInfiniteCoins = [...(user.infiniteCoins ?? [])];
+        const newGameInfo = {...(user['2048'] ?? {}), hasPlayed: true};
+
+        if (gameState?.incomes?.length > 0) {
+            let coinsIndex = 0;
+
+            if (score >= 512) {
+                coinsIndex = 2;
+            }
+
+            if (score === 256) {
+                coinsIndex = 1;
+            }
+
+            coins = gameState.incomes[coinsIndex];
+            newGameInfo.coins = newGameInfo.coins + coins;
+        } else {
+            if (score >= 256 && user.infiniteCoins[CURRENT_WEEK - 1] < MAX_INFINITE) {
+                coins = 10;
+                newInfiniteCoins[CURRENT_WEEK - 1] += 10;
+                newGameInfo.coinsInfinity = newGameInfo.coinsInfinity + coins;
+            }
+        }
+
+        if (gameState?.id) {
+            finishCell(gameState?.id, {coinsAdd: coins, score}, coins, {2048: newGameInfo});
+        } else {
+            updateUser({totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, 2048: newGameInfo})
+        }
+
+        const isGameMode = gameState?.isInfinite;
+        handleOpenModal({Component: <EndModal onClose={isGameMode ? restartGame : next(SCREENS.LOBBY)} title={"Ура, капитал собран!"} isGameMode={isGameMode} coins={coins}/>});
     }
 
     useLayoutEffect(() => {
         handleOpenModal(
             { 
                 Component: <Start2048Modal />, 
-                nextOpenedModalProps: {
-                    component: <RulesModal />, 
-                    isBlurTransitionDisabled: true,
-                }
-            });
+               ...(isFirstTime ? (
+                {
+                    nextOpenedModalProps: {
+                        component: <RulesModal />, 
+                        isBlurTransitionDisabled: true,
+                    }
+                }) : {}
+               )
+            }
+        );
     }, []);
 
     useEffect(() => {
-        // TODO заменить тру на первый трай 
-        startGame(true);
+        startGame(isFirstTime);
     }, []);
 
     return (
         <Wrapper $ratio={ratio}>
-            
+            <BackHeaderGame 
+                onRulesClick={() => handleOpenModal({Component: <RulesModal />, isBlurTransitionDisabled: true})}
+                onBack={() => handleOpenModal({Component: <CommonModal />})}
+                isCenteredTimer
+                isLarge
+                timerData={{
+                    initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK],
+                    isStart: isGameActive,
+                    onFinish: handleResult,
+                }}
+            />
                 <GameController
                     active={isGameActive}
                     onMoveUp={() => moveTiles(ACTIONS.MOVE_UP)}
@@ -103,10 +152,7 @@ function Game2048({isFirst, isGameMode, lobbyScreen, day}) {
                 >
                     {(ref) => (
                         <WrapperInner ref={ref} $ratio={ratio}>
-                            <BackHeaderGame 
-                                onRulesClick={() => handleOpenModal({Component: <RulesModal />, isBlurTransitionDisabled: true})}
-                                onBack={() => handleOpenModal({Component: <CommonModal />})}
-                            />
+                            
                             <GameBoard tiles={getTiles()}/>
                             <PointsWrapper  $ratio={ratio}>
                                 <Aim $ratio={ratio}>

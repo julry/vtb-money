@@ -15,7 +15,7 @@ const Wrapper = styled.button`
     max-width: ${({$width, $ratio}) => $width ? $ratio * $width + 'px' : 'var(--content-width)'};
     min-height: ${({$ratio}) => $ratio * 42}px;
     border-radius: var(--border-radius-md);
-    box-shadow: ${({$type}) => $type === 'secondary' ? '0.694444px 0.694444px 1.38889px rgba(1, 32, 103, 0.8),' : ''} inset 2px 2px 2px rgba(255, 255, 255, 0.4);
+    box-shadow: ${({$type}) => $type === 'secondary' ? '0.7px 0.7px 1.5px rgba(1, 32, 103, 0.8),' : ''} inset 2px 2px 2px rgba(255, 255, 255, 0.4);
 
     text-align: center;
     cursor: pointer;

@@ -11,7 +11,7 @@ export const MAX_TURNS_PER_WEEK = 5;
 export const INITIAL_COINS = 1000;
 
 export const INITIAL_USER = {
-    id: '',
+    gameId: '',
     name: '',
     surname: '',
     email: '',
@@ -21,8 +21,17 @@ export const INITIAL_USER = {
     isTargeted: false,
     seenStartInfo: false,
     gender: GENDERS.Female,
-
+    weekEnter: {
+        week1: false,
+        week2: false,
+        week3: false,
+        week4: false
+    },
     totalCoins: INITIAL_COINS,
+    //Заработанные коины с newWeekCoins
+    passiveIncomeCoins: [0, 0, 0, 0],
+    //Заработанные коины с coinsKoefs (это надо?)
+    // passivePercentIncomeCoins: [0, 0, 0, 0],
     //На какой ща неделе
     progressWeek: 1,
     //Выбранные клетки по неделям
@@ -35,13 +44,17 @@ export const INITIAL_USER = {
     //Количество ходов
     turns: MAX_TURNS_PER_WEEK,
     //Последняя открытая клетка
-    lastOpenedCell: '',
+    lastOpenedCell: undefined,
     //Открывал ли профиль
     hasWatchedProfile: false,
     //Покупки
     shop: [],
     //Tickets
     bilets: 0,
+    infiniteCoins: [0, 0, 0, 0],
+    game2048Infinite: [0, 0, 0, 0],
+    crossyroadInfinite: [0, 0, 0, 0],
+    match3Infinite: [0, 0, 0, 0],
     runner: GAME_COINS_INFO,
     2048: GAME_COINS_INFO,
     crossyroad: GAME_COINS_INFO,
@@ -55,7 +68,6 @@ export const INITIAL_STATE = {
     user: INITIAL_USER,
     passedWeeks: [],
 }
-
 
 export const MAX_RETRIES = 3;
 export const RETRY_DELAY = 1000;

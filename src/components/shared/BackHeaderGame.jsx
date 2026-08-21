@@ -7,6 +7,7 @@ import { useProgress } from "../../hooks/useProgress";
 import { useTimer } from "../../hooks/useTimer";
 import { CommonModal } from "./modals";
 import {CloseIcon} from './CloseIcon';
+import { SCREENS } from "../../constants/screens";
 
 const HeaderButton = styled(Button)`
     position: absolute;
@@ -58,6 +59,7 @@ const AdditionalBlock = styled.div`
 `;
 
 const TimerBlock = styled(AdditionalBlock)`
+    ${({$isCenteredTimer}) => $isCenteredTimer ? 'border-radius: var(--border-radius-md); margin: auto;': ''};
     width: ${({$ratio,  $isLarge}) => $ratio * ($isLarge ? 98 : 79)}px;
 `
 
@@ -87,8 +89,9 @@ const InfoWrapper = styled.div`
     }
 `;
 
-export const BackHeaderGame = ({ className, isHidden, isLarge, onBack, timerData, currentPoints, onRulesClick, scoreElementRef }) => {
-    const { getSeconds } = useTimer(timerData ?? {});
+export const BackHeaderGame = ({ isCenteredTimer, isHidden, isLarge, onBack, timerData, currentPoints, shouldShowCoinIcon = true, onRulesClick, scoreElementRef }) => {
+    const { next } = useProgress();
+    const { getSeconds, getMinutes} = useTimer(timerData ?? {});
 
     const ratio = useSizeRatio();
 
@@ -99,7 +102,7 @@ export const BackHeaderGame = ({ className, isHidden, isLarge, onBack, timerData
 
     return (
         <>
-            <ExitButton $ratio={ratio} $isHidden={isHidden} onPointerDown={e => e?.stopPropagation} onClick={onButtonClick(onBack)} width={90}>
+            <ExitButton $ratio={ratio} $isHidden={isHidden} onPointerDown={e => e?.stopPropagation} onClick={onButtonClick(() => next(SCREENS.LOBBY))} width={90}>
                 <CloseIcon />
             </ExitButton>
             
@@ -108,13 +111,13 @@ export const BackHeaderGame = ({ className, isHidden, isLarge, onBack, timerData
             </RulesButton>
             <InfoWrapper $ratio={ratio} $isHidden={isHidden}>
                 {timerData !== undefined && (
-                    <TimerBlock $ratio={ratio} $isLarge={isLarge}>
-                        <p>0:{getSeconds()}</p>
+                    <TimerBlock $ratio={ratio} $isCenteredTimer={isCenteredTimer} $isLarge={isLarge}>
+                        <p>{getMinutes()}:{getSeconds()}</p>
                     </TimerBlock>
                 )}
                 {currentPoints !== undefined && (
                     <CurrentPointsBlock $ratio={ratio} $isLarge={isLarge}>
-                        <CoinIcon $ratio={ratio} src={coinIcon} alt="" />
+                       {shouldShowCoinIcon && <CoinIcon $ratio={ratio} src={coinIcon} alt="" />}
                         <p ref={scoreElementRef}>{currentPoints}</p>
                     </CurrentPointsBlock>
                 )}

@@ -23,11 +23,11 @@ const SubTitle = styled.p`
     margin-top: var(--spacing_x2);
 `;
 
-export const EndModal = ({title, isGameMode, subTitle, coins}) => {
+export const EndModal = ({title, isGameMode, onClose, subTitle, coins}) => {
     const ratio = useSizeRatio();
 
     return (
-        <GameModal isBoldTitle btnText={isGameMode ? 'Играть ещё' : 'Забрать'} title={title} secondBtnText={isGameMode ? "Вернуться на главный экран" : undefined}>
+        <GameModal isBoldTitle onClose={onClose} btnText={isGameMode ? 'Играть ещё' : 'Забрать'} title={title} secondBtnText={isGameMode ? "Вернуться на главный экран" : undefined}>
             <SubTitle $ratio={ratio}>{subTitle ?? `Заработано ${getPluralCoins(coins)}`}</SubTitle>
             <ImageWrapper $ratio={ratio}>
                 <img src={endImg} alt="" />

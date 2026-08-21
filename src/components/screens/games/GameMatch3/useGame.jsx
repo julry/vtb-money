@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { GRID_SIZE, COLORS, FIRST_GAME_BOARD } from './constants';
 
-export const useGame = ({isRules = false}) => {
+export const useGame = ({isRules = false, isFirstTime = false}) => {
     const [board, setBoard] = useState([]);
     const [score, setScore] = useState(0);
     const [selected, setSelected] = useState(null);
@@ -289,7 +289,7 @@ export const useGame = ({isRules = false}) => {
     useEffect(() => {
         let b;
         //TODO: заменить на первый раз и следующие 
-        if (true) {
+        if (isRules || isFirstTime) {
             b = FIRST_GAME_BOARD;
         } else {
             b = generateBoard();
@@ -300,11 +300,19 @@ export const useGame = ({isRules = false}) => {
         }
         boardRef.current = b;
         setBoard(b);
-        if (!isRules) {
-            handleSwap(1, 1, 1, 2);
-            setSelected({});
-        }
     }, [generateBoard, hasValidMoves]);
 
-    return { score, selected, board, handleCellClick, handleTouchStart, handleTouchEnd, showShuffle, touchStartRef }
+    const resetGame = useCallback(() => {
+            let b = generateBoard();
+
+            while (!hasValidMoves(b)) {
+                b = generateBoard();
+            }
+
+            boardRef.current = b;
+            setBoard(b);
+            setScore(0);
+    }, []);
+
+    return { score, selected, board, handleCellClick, handleTouchStart, handleTouchEnd, showShuffle, handleSwap, setSelected, touchStartRef, resetGame }
 }

@@ -14,6 +14,8 @@ import PathMap from './Board';
 import {useMemo, useEffect, useState} from 'react';
 import NumberPicker from "./NumberPicker";
 import { GAME_CELLS } from "./constants";
+import {UnfinishedModal} from './UnfinishedModal';
+import { CellModal } from "../../shared/modals/CellModal";
 
 const ButtonStyled = styled(Button)`
     position: absolute;
@@ -24,7 +26,7 @@ const ButtonStyled = styled(Button)`
     width: ${({$ratio}) => $ratio * 58}px;
     height: ${({$ratio}) => $ratio * 51}px;
     background-color: rgba(219, 237, 255, 0.8);
-    z-index: 5;
+    z-index: calc(var(--header-z-index) + 1);
 
     & img {
         width: ${({$ratio}) => $ratio * 48}px;
@@ -32,9 +34,26 @@ const ButtonStyled = styled(Button)`
     }
 `;
 
+const TurnsButton = styled(Button)`
+    position: absolute;
+    font-size: ${({$ratio}) => $ratio * 17}px;
+    top: ${({$ratio}) => $ratio * 68}px;
+    right: -1px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    justify-content: flex-start;
+    max-height: ${({$ratio}) => $ratio * 42}px;
+    z-index: var(--header-z-index);
+
+    & img {
+        width:${({$ratio}) => $ratio * 37}px;
+        height:${({$ratio}) => $ratio * 37}px;
+    }
+`;
+
 const Lobby = () => {
     const ratio = useSizeRatio();
-    const { next, user, handleOpenModal } = useProgress();
+    const { next, user, handleOpenModal, updateUser, setGameState } = useProgress();
     //мб перенести в отдельный стейт
     const lastCell = useMemo(() => {
         if (user.lastOpenedCell) {
@@ -49,6 +68,7 @@ const Lobby = () => {
     }, [user.cells, user.lastOpenedCell]);
 
     const [cellIndex, setCellIndex] = useState(GAME_CELLS.findIndex(({id}) => id === lastCell));
+    const [isUnfinishedModal, setIsUnfinishedModal] = useState(!!user.lastOpenedCell);
 
     useEffect(() => {
         const preventDefault = (e) => e.preventDefault();
@@ -58,34 +78,52 @@ const Lobby = () => {
         return () => document.body.removeEventListener('touchmove', preventDefault);
     }, []);
 
-    useEffect(() => {
-        if (user.lastOpenedCell) {
-            // компонент который типа "походи сначала"
+    const handleClose = () => {
+        const lastCell = GAME_CELLS.find(({id}) => id === user.lastOpenedCell);
+        setGameState(lastCell);
+        
+        handleOpenModal({
+            Component: <CellModal cell={lastCell} />
+        });
 
-            // handleOpenModal({
-            //     Component: 
-            // })
-        };
-    }, []);
+        setIsUnfinishedModal(false);
+    };
 
-    // проверить целевой ли для доступа в магаз
+    const handleMakeTurn = (number) => {
+        if (user.turns < 1) {
+            return;
+        }
+
+        updateUser({turns: user.turns - 1});
+        setCellIndex(prev => prev + number)
+    }
+
     return (
         <FlexWrapper>
             <BackHeader isShownExit={false} isShownCoins/>
+            <TurnsButton $ratio={ratio} width={user.turns > 9 ? 80 : 65}>
+                <img src={turns} alt="Ходов"/>
+                <p>{user.turns}</p>
+            </TurnsButton>
             <ButtonStyled $ratio={ratio} $top={57 * ratio} type="transparent" onClick={() => next(SCREENS.PROFILE)}>
                 <img src={profile} alt="Профиль"/>
             </ButtonStyled>
             <ButtonStyled $ratio={ratio} $top={118 * ratio} type="transparent" onClick={() => next(SCREENS.MINIGAMES)}>
                 <img src={games} alt="Мини-игры"/>
             </ButtonStyled>
-            <ButtonStyled $ratio={ratio} $top={179 * ratio} type="transparent" onClick={() => next(SCREENS.STORE)}>
-                <img src={shop} alt="Магазин"/>
-            </ButtonStyled>
-            <ButtonStyled $ratio={ratio}  $top={240 * ratio} type="transparent" onClick={() => next(SCREENS.RULES)}>
+            {user.isTargeted && (
+                <ButtonStyled $ratio={ratio} $top={179 * ratio} type="transparent" onClick={() => next(SCREENS.STORE)}>
+                    <img src={shop} alt="Магазин"/>
+                </ButtonStyled>
+            )}
+            <ButtonStyled $ratio={ratio}  $top={(user.isTargeted ? 240 : 179) * ratio} type="transparent" onClick={() => next(SCREENS.RULES)}>
                 <img src={rules} alt="Правила"/>
             </ButtonStyled>
-            <PathMap centerCellId={lastCell} cellIndex={cellIndex}/>
-            <NumberPicker onChange={(number) => setCellIndex(prev => prev + number)}/>
+            <PathMap isBlured={isUnfinishedModal} centerCellId={lastCell} cellIndex={cellIndex}/>
+            <NumberPicker isBlured={isUnfinishedModal} onChange={handleMakeTurn}/>
+            {isUnfinishedModal && (
+                <UnfinishedModal lastOpenedCell={user.lastOpenedCell} onClose={handleClose}/>
+            )}
         </FlexWrapper>
     )
 };

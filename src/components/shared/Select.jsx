@@ -56,7 +56,8 @@ const List = styled(motion.ul)`
     width: 100%;
     top: 100%;
     left: 0;
-    height: ${({$ratio}) => $ratio * 115}px;
+    height: ${({$height}) => $height}px;
+    /* height: ${({$ratio}) => $ratio * 115}px; */
     transform-origin: top;
     z-index: ${({$zIndex}) => $zIndex ?? 20};
     border: 0.5px solid var(--color-accent);
@@ -71,6 +72,7 @@ const Option = styled(motion.li)`
     cursor: pointer;
     list-style-type: none;
     color: var(--color-accent);
+    
     &:last-of-type {
         margin-bottom: calc(1.5 * var(--spacing_x1));
     }
@@ -85,6 +87,10 @@ const SelectText = styled.p`
   max-width: calc(100% - ${({$ratio}) => $ratio * 14}px);     
 `;
 
+const HEIGHT_TO_FACS = {
+
+};
+
 export const Select = (props) => {
     const wrapperRef = useRef();
     const [isOpen, setIsOpen] = useState(false);
@@ -95,6 +101,8 @@ export const Select = (props) => {
         props.onChoose?.(id, name);
         setIsOpen(false);
     };
+
+    //TODO: Пофиксить высоту листа хардкодом
 
     return (
         <SelectWrapper $zIndex={zIndex}>
@@ -115,6 +123,7 @@ export const Select = (props) => {
                             animate={{ opacity: 1, scaleY: 1 }}
                             exit={{ opacity: 0, scaleY: 0.5 }}
                             transition={{ duration: 0.15 }}
+                            $height={Math.min((options.length + 1) * 26 + 5, 115) * ratio}
                         >
                             <Scrollbar top={10} bottom={10} isSimple>
                                 {options.map(({id, name}) => (

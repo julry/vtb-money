@@ -30,7 +30,7 @@ function gameReducer(
 ) {
     switch (action.type) {
         case ACTIONS.RESTART: {
-            return {...initialState, score: state.score};
+            return {...initialState};
         }
         case ACTIONS.CLEAN_UP: {
             const flattenBoard = flattenDeep(state.board);
@@ -387,17 +387,6 @@ export function useGame(onWin, onLose, isRules) {
 
         dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [0, 0], value: 2 } });
         dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [1, 0], value: 2 } });
-        // dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [0, 0], value: 2 } });
-        // dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [1, 0], value: 4 } });
-        // dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [2, 0], value: 8 } });
-        // dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [3, 0], value: 16 } });
-        // dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [0, 1], value: 32 } });
-        // dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [1, 1], value: 64 } });
-        // dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [2, 1], value: 128 } });
-        // dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [3, 1], value: 256 } });
-        // dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [0, 2], value: 512 } });
-        // dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [1, 2], value: 1024 } });
-        // dispatch({ type: ACTIONS.CREATE_TILE, tile: { position: [2, 2], value: 2048 } });
     };
 
     const result = {

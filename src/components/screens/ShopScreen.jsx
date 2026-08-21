@@ -11,8 +11,10 @@ import {Text} from '../shared/Text';
 import { Scrollbar } from "../shared/ScrollBar";
 import { CURRENT_WEEK } from "../../contexts/ProgressProvider";
 import {SCREENS} from '../../constants/screens';
-import { Select } from "../shared/Select";
 import { faculties, universities } from "../../constants/universities";
+import {ConfirmShopModal} from '../shared/modals/ConfirmShopModal';
+import { EmptyShopModal } from "../shared/modals/EmptyShopModal";
+import {SuccessShopModal} from '../shared/modals/SuccessShopModal';
 
 const Wrapper = styled.div`
     padding-top: ${({$ratio}) => $ratio * 64}px;
@@ -27,9 +29,6 @@ const InnerWrapper = styled.div`
     grid-template-rows: auto;
     row-gap: var(--spacing_x5);
     column-gap: var(--spacing_x3);
-    /* overflow-y: auto; */
-    /* max-height: calc(100svh - ${({$ratio}) => $ratio * 104}px);
-    height: calc(100svh - ${({$ratio}) => $ratio * 104}px); */
 `;
 
 const CardWrapper = styled.div`
@@ -54,15 +53,6 @@ const TitleStyled = styled(Title)`
     font-size: ${({ $ratio }) => 30 * $ratio}px;
 `;
 
-const SelectWrapper = styled.div`
-    position: absolute;
-    top: 16px;
-    left: 45%;
-    width: 200px;
-    transform: translateX(-50%);
-    z-index: 30;
-`;
-
 const WEEK_TO_DATE = {
     2: '14 сентября',
     3: '21 сентября',
@@ -71,29 +61,33 @@ const WEEK_TO_DATE = {
 
 const ShopScreen = () => {
     const ratio = useSizeRatio();
-    const facultiesData = useMemo(() => 
-        faculties?.map((fac) => ({...fac, name: (universities.find(un => un.id === fac.university)?.name ?? 'Другое') + '-' + fac?.name}))
-    , [])
-    const [facId, setFacId] = useState(facultiesData[0]);
-
-    const { updateShopItems, shopItems, next } = useProgress();
+    const { updateShopItems, shopItems, next, user, handleOpenModal } = useProgress();
    
     useEffect(() => {
-        updateShopItems(facId.id);
-    }, [facId]);
+       updateShopItems(user.facId).then(res => {
+            if (res?.isClosed) {
+                handleOpenModal({
+                    Component: <EmptyShopModal />,
+                })
+            }
+       });
+    }, []);
 
 
+    const handleClick = async (itemId) => {
+        handleOpenModal({
+            Component: <ConfirmShopModal itemId={itemId}/>,
+        })
+    }
     return (
         <Wrapper $ratio={ratio}> 
             <BackHeader isShownCoins onBack={() => next(SCREENS.LOBBY)}/>
-                <SelectWrapper>
-                    <Select options={facultiesData} value={facId.name} onChoose={(id, name) => setFacId({id, name})} zIndex={30}/>
-                </SelectWrapper>
             <Scrollbar offset={4}>
                 <TitleStyled>Магазин</TitleStyled>
                 <InnerWrapper $ratio={ratio}>
                     {shopItems.map((card) => {
-                        const isDisabled = card.week > CURRENT_WEEK || card.amount < 1;
+                        //TODO: поменять на обычный amount
+                        const isDisabled = card.week > CURRENT_WEEK || card.testAmount < 1;
                         return (
                         <CardWrapper $ratio={ratio} key={card.id}>
                             <TitleWrapper>
@@ -101,10 +95,15 @@ const ShopScreen = () => {
                                     {card.title}
                                 </CardTitle>
                             </TitleWrapper>
-                            <ShopCard shouldShowInfo={card.week <= CURRENT_WEEK} disabledText={card.week > CURRENT_WEEK ? `будет\nдоступно\n${WEEK_TO_DATE[card.week]}` : null} isDisabled={isDisabled} cardInfo={{...card, src: mapIdToImage(card.id)}} />
+                            <ShopCard 
+                                shouldShowInfo={card.week <= CURRENT_WEEK && !isDisabled} 
+                                disabledText={card.week > CURRENT_WEEK ? `будет\nдоступно\n${WEEK_TO_DATE[card.week]}` : null} 
+                                isDisabled={isDisabled} 
+                                cardInfo={{...card, src: mapIdToImage(card.id)}} 
+                            />
                             <Button
-                                // onClick={handleClick}
-                                //  disabled={isDisabled}
+                                onClick={() => handleClick(card.id)}
+                                disabled={isDisabled || user.totalCoins < card.cost}
                             >купить</Button>
                         </CardWrapper>
                     )

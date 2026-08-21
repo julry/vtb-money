@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 import { Modal } from "../../../../shared/modals";
 import { useSizeRatio } from "../../../../../hooks/useSizeRatio";
+import { MovingBlock } from "../../../../shared/MovingBlock";
 
 const Description = styled(motion.div)`
     position: absolute;
@@ -26,7 +27,7 @@ export const RulesModal = ({onClose}) => {
 
     return (
         <Modal $ratio={ratio} isDisabledAnimation onClick={onClose}>
-            <Description $ratio={ratio} exit={{x: 330}} transition={{duration: 0.25}}>
+            <MovingBlock onClose={onClose} top={75} $ratio={ratio}>
                 <p>
                     Тапни вперёд, чтобы сделать шаг. Свайпай влево или вправо, чтобы уклоняться
                 </p>
@@ -34,7 +35,7 @@ export const RulesModal = ({onClose}) => {
                 <p>
                     Следи за движущимся потоком трат — смотри не столкнись с ними!
                 </p>
-            </Description>
+            </MovingBlock>
         </Modal>
     )
 }

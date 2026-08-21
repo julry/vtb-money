@@ -4,13 +4,17 @@ import { BackHeaderGame } from '../../../shared/BackHeaderGame';
 import { useSizeRatio } from '../../../../hooks/useSizeRatio';
 import { Board } from './parts/Board';
 import { AnimatePresence, motion} from 'framer-motion';
-import { useEffect, useLayoutEffect } from 'react';
+import {useEffect, useLayoutEffect, useState, useCallback} from 'react';
 import { StartMatch3Modal } from './parts/StartModal';
 import { RulesMatch3Modal } from './parts/RulesModal';
 import { useProgress } from '../../../../hooks/useProgress';
 import { useTimer } from '../../../../hooks/useTimer';
 import { EndModal } from '../../../shared/modals/EndModal';
 import coinIcon from '../../../../assets/images/coinImg.webp';
+import {WEEK_TO_TIMER, MAX_INFINITE} from '../constants';
+import { CURRENT_WEEK } from '../../../../contexts/ProgressProvider';
+import {getPluralCoins} from '../../../../utils/getPluralCoins';
+import {SCREENS} from '../../../../constants/screens';
 
 const Wrapper = styled.div`
     height: 100%;
@@ -72,13 +76,59 @@ const CoinIcon = styled.img`
 
 const GameMatch3 = () => {
     const ratio = useSizeRatio();
-    const { openedModal, handleOpenModal } = useProgress();
-    const { score, selected, board, handleCellClick, handleTouchStart, handleTouchEnd, showShuffle } = useGame({});
+    const { openedModal, handleOpenModal, user, gameState, finishCell, updateUser, next } = useProgress();
+    const isFirstTime = !user.match3?.hasPlayed;
 
+    const { 
+        score, selected, board, handleCellClick, 
+        handleTouchStart, handleTouchEnd, showShuffle,
+        handleSwap, setSelected, resetGame
+    } = useGame({isFirstTime});
+
+    const handleFinish = () => {
+        let coins = 0;
+            const newInfiniteCoins = [...(user.infiniteCoins ?? [])];
+            const newGameInfo = { ...(user['match-3'] ?? {}), hasPlayed: true };
+    
+        if (gameState?.incomes?.length > 0) {
+            let coinsIndex = 0;
+
+            if (score >= 700) {
+                coinsIndex = 1;
+            }
+
+            if (score >= 1300) {
+                coinsIndex = 2;
+            }
+
+            coins = gameState.incomes[coinsIndex];
+            newGameInfo.coins = newGameInfo.coins + coins;
+        } else {
+            if (score >= 700 && user.infiniteCoins[CURRENT_WEEK - 1] < MAX_INFINITE) {
+                coins = 10;
+                newInfiniteCoins[CURRENT_WEEK - 1] += 10;
+                    newGameInfo.coinsInfinity = newGameInfo.coinsInfinity + coins;
+            }
+        }
+
+        if (gameState?.id) {
+            finishCell(gameState?.id, { coinsAdd: coins, score }, coins, {'match-3': newGameInfo});
+        } else {
+            updateUser({ totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, 'match-3': newGameInfo })
+        }
+        
+        const isGameMode = gameState?.isInfinite;
+
+        handleOpenModal({
+            Component: <EndModal title={"Время вышло!"} onClose={isGameMode ? resetGame : next(SCREENS.LOBBY)} isGameMode={isGameMode}  coins={coins}/>,
+        })
+    }
     //TODO: добавить выход в меню
-    const { getSeconds } = useTimer({isStart: !openedModal?.isOpen, initialTime: 50, onFinish: () => handleOpenModal({
-        Component: <EndModal title={"Время вышло!"} coins={"[уточняется]"}/>,
-    })});
+    const { getSeconds, getMinutes } = useTimer({
+        isStart: !openedModal?.isOpen, 
+        initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK], 
+        onFinish: handleFinish
+    });
 
     useEffect(() => {
         const preventDefault = (e) => e.preventDefault();
@@ -88,15 +138,22 @@ const GameMatch3 = () => {
         return () => document.body.removeEventListener('touchmove', preventDefault);
     }, [])
 
+    const handleSwapOnFirstRules = () => {
+        handleSwap(1, 1, 1, 2);
+        setSelected({});
+    }
+
     useLayoutEffect(() => {
         handleOpenModal(
             {
                 Component: <StartMatch3Modal />,
                 isBlurTransitionDisabled: true,
-                nextOpenedModalProps: {
-                    component: <RulesMatch3Modal />,
+                ...(isFirstTime ? {
+                    nextOpenedModalProps: {
+                    component: <RulesMatch3Modal onFinish={handleSwapOnFirstRules}/>,
                     isBlurTransitionDisabled: true,
                 }
+                }:{})
             });
     }, []);
 
@@ -114,7 +171,7 @@ const GameMatch3 = () => {
             <Board board={board} selected={selected} handleCellClick={handleCellClick} handleTouchStart={handleTouchStart} handleTouchEnd={handleTouchEnd} />
             <TimerWrapper $ratio={ratio}>
                 <TimerBlock $ratio={ratio}>
-                    <TimeAmount $ratio={ratio}>0:{getSeconds()}</TimeAmount>
+                    <TimeAmount $ratio={ratio}>{getMinutes()}:{getSeconds()}</TimeAmount>
                 </TimerBlock>
                 <TimerBlock $ratio={ratio}>
                     <CoinIcon $ratio={ratio} src={coinIcon} alt="" />

@@ -8,6 +8,7 @@ import React, {
 import styled from 'styled-components';
 import {CELL_HEIGHT, CELL_WIDTH, CULL_BUFFER, GAME_CELLS, PAN_PADDING} from './constants';
 import characterSrc from '../../../assets/images/person/persStand.webp';
+import characterFSrc from '../../../assets/images/person/persFStand.webp';
 import { buildSpatialIndex, getCharacterStyle, getVisibleCells } from './helpers';
 import { useMapPan } from './useMapPan';
 import { SeparatorCell } from './SeparatorCell';
@@ -18,6 +19,7 @@ import { useProgress } from '../../../hooks/useProgress';
 import { CellMiniGameModal } from '../../shared/modals/CellMiniGameModal';
 import {CellQuizModal} from '../../shared/modals/CellQuizModal';
 import { CellModal } from '../../shared/modals/CellModal';
+import { GENDERS } from '../../../constants/genders';
 
 const Viewport = styled.div`
   position: relative;
@@ -42,12 +44,14 @@ const Person = styled.img`
   object-fit: contain;
 `;
 
+
 export default function PathMap({
     cells = GAME_CELLS,
     cellIndex,
     children,
+    isBlured,
 }) {
-    const { next, handleOpenModal, openCell } = useProgress();
+    const { handleOpenModal, openCell, setGameState, isFemale, updateUser } = useProgress();
     const viewportRef = useRef(null);
     const mapLayerRef = useRef(null);
     const [activeCell, setActiveCell] = useState(cells[cellIndex]);
@@ -58,17 +62,22 @@ export default function PathMap({
     const onComplete = useCallback((index) => {
         const currCell = cells[index];
         setActiveCell(currCell);
+        setGameState(currCell);
+
         openCell(currCell.id, {week: currCell.week});
-        handleOpenModal({
-            Component: <CellModal cell={currCell}/>,
-        })
+        setTimeout(() => {
+            handleOpenModal({
+                Component: <CellModal cell={currCell}/>,
+            })
+        }, 300)
     }, []);
 
+
     useEffect(() => {
-     const currCell = cells[3];
-        handleOpenModal({
-            Component: <CellModal cell={currCell}/>,
-        })
+    //  const currCell = cells[24];
+    //     handleOpenModal({
+    //         Component: <CellModal cell={currCell}/>,
+    //     })
     }, [])
 
     const { animatedCell } = useCharacterPath(cells, cellIndex, onComplete);
@@ -88,7 +97,7 @@ export default function PathMap({
         };
     }, [cells]);
 
-    const { offset, setOffset, bind } = useMapPan({
+    const { offset, bind } = useMapPan({
         centerCellId: currentCell.id,
         cells,
         cellWidth: CELL_WIDTH,
@@ -106,14 +115,13 @@ export default function PathMap({
 
         const update = () => {
             setViewportSize({ w: el.clientWidth, h: el.clientHeight });
-            setOffset((prev) => prev);
         };
         update();
 
         const ro = new ResizeObserver(update);
         ro.observe(el);
         return () => ro.disconnect();
-    }, [setOffset]);
+    }, []);
 
     const visibleCells = useMemo(() => {
         if (!viewportSize.w || !viewportSize.h) return cells;
@@ -150,6 +158,7 @@ export default function PathMap({
                                     opacity={cell.week > CURRENT_WEEK ? 0.5 : 1}
                                     x={cell.x}
                                     y={cell.y}
+                                    isBlured={isBlured}
                                 />
                             ))
                         }
@@ -168,11 +177,12 @@ export default function PathMap({
                             activeColor={cell.activeColor}
                             cellType={cell.cellType}
                             opacity={cell.week > CURRENT_WEEK ? 0.3 : 1}
+                            isBlured={isBlured && cell.id !== activeCell.id}
                         />
                     </React.Fragment>
                 ))}
                 <Person
-                    src={characterSrc}          // путь к спрайту
+                    src={isFemale ? characterFSrc : characterSrc}          // путь к спрайту
                     alt=""
                     style={getCharacterStyle(animatedCell)}
                 />

@@ -14,6 +14,10 @@ const BlockStyled = styled(Block)`
     position: relative;
     min-height: ${({$ratio}) => $ratio * 582}px;
     padding: ${({$ratio}) => $ratio * 20}px ${({$ratio}) => $ratio * 23}px ${({$ratio}) => $ratio * 23}px;
+    & button {
+        position: relative;
+        z-index: 2;
+    }
 `;
 
 const TextWrapper = styled.div`

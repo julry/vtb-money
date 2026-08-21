@@ -10,6 +10,8 @@ const Container = styled.div`
 
 const Viewport = styled.div`
   height: 100%;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: ${({ $padRight }) => $padRight}px;
@@ -65,6 +67,7 @@ export function Scrollbar({
     width = 6,               // ширина трека (px)
     minThumbHeight = 40, 
     isSimple,   
+    additionalPadding = 0,
 }) {
     const viewportRef = useRef(null);
     const trackRef = useRef(null);
@@ -82,7 +85,7 @@ export function Scrollbar({
     }).current;
 
     // Отступ контента под скроллбар
-    const padValue = hasScroll ? offset + width + 4 : 0;
+    const padValue = hasScroll ? offset + width + 4 : additionalPadding;
 
     const updateThumb = useCallback(() => {
         const viewport = viewportRef.current;

@@ -69,9 +69,9 @@ const TextStyled = styled(Text)`
 export const ItemsModal = () => {
     const ratio = useSizeRatio();
     const {user} = useProgress();
-    const items = useMemo(() => countDuplicatesById(TEST_ITEMS), []);
+    // const items = useMemo(() => countDuplicatesById(TEST_ITEMS), []);
 
-    // const items = useMemo(() => countDuplicatesById(user.shop), [user.shop]);
+    const items = useMemo(() => countDuplicatesById(user.shop), [user.shop]);
     return (
         <InfoModalStyled title={'Твои подарки'}>
             <InfoWrapper $ratio={ratio}>

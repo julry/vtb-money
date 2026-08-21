@@ -9,7 +9,6 @@ import { RuleTextModal } from '../shared/modals/RuleTextModal';
 import { rulesTexts } from '../../constants/rulesTexts';
 import { RulePrizeModal } from "../shared/modals/RulePrizeModal";
 import { RuleIncomeModal } from '../shared/modals/RuleIncomeModal';
-import { shopInfo } from "../../constants/shopInfo";
 import { SCREENS } from "../../constants/screens";
 
 const Wrapper = styled.div`
@@ -29,11 +28,11 @@ const ButtonsWrapper = styled.div`
 
 const RulesScreen = () => {
     const ratio = useSizeRatio();
-    const { handleOpenModal, next } = useProgress();
+    const { handleOpenModal, next, user } = useProgress();
 
     return (
         <>
-            <BackHeader onBack={() => next(SCREENS.LOBBY)}/>
+            <BackHeader onBack={() => next(SCREENS.LOBBY)} />
             <Wrapper $ratio={ratio}>
                 <Title>Правила</Title>
                 <TextStyled $ratio={ratio}>Здесь ты можешь узнать, как играть в игру и участвовать в розыгрыше.{'\n'}Жми на нужный раздел</TextStyled>
@@ -76,43 +75,43 @@ const RulesScreen = () => {
                     >
                         Как сделать ход?
                     </Button>
+                    {user.isTargeted && (
+                        <>
+                            <Button
+                                onClick={() =>
+                                    handleOpenModal({
+                                        Component: (
+                                            <RuleTextModal
+                                                title={"Как работает\nмагазин?"}
+                                                text={rulesTexts.shop}
+                                            />
+                                        )
+                                    })
+                                }
+                            >
+                                Как работает магазин?
+                            </Button>
+                            <Button
+                                onClick={() =>
+                                    handleOpenModal({
+                                        Component: (
+                                            <RuleTextModal
+                                                title="Билетики"
+                                                text={rulesTexts.ticket}
+                                            />
+                                        )
+                                    })
+                                }
+                            >
+                                Билетики
+                            </Button>
+                        </>
+                    )}
                     <Button
                         onClick={() =>
                             handleOpenModal({
                                 Component: (
-                                    <RuleTextModal
-                                        title={"Как работает\nмагазин?"}
-                                        text={rulesTexts.shop}
-                                    />
-                                )
-                            })
-                        }
-                    >
-                        Как работает магазин?
-                    </Button>
-                    {/* {user.isTargeted && ( */}
-                    <Button
-                        onClick={() =>
-                            handleOpenModal({
-                                Component: (
-                                    <RuleTextModal
-                                        title="Билетики"
-                                        text={rulesTexts.ticket}
-                                    />
-                                )
-                            })
-                        }
-                    >
-                        Билетики
-                    </Button>
-                    {/* )} */}
-                    <Button
-                        onClick={() =>
-                            handleOpenModal({
-                                Component: (
-                                    <RulePrizeModal isTargeted
-                                    // isTargeted={user.isTargeted}
-                                    />
+                                    <RulePrizeModal isTargeted={user.isTargeted}/>
                                 )
                             })
                         }

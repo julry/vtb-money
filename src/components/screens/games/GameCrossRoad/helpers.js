@@ -1,4 +1,4 @@
-import {BOTTOM_BUFFER_ROWS, MIN_ENTITY_GAP, PERSON_WIDTH, TILE_SIZE, TRASH_IMAGES, TRASH_SIZES} from './constants';
+import {BOTTOM_BUFFER_ROWS, MIN_ENTITY_GAP, PERSON_WIDTH, TILE_SIZE, TRASH_IMAGES, TRASH_SIZES, TREE_IMAGES, TREE_SIZES} from './constants';
 import {generateRandomNumber} from '../../../../utils/generateRandomNumber';
 import { COLORS } from '../GameMatch3/constants';
 
@@ -42,7 +42,8 @@ export function generateLane(index, prevType, maxWidth, safePad = 30) {
       if (attempts < 20) entities.push(newEntity);
     }
   } else if (type === 'grass') {
-    const PASSAGE_WIDTH = 2.5 * PERSON_WIDTH;
+    const PASSAGE_WIDTH = 2.8 * PERSON_WIDTH;
+    // const PASSAGE_WIDTH = 0;
     const playableStart = safePad;
     const playableEnd = maxWidth - safePad;
     
@@ -52,16 +53,18 @@ export function generateLane(index, prevType, maxWidth, safePad = 30) {
       const passageStart = generateRandomNumber(playableStart, maxPassageStart);
       const passageEnd = passageStart + PASSAGE_WIDTH;
 
-      const treeCount = generateRandomNumber(1, 3);
+      const treeCount = generateRandomNumber(2, 7);
       for (let i = 0; i < treeCount; i++) {
         let attempts = 0;
         let newTree;
+        const treeId = generateRandomNumber(0, TREE_IMAGES.length - 1);
+
         do {
           newTree = {
             x: generateRandomNumber(playableStart, playableEnd - (TILE_SIZE / 2)),
             w: TILE_SIZE / 1.5,
             h: TILE_SIZE,
-            color: COLORS.grassDark,
+            imgIndex: treeId,
             speed: 0,
             isTree: true,
           };

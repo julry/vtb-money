@@ -7,18 +7,20 @@ import {
     ACCELERATION_DISTANCE, BASE_SPEED, CHARACTER_SCREEN_X, CHUNK_WIDTH,
     DEFAULT_CHARACTER_WIDTH, GAP_CHARACTER_MULTIPLIER, INITIAL_Y,
     JUMP_CLEARANCE, MAX_SPEED, subjectK, VISIBLE_AHEAD, VISIBLE_BEHIND, MAX_JUMP,
-    JUMP_DISTANCE
+    JUMP_DISTANCE,
+    DISTANCE_KOEF
 } from './constants';
 import { generateChunk } from './helpers';
 import { EndModal } from '../../../shared/modals/EndModal';
 import { getPluralCoins } from '../../../../utils/getPluralCoins';
 
 
-export const useGame = (isFirstTry) => {
+export const useGame = ({isFirstTry, onDie}) => {
     const sizeRatio = useSizeRatio();
     const [isRules, setIsRules] = useState(isFirstTry);
     const [gamePoint, setGamePoints] = useState(0);
-    const { openedModal, handleOpenModal } = useProgress();
+    const [distance, setDistance] = useState(0);
+    const { openedModal } = useProgress();
 
     // State только для монтирования чанков и UI
     const [chunks, setChunks] = useState([]);
@@ -38,6 +40,7 @@ export const useGame = (isFirstTry) => {
     const collectedRef = useRef(new Set());
     const hitTrashIdsRef = useRef(new Set());
     const collectTimeoutRef = useRef(null);
+    const distanceRef = useRef(0);
 
     // Mutable game state (rAF не зависит от замыканий)
     const isGameStartedRef = useRef(false);
@@ -143,6 +146,11 @@ export const useGame = (isFirstTry) => {
 
                 charXRef.current = nextX;
                 charYRef.current = nextY;
+                const newDistance = Math.floor(nextX / DISTANCE_KOEF);          // целые «метры»
+                if (newDistance !== distanceRef.current) {
+                    distanceRef.current = newDistance;
+                    setDistance(newDistance);
+                }
 
             const worldOffsetPx = -nextX * ratio + CHARACTER_SCREEN_X * ratio;
             const bgOffsetPx = -nextX * 0.5;
@@ -259,17 +267,9 @@ export const useGame = (isFirstTry) => {
 
                         if (charBox.x2 >= tBox.x1 && charBox.x1 <= tBox.x2 && charBox.y1 <= tBox.y2) {
                             hitTrashIdsRef.current.add(trash.id);
-                            //TODO: поменять subTitle когда добавится пол Ты заработал${sex === f ? 'a' : ''} ${getPluralCoins(gamePointRef.current ?? 0)}
-                            //TODO: добавить выход в меню
-                            handleOpenModal({
-                                Component: (
-                                    <EndModal 
-                                        title="Забег окончен!"
-                                        subTitle={`Ты заработал ${getPluralCoins(gamePointRef.current ?? 0)}`} 
-                                        coins={gamePointRef.current ?? 0}
-                                    />
-                                )
-                            });
+                            console.log(distanceRef.current);
+                            //TODO: ??? do we need it поменять subTitle когда добавится пол Ты заработал${sex === f ? 'a' : ''} ${getPluralCoins(gamePointRef.current ?? 0)}
+                            onDie(distanceRef.current);
                         }
                     }
                 }
@@ -302,6 +302,8 @@ export const useGame = (isFirstTry) => {
         gamePoint,
         isGameStartedRef,
         handleOpenRules,
-        isRules
+        isRules,
+        distance,
+        distanceRef: distanceRef.current,
     };
 };

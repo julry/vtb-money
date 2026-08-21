@@ -76,25 +76,29 @@ const RadioButtonLabel = styled.label`
     }
 `;
 
-const Link = styled.a`
-    font-weight: 500;
-`;
-
 const InputStyled = styled(Input)`
-    margin-top: calc(1.5 * var(--spacing_x5));
+    --inputMargin: ${({$isSmall}) => $isSmall ? 'var(--spacing_x4)' : 'var(--spacing_x5)'};
+
+    margin-top: ${({$marginTop}) => $marginTop ?? 'calc(1.5 * var(--inputMargin))'};
 
     & + & {
-        margin-top: var(--spacing_x5);
+        margin-top: var(--inputMargin);
     }
+
+    transition: margin 0.25s;
 `;
 
 const SelectStyled = styled(Select)`
-    margin-top: var(--spacing_x5);
+    --inputMargin: ${({$isSmall}) => $isSmall ? 'var(--spacing_x4)' : 'var(--spacing_x5)'};
+
+    margin-top: var(--inputMargin);
+
+    transition: margin 0.25s;
 `;
 
 const Registration = () => {
     const ratio = useSizeRatio();
-    const { next, checkEmailRegistrated, registrateUser } = useProgress();
+    const { next, checkEmailRegistrated, updateUser } = useProgress();
     const [univ, setUniv] = useState({});
     const [fac, setFac] = useState({});
     const [otherUniv, setOtherUniv] = useState('');
@@ -126,29 +130,40 @@ const Registration = () => {
         if (isSending) return;
         setIsSending(true);
 
-        const hasEmail = await checkEmailRegistrated(email);
+        // const hasEmail = await checkEmailRegistrated(email);
 
-        if (hasEmail) {
-            setIsAlreadyHas(true);
-            setIsSending(false);
+        // if (hasEmail) {
+        //     setIsAlreadyHas(true);
+        //     setIsSending(false);
 
-            return;
-        }
+        //     return;
+        // }
 
         const university = univ?.id === 'other' ? otherUniv?.trim() : univ?.name;
         const faculty = univ?.id === 'other' || fac?.id === 'other' ? otherFac?.trim() : fac?.name;
         
-        const regRes = await registrateUser({ 
-            name: name.trim(), 
-            surname: surname.trim(),
+        updateUser({ 
+            name: name.trim(),
+            surname: surname.trim(), 
             email: email.trim(), 
             university, 
-            universityId: univ?.id, 
-            isAddsAgreed: isMailsAgreed,
-            faculty, 
-            facultyId: fac?.id,
-            isTargeted: !!fac?.isTargeted,
+            universityId: univ?.id,
+            faculty,  
+            facId: fac?.id,
+            isTargeted: !!fac.id && fac?.id !== 'other'
         });
+
+        // const regRes = await registrateUser({ 
+        //     name: name.trim(), 
+        //     surname: surname.trim(),
+        //     email: email.trim(), 
+        //     university, 
+        //     universityId: univ?.id, 
+        //     isAddsAgreed: isMailsAgreed,
+        //     faculty, 
+        //     facultyId: fac?.id,
+        //     isTargeted: !!fac?.isTargeted,
+        // });
 
         setIsSending(false);
 
@@ -158,13 +173,7 @@ const Registration = () => {
         //     return;
         // }
 
-        if (CURRENT_WEEK < 1) {
-            next(SCREENS.WAITING);
-
-            return;
-        }
-
-        next(SCREENS.INTRO_RULES);
+        next();
     }
 
     //TODO: че происходит на другое
@@ -192,7 +201,7 @@ const Registration = () => {
     const handleChange = (e) => {
         if (isSending) return;
         setIsAlreadyHas(false);
-        setIsEmailFieldCorrect();
+        setIsEmailFieldCorrect(true);
         setEmail(e.target.value);
     };
 
@@ -211,7 +220,6 @@ const Registration = () => {
     const handleFacPick = (id, name) => {
         if (!id || id === 'other') {
             setFac({id: 'other'});
-            setOtherFac(name);
 
             return;
         }
@@ -220,7 +228,7 @@ const Registration = () => {
     }
 
     const facultiesFilteres = useMemo(() => (
-        faculties.filter(({university}) => university === univ.id)
+        faculties.filter(({university, id}) => university === univ.id || id === 'other')
     ), [univ]);
 
     return (
@@ -229,6 +237,7 @@ const Registration = () => {
             <BlockStyled $ratio={ratio}>
                 <Title>Регистрация</Title>
                 <InputStyled
+                    $isSmall={univ?.id === 'other' || fac?.id === 'other'}
                     type="text"
                     id="name"
                     value={name}
@@ -241,6 +250,7 @@ const Registration = () => {
                 />
 
                 <InputStyled
+                    $isSmall={univ?.id === 'other' || fac?.id === 'other'}
                     type="text"
                     id="surname"
                     value={surname}
@@ -253,6 +263,7 @@ const Registration = () => {
                 />
 
                 <InputStyled
+                    $isSmall={univ?.id === 'other' || fac?.id === 'other'}
                     isCorrect={isEmailFieldCorrect}
                     type="email"
                     id="email"
@@ -265,6 +276,7 @@ const Registration = () => {
                 />
 
                 <SelectStyled
+                    $isSmall={univ?.id === 'other' || fac?.id === 'other'}
                     value={univ.name}
                     options={universities}
                     onChoose={handlePickUniversity}
@@ -275,11 +287,38 @@ const Registration = () => {
                 {
                     univ?.id !== undefined && univ?.id !== 'other' && (
                         <SelectStyled 
+                            $isSmall={univ?.id === 'other' || fac?.id === 'other'}
                             value={fac.name}
                             options={facultiesFilteres}
                             placeholder="Факультет"
                             onChoose={handleFacPick}
                             zIndex={20}
+                        />
+                    )
+                }
+                {
+                    univ?.id !== undefined && univ?.id === 'other' && (
+                        <InputStyled
+                            $isSmall={univ?.id === 'other' || fac?.id === 'other'}
+                            $marginTop={'var(--spacing_x4)'}
+                            isCorrect 
+                            value={otherUniv}
+                            placeholder="ВУЗ"
+                            onChange={(e) => setOtherUniv(e.target.value)}
+                        />
+                    )
+                }
+
+                {
+                    (univ?.id === 'other' || fac?.id !== undefined && fac?.id === 'other') && (
+                        <InputStyled
+                            $isSmall={univ?.id === 'other' || fac?.id === 'other'}
+                            isCorrect 
+                            $marginTop={'var(--spacing_x5)'}
+                            value={otherFac}
+                            placeholder="Факультет"
+                            onChange={(e) => setOtherFac(e.target.value)}
+
                         />
                     )
                 }
@@ -344,7 +383,7 @@ const Registration = () => {
                             </a>.
                         </span>
                     </RadioButtonLabel>
-                    <Button mt={15 * ratio} onClick={() => next()}>Готово</Button>
+                    <Button mt={15 * ratio} onClick={handleClick}>Готово</Button>
             </BlockStyled>
         </FlexWrapper>
     )

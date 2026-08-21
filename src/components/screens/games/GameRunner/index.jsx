@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import styled, { css, keyframes } from "styled-components";
 import collectEffectImg from '../../../../assets/images/runner/collectEffect.webp';
 import { useSizeRatio } from '../../../../hooks/useSizeRatio';
@@ -14,6 +14,12 @@ import { RulesModal } from "./parts/RulesModal";
 import {useLayoutEffect, useEffect} from 'react';
 import { StartRunnerModal } from "./parts/StartModal";
 import { useProgress } from "../../../../hooks/useProgress";
+import {MAX_INFINITE, WEEK_TO_TIMER} from '../constants';
+import {CURRENT_WEEK} from '../../../../contexts/ProgressProvider';
+import {EndModal} from '../../../shared/modals/EndModal';
+import {getPluralCoins} from '../../../../utils/getPluralCoins';
+import { SCREENS } from "../../../../constants/screens";
+import {getDistance} from './helpers';
 
 const Wrapper = styled.div`
     position: relative;
@@ -53,8 +59,54 @@ const CharacterStyled = styled(Character)`
 
 function GameRunner({ className }) {
     const sizeRatio = useSizeRatio();
-    const { handleOpenModal, openedModal } = useProgress();
+    const { handleOpenModal, openedModal, user, gameState, next, finishCell, updateUser } = useProgress();
     
+    const onDie = useCallback((dist) => {
+        let coins = 0;
+            const newInfiniteCoins = [...(user.infiniteCoins ?? [])];
+            const newGameInfo = { ...(user.runner ?? {}), hasPlayed: true };
+    
+        if (gameState?.incomes?.length > 0) {
+            let coinsIndex = 0;
+
+            if (dist >= 150) {
+                coinsIndex = 1;
+            }
+
+            if (dist >= 300) {
+                coinsIndex = 2;
+            }
+
+            coins = gameState.incomes[coinsIndex];
+            newGameInfo.coins = newGameInfo.coins + coins;
+        } else {
+            if (dist >= 150 && user.infiniteCoins[CURRENT_WEEK - 1] < MAX_INFINITE) {
+                coins = 10;
+                newInfiniteCoins[CURRENT_WEEK - 1] += 10;
+                    newGameInfo.coinsInfinity = newGameInfo.coinsInfinity + coins;
+            }
+        }
+
+        if (gameState?.id) {
+            finishCell(gameState?.id, { coinsAdd: coins, score: dist }, coins, {runner: newGameInfo });
+        } else {
+            updateUser({ totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, runner: newGameInfo })
+        }
+        const isGameMode = gameState?.isInfinite;
+
+        handleOpenModal({
+            Component: (
+                <EndModal 
+                    title="Забег окончен!"
+                    isGameMode={isGameMode}
+                    onClose={isGameMode ? () => {} : next(SCREENS.LOBBY)}
+                    subTitle={`Ты заработал ${getPluralCoins(coins)}`} 
+                    coins={coins}
+                />
+            )
+        });
+    }, []);
+
     const {
         wrapperRef,
         handleTapStart,
@@ -66,12 +118,13 @@ function GameRunner({ className }) {
         characterRef,
         isUp,
         isPaused,
-        gamePoint,
+        distanceRef,
+        distance,
         isCollected,
         isGameStartedRef,
         isRules,
         handleOpenRules
-    } = useGame(true);
+    } = useGame({isFirstTry: !user.runner.hasPlayed, onDie});
 
     useLayoutEffect(() => {
         handleOpenModal(
@@ -97,12 +150,14 @@ function GameRunner({ className }) {
         >
             <BackHeaderGame 
                 onRulesClick={handleOpenRules}
-                currentPoints={gamePoint}
+                currentPoints={getDistance(distance)}
+                shouldShowCoinIcon={false}
                 isHidden={isRules}
                 isLarge
                 timerData={{
-                    initialTime: 50,
-                    isStart: isGameStartedRef.current
+                    initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK],
+                    isStart: isGameStartedRef.current,
+                    onFinish: () => onDie(distanceRef),
                 }}
             />
             <AnimatePresence>

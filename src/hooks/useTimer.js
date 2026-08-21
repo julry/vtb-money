@@ -120,7 +120,7 @@ export const useTimer = ({ timerId, isStart, initialTime, reverse, onFinish, onS
 
     const getMinutes = useCallback(() => {
         const minutes = Math.floor(time / 60);
-        return minutes > 9 ? minutes : `0${minutes}`;
+        return minutes;
     }, [time]);
 
     const getSeconds = useCallback(() => {

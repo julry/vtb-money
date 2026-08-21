@@ -7,6 +7,7 @@ export const GROUND_HEIGHT = 175;
 export const subjectK = 1;
 export const SCALE_K = 1;
 export const LG_KOEF = SCALE_K * subjectK;
+export const DISTANCE_KOEF = 25;
 
 export const CHARACTER_SIZE = [140 * subjectK, 222 * subjectK];
 export const CHARACTER_SIZE_LG = [140 * LG_KOEF, 222 * LG_KOEF];
