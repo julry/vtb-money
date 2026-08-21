@@ -51,7 +51,7 @@ export default function PathMap({
     children,
     isBlured,
 }) {
-    const { handleOpenModal, openCell, setGameState, isFemale, updateUser } = useProgress();
+    const { handleOpenModal, openCell, setGameState, isFemale } = useProgress();
     const viewportRef = useRef(null);
     const mapLayerRef = useRef(null);
     const [activeCell, setActiveCell] = useState(cells[cellIndex]);
@@ -72,13 +72,6 @@ export default function PathMap({
         }, 300)
     }, []);
 
-
-    useEffect(() => {
-    //  const currCell = cells[24];
-    //     handleOpenModal({
-    //         Component: <CellModal cell={currCell}/>,
-    //     })
-    }, [])
 
     const { animatedCell } = useCharacterPath(cells, cellIndex, onComplete);
 

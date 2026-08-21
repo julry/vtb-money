@@ -43,11 +43,12 @@ const DEV_ID = import.meta.env.VITE_DEV_ID;
 export function ProgressProvider(props) {
     const { children } = props
     const [isLoading, setIsLoading] = useState();
-    const [currentScreen, setCurrentScreen] = useState(getUrlParam('screen') ?? SCREENS.INTRO);
+    const [currentScreen, setCurrentScreen] = useState();
     const [openedModal, setOpenedModal] = useState();
     const [user, setUser] = useState(INITIAL_STATE.user);
     const [isFemale, setIsFemale] = useState(true);
     const [gameState, setGameState] = useState({});
+    const [isMapHidden, setIsMapHidden] = useState(false);
     const [shopItems, setShopItems] = useState([]);
     const [tgError, setTgError] = useState({isError: false, message: ''});
 
@@ -254,9 +255,6 @@ export function ProgressProvider(props) {
 
         const data = {
             ...user,
-            achieves: [],
-            regPoints: 10,
-            passedWeeks: [],
             gameId,
             regDate,
             progressWeek: 1,
@@ -591,6 +589,8 @@ export function ProgressProvider(props) {
         setGameState,
         gameState,
         isFemale,
+        setIsMapHidden,
+        isMapHidden,
     }
  
     return (

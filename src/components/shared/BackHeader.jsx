@@ -7,6 +7,7 @@ import { useProgress } from "../../hooks/useProgress";
 import { CloseIcon } from "./CloseIcon";
 import { Logo } from "./Logo";
 import { CoinsInfoModal } from "./modals/CoinsInfoModal";
+import { LogoOutlined } from "./LogoOutlined";
 
 const Header = styled.div`
     display: flex;
@@ -37,6 +38,7 @@ const CoinsButton = styled(Button)`
     font-size: ${({$ratio}) => $ratio * 17}px;
     justify-content: flex-start;
     max-height: ${({$ratio}) => $ratio * 42}px;
+    ${({$isHighlighted}) => $isHighlighted ? 'box-shadow:  0px 0px 10px 5px #FFFFFF, inset 2px 2px 2px rgba(255, 255, 255, 0.4)' : ''};
 `;
 
 const CoinIcon = styled.img`
@@ -55,11 +57,16 @@ const TicketIcon = styled.img`
     margin-right: ${({$ratio}) => $ratio * 5}px;
 `;
 
-const LogoWrapper = styled.div`
-  padding-left:  ${({$ratio}) => $ratio * 13}px; 
+const LogoOutlinedStyled = styled(LogoOutlined)`
+    background: rgba(219, 237, 255, 0.8);
+    box-shadow: inset 1.38889px 1.38889px 1.38889px rgba(255, 255, 255, 0.4);
+    border-radius: 0px ${({$ratio}) => $ratio * 17}px ${({$ratio}) => $ratio * 17}px 0px;
+    padding-left:  ${({$ratio}) => $ratio * 10}px;
+    height:  ${({$ratio}) => $ratio * 51}px;
+    width:  ${({$ratio}) => $ratio * 86}px;
 `;
 
-export const BackHeader = ({ className, isDisabledBtns, onBack, isShownExit = true, isHiddenLogo, isShownTickets, isShownCoins }) => {
+export const BackHeader = ({ className, isDisabledBtns, onBack, isHighlightedCoins, isShownExit = true, isHiddenLogo, isShownTickets, isShownCoins }) => {
     const { user, handleOpenModal } = useProgress();
 
     const coins = (user.totalCoins ?? 0).toLocaleString();
@@ -104,13 +111,12 @@ export const BackHeader = ({ className, isDisabledBtns, onBack, isShownExit = tr
                         <CloseIcon />
                     </ExitButton>
                 ) : !isHiddenLogo && (
-                    <LogoWrapper $ratio={ratio}>
-                        <Logo isWhiteVersion/>
-                    </LogoWrapper>
+                    <LogoOutlinedStyled $ratio={ratio}>
+                    </LogoOutlinedStyled>
                 )}
                 
                 {isShownCoins && (
-                    <CoinsButton $ratio={ratio} width={getCoinsButtonLength()} onClick={handleOpenCoinsModal}>
+                    <CoinsButton $isHighlighted={isHighlightedCoins} $ratio={ratio} width={getCoinsButtonLength()} onClick={handleOpenCoinsModal}>
                         <CoinIcon $ratio={ratio} src={coinIcon} alt="" />
                         <p>{coins}</p>
                     </CoinsButton>

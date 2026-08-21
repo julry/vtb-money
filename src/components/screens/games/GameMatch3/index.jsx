@@ -4,16 +4,14 @@ import { BackHeaderGame } from '../../../shared/BackHeaderGame';
 import { useSizeRatio } from '../../../../hooks/useSizeRatio';
 import { Board } from './parts/Board';
 import { AnimatePresence, motion} from 'framer-motion';
-import {useEffect, useLayoutEffect, useState, useCallback} from 'react';
+import {useEffect, useLayoutEffect} from 'react';
 import { StartMatch3Modal } from './parts/StartModal';
 import { RulesMatch3Modal } from './parts/RulesModal';
 import { useProgress } from '../../../../hooks/useProgress';
 import { useTimer } from '../../../../hooks/useTimer';
 import { EndModal } from '../../../shared/modals/EndModal';
-import coinIcon from '../../../../assets/images/coinImg.webp';
 import {WEEK_TO_TIMER, MAX_INFINITE} from '../constants';
 import { CURRENT_WEEK } from '../../../../contexts/ProgressProvider';
-import {getPluralCoins} from '../../../../utils/getPluralCoins';
 import {SCREENS} from '../../../../constants/screens';
 
 const Wrapper = styled.div`
@@ -57,6 +55,7 @@ const TimerBlock = styled.div`
     width: calc((100% - var(--spacing_x3)) / 2);
     height: ${({$ratio}) => $ratio * 70}px;
     display: flex;
+    flex-direction: column;
     gap: var(--spacing_x1);
     align-items: center;
     justify-content: center;
@@ -68,16 +67,14 @@ const TimeAmount = styled.h4`
     font-size: ${({$ratio}) => $ratio * 34}px;
 `;
 
-const CoinIcon = styled.img`
-    width: ${({$ratio}) => $ratio * 36}px;
-    height: ${({$ratio}) => $ratio * 36}px;
-    object-fit: contain;
+const Subtitle = styled.p`
+    font-size: var(--font_md);
 `;
 
 const GameMatch3 = () => {
     const ratio = useSizeRatio();
     const { openedModal, handleOpenModal, user, gameState, finishCell, updateUser, next } = useProgress();
-    const isFirstTime = !user.match3?.hasPlayed;
+    const isFirstTime = !user['match-3']?.hasPlayed;
 
     const { 
         score, selected, board, handleCellClick, 
@@ -174,7 +171,9 @@ const GameMatch3 = () => {
                     <TimeAmount $ratio={ratio}>{getMinutes()}:{getSeconds()}</TimeAmount>
                 </TimerBlock>
                 <TimerBlock $ratio={ratio}>
-                    <CoinIcon $ratio={ratio} src={coinIcon} alt="" />
+                    <Subtitle>
+                        Счётчик
+                    </Subtitle>
                     <TimeAmount $ratio={ratio}>{score}</TimeAmount>
                 </TimerBlock>
             </TimerWrapper>

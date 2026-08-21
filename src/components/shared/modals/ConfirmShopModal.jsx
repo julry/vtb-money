@@ -58,7 +58,6 @@ export const ConfirmShopModal = ({itemId}) => {
             <Title $ratio={ratio}>
                 {'Ты точно хочешь купить это?'}
             </Title>
-            <SubTitle $ratio={ratio}>{'Вы уверены, что хотите приобрести данный товар?'}</SubTitle>
             <ImageWrapper $ratio={ratio}>
                 <img src={endImg} alt="" />
             </ImageWrapper>

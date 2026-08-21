@@ -58,9 +58,7 @@ const Subtitle = styled.p`
     font-size: var(--font_md);
 `;
 
-const TRIES_AMOUNT = 3;
-
-function Game2048({isFirst, lobbyScreen, day}) {
+function Game2048() {
     const { finishCell, gameState, user, next, updateUser, openedModal, handleOpenModal } = useProgress();
     const ratio = useSizeRatio();
     const isFirstTime = !user['2048'].hasPlayed;
