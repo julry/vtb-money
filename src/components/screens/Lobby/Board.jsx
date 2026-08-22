@@ -16,10 +16,7 @@ import { TileCell } from './TileCell';
 import { CURRENT_WEEK } from '../../../contexts/ProgressProvider';
 import { useCharacterPath } from './useCharacterPath';
 import { useProgress } from '../../../hooks/useProgress';
-import { CellMiniGameModal } from '../../shared/modals/CellMiniGameModal';
-import {CellQuizModal} from '../../shared/modals/CellQuizModal';
 import { CellModal } from '../../shared/modals/CellModal';
-import { GENDERS } from '../../../constants/genders';
 
 const Viewport = styled.div`
   position: relative;
@@ -44,14 +41,13 @@ const Person = styled.img`
   object-fit: contain;
 `;
 
-
 export default function PathMap({
     cells = GAME_CELLS,
     cellIndex,
     children,
     isBlured,
 }) {
-    const { handleOpenModal, openCell, setGameState, isFemale } = useProgress();
+    const { handleOpenModal, openCell, setGameState, isFemale, user } = useProgress();
     const viewportRef = useRef(null);
     const mapLayerRef = useRef(null);
     const [activeCell, setActiveCell] = useState(cells[cellIndex]);
@@ -77,30 +73,77 @@ export default function PathMap({
 
     const spatialIndex = useMemo(() => buildSpatialIndex(cells), [cells]);
 
-    const { mapW, mapH } = useMemo(() => {
-        let maxX = 0;
-        let maxY = 0;
-        for (let i = 0; i < cells.length; i++) {
-            if (cells[i].x > maxX) maxX = cells[i].x;
-            if (cells[i].y > maxY) maxY = cells[i].y;
-        }
-        return {
-            mapW: (maxX + 1) * CELL_WIDTH,
-            mapH: (maxY + 1) * CELL_HEIGHT,
-        };
-    }, [cells]);
+const EXTRA_CELLS = 1; // уже есть в constants
 
-    const { offset, bind } = useMapPan({
-        centerCellId: currentCell.id,
-        cells,
-        cellWidth: CELL_WIDTH,
-        cellHeight: CELL_HEIGHT,
+const { mapW, mapH, clampBounds } = useMemo(() => {
+    const progressWeek = user?.progressWeek ?? CURRENT_WEEK;
+
+    let maxX = 0;
+    let minYAll = Infinity;
+    let maxYAll = -Infinity;
+
+    // пиксельные границы клеток текущей недели (с учётом marginTop / height)
+    let weekTop = Infinity;      // самый верхний пиксель
+    let weekBottom = -Infinity;  // самый нижний пиксель
+
+    for (const c of cells) {
+        const cellH = c.height ?? CELL_HEIGHT;
+        const mTop = c.marginTop ?? 0;
+        const pxTop = c.y * CELL_HEIGHT + mTop;
+        const pxBottom = pxTop + cellH;
+
+        if (c.x > maxX) maxX = c.x;
+        // для полной высоты слоя тоже учитываем margin
+        if (pxTop < minYAll) minYAll = pxTop;
+        if (pxBottom > maxYAll) maxYAll = pxBottom;
+
+        if (c.week === progressWeek) {
+            if (pxTop < weekTop) weekTop = pxTop;
+            if (pxBottom > weekBottom) weekBottom = pxBottom;
+        }
+    }
+
+    // fallback, если на неделе нет клеток
+    if (!Number.isFinite(weekTop)) {
+        weekTop = minYAll;
+        weekBottom = maxYAll;
+    }
+
+    const extraPx = EXTRA_CELLS * CELL_HEIGHT;
+
+    // MapLayer покрывает все клетки (с запасом)
+    const mapTop = Math.min(0, minYAll);
+    const mapBottom = maxYAll + 0.2 * CELL_HEIGHT;
+    const mapH = mapBottom - mapTop;
+    const mapW = (maxX + 1.2) * CELL_WIDTH;
+
+    // разрешённая полоса = неделя ± EXTRA клеток (в пикселях)
+    const allowedTop = weekTop - extraPx;
+    const allowedBottom = weekBottom + extraPx;
+
+    // в координатах MapLayer (если mapTop < 0 — сдвигаем)
+    return {
         mapW,
         mapH,
-        viewportRef,
-        mapLayerRef,
-        padding: PAN_PADDING,
-    });
+        clampBounds: {
+            top: allowedTop - mapTop,
+            bottom: allowedBottom - mapTop,
+        },
+    };
+}, [cells, user?.progressWeek]);
+
+    const { offset, bind } = useMapPan({
+    centerCellId: currentCell.id,
+    cells,
+    cellWidth: CELL_WIDTH,
+    cellHeight: CELL_HEIGHT,
+    mapW,
+    mapH,
+    clampBounds,           // ← обязательно
+    viewportRef,
+    mapLayerRef,
+    padding: PAN_PADDING,
+});
 
     useEffect(() => {
         const el = viewportRef.current;
@@ -148,7 +191,7 @@ export default function PathMap({
                                 <SeparatorCell
                                     key={`separator_${cell.id}_${index}`}
                                     {...separator}
-                                    opacity={cell.week > CURRENT_WEEK ? 0.5 : 1}
+                                    opacity={cell.week > CURRENT_WEEK ? 0.3 : 1}
                                     x={cell.x}
                                     y={cell.y}
                                     isBlured={isBlured}
@@ -160,12 +203,14 @@ export default function PathMap({
                             id={cell.id}
                             x={cell.x}
                             y={cell.y}
+                            zIndex={cell.zIndex}
                             marginLeft={cell.marginLeft}
                             marginTop={cell.marginTop}
                             tileSrc={cell.tileSrc}
                             width={cell.width}
                             height={cell.height}
                             isStart={cell.isStart}
+                            type={cell.type}
                             isActive={cell.id === activeCell.id}
                             activeColor={cell.activeColor}
                             cellType={cell.cellType}

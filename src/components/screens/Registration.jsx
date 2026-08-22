@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import {useMemo, useState, useEffect} from 'react';
 import styled from "styled-components";
 import { CURRENT_WEEK } from "../../contexts/ProgressProvider";
 import { useProgress } from "../../hooks/useProgress";
@@ -15,6 +15,7 @@ import { Title } from "../shared/Title";
 import {LogoOutlined} from '../shared/LogoOutlined';
 import { Block } from "../shared/Block";
 import { Button } from "../shared/Button";
+import {preload} from '../../constants/screensComponents';
 
 const BlockStyled = styled(Block)`
     margin-top: ${({$ratio}) => $ratio * 27}px;
@@ -114,6 +115,14 @@ const Registration = () => {
     const [isSurnameCorrect, setIsSurnameCorrect] = useState(true);
     const [isEmailFieldCorrect, setIsEmailFieldCorrect] = useState(true);
     const [isAlreadyHas, setIsAlreadyHas] = useState(false);
+
+    useEffect(() => {
+        //TODO: load картинок из лобби или waiting
+        Promise.all([
+            preload.sex(),
+            ...(CURRENT_WEEK > 0 ? [preload.lobby()] : [preload.waiting()]),
+        ]).catch(console.error);
+    }, []);
 
      //TODO: че происходит на найденную почту или это на экран раньше спрашивают
     const handleClick = async () => {

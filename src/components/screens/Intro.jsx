@@ -7,6 +7,9 @@ import { Title } from "../shared/Title";
 import { Text } from "../shared/Text";
 import { Button } from "../shared/Button";
 import { useProgress } from "../../hooks/useProgress";
+import { useEffect } from "react";
+import { CURRENT_WEEK } from "../../contexts/ProgressProvider";
+import { preload } from "../../constants/screensComponents";
 
 const ContentWrapper = styled(Block)`
     position: absolute;
@@ -40,6 +43,11 @@ const IntroScreen = () => {
     const handleClick = () => {
         next();
     };
+
+    //TODO: load картинок из introReg или waiting
+    useEffect(() => {
+        preload.introReg();
+    }, []);
 
     return (
         <FlexWrapper>

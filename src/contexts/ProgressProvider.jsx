@@ -89,6 +89,8 @@ export function ProgressProvider(props) {
             const {data = {}} = info ?? {};
 
             setIsFemale(data.gender === GENDERS.Female);
+            console.log('ProgressProvider initProject setFinishedTurnsModal', !data.lastOpenedCell && data.turns < 1);
+            setFinishedTurnsModal(!data.lastOpenedCell && data.turns < 1);
 
             if (data.facId) {
                 updateShopItems(data.facId);

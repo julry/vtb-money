@@ -8,6 +8,8 @@ import { Text } from "../shared/Text";
 import { Button } from "../shared/Button";
 import pic from '../../assets/images/introreg.webp';
 import { useProgress } from "../../hooks/useProgress";
+import {useEffect} from 'react';
+import {preload} from '../../constants/screensComponents';
 
 const ContentWrapper = styled(Block)`
     position: absolute;
@@ -42,6 +44,17 @@ const IntroRegScreen = () => {
     const handleClick = () => {
         next();
     };
+
+    useEffect(() => {
+        preload.reg();
+                    // if (cancelled) return;
+                    // await preload.sex();
+                    // if (cancelled) return;
+    
+                    // if (CURRENT_WEEK > 0) {
+                    //     await preload.lobby();
+                    // }
+    }, []);
 
     return (
         <FlexWrapper>

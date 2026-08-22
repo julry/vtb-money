@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useProgress } from "../hooks/useProgress";
 import { FlexWrapper } from "./shared/ContentWrapper";
@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 
 export function ScreenContent() {
     const { isLoading, tgError, openedModal, currentScreen } = useProgress();
-    const Screen = screens[currentScreen];
+    const Screen = useMemo(() => screens[currentScreen], [currentScreen]);
 
     if (tgError?.isError) return (
         <div>
@@ -38,11 +38,11 @@ export function ScreenContent() {
                 $isBlurTransitionDisabled={openedModal?.isBlurTransitionDisabled}
             >
                 <DelayedSuspenseWithPrevious
-                    fallback={<Loading />} 
-                    delay={900}
-                    currentKey={currentScreen}
+                fallback={<Loading />}
+                delay={500}          // ← теперь по умолчанию 500
+                currentKey={currentScreen}
                 >
-                    <Screen />
+                <Screen />
                 </DelayedSuspenseWithPrevious>
             </Wrapper>
         )}

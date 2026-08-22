@@ -14,13 +14,12 @@ const TitleStyled = styled.h3`
     margin-bottom: ${({$ratio}) => $ratio * 10}px;
 `;
 
-
 export const FinishedTurnsModal = () => {
     const ratio = useSizeRatio();
 
     return (
         <ModalStyled>
-            <MovingBlock isInitial={false} top={366} right={-80}>
+            <MovingBlock isInitial={false} top={189} right={-81} width={358}>
                 <TitleStyled $ratio={ratio}>5 ходов сделаны! </TitleStyled>
                 <p>Приходи на следующей неделе делать новые. Пока можешь поиграть в бесконечные мини‑игры по кнопке джойстика</p>
             </MovingBlock>

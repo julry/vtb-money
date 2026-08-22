@@ -15,6 +15,7 @@ export function useMapPan({
 	cellHeight = CELL_HEIGHT,
 	mapW = 0,
 	mapH = 0,
+	clampBounds = null,
 	viewportRef,
 	mapLayerRef,
 	padding = PAN_PADDING,
@@ -33,35 +34,40 @@ export function useMapPan({
 	const animFrom = useRef({ x: 0, y: 0 });
 	const animTo = useRef({ x: 0, y: 0 });
 
-	const mapSizeRef = useRef({ mapW, mapH });
-	mapSizeRef.current = { mapW, mapH };
+	const mapSizeRef = useRef({ mapW, mapH, clampBounds });
+    mapSizeRef.current = { mapW, mapH, clampBounds };
 	const paddingRef = useRef(padding);
 	paddingRef.current = padding;
 
 	const applyTransform = useCallback(
-		(x, y, { clamp = true } = {}) => {
-			let nextX = x;
-			let nextY = y;
+        (x, y, { clamp = true } = {}) => {
+            let nextX = x;
+            let nextY = y;
 
-			if (clamp && viewportRef.current) {
-				const { clientWidth: vw, clientHeight: vh } = viewportRef.current;
-				const { mapW: w, mapH: h } = mapSizeRef.current;
-				if (w > 0 && h > 0 && vw > 0 && vh > 0) {
-					const clamped = clampOffset(x, y, w, h, vw, vh, paddingRef.current);
-					nextX = clamped.x;
-					nextY = clamped.y;
-				}
-			}
+            if (clamp && viewportRef.current) {
+                const { clientWidth: vw, clientHeight: vh } = viewportRef.current;
+                const { mapW: w, mapH: h, clampBounds: bounds } = mapSizeRef.current;
 
-			const el = mapLayerRef.current;
-			if (el) {
-				el.style.transform = `translate3d(${nextX}px, ${nextY}px, 0)`;
-			}
-			offsetRef.current = { x: nextX, y: nextY };
-			return offsetRef.current;
-		},
-		[mapLayerRef, viewportRef]
-	);
+                if (w > 0 && h > 0 && vw > 0 && vh > 0) {
+                    const clamped = clampOffset(
+                        x, y, w, h, vw, vh,
+                        paddingRef.current,
+                        bounds
+                    );
+                    nextX = clamped.x;
+                    nextY = clamped.y;
+                }
+            }
+
+            const el = mapLayerRef.current;
+            if (el) {
+                el.style.transform = `translate3d(${nextX}px, ${nextY}px, 0)`;
+            }
+            offsetRef.current = { x: nextX, y: nextY };
+            return offsetRef.current;
+        },
+        [mapLayerRef, viewportRef]
+    );
 
 	// плавная анимация к точке
 	const animateTo = useCallback(
@@ -123,7 +129,7 @@ export function useMapPan({
 			let targetY = vh / 2 - cellCenterY;
 
 			if (w > 0 && h > 0 && vw > 0 && vh > 0) {
-				const clamped = clampOffset(targetX, targetY, w, h, vw, vh, paddingRef.current);
+				const clamped = clampOffset(targetX, targetY, w, h, vw, vh, paddingRef.current, mapSizeRef.current.clampBounds);
 				targetX = clamped.x;
 				targetY = clamped.y;
 			}

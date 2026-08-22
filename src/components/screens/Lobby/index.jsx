@@ -20,6 +20,7 @@ import { TurnsInfoModal } from "../../shared/modals/TurnsInfoModal";
 import { SettingsModal } from "../../shared/modals/SettingsModal";
 import { OnBoardingModal } from "../../shared/modals/OnboardingModal";
 import { FinishedTurnsModal } from "./FinishedTurnsModal";
+import { preload } from "../../../constants/screensComponents";
 
 const ButtonStyled = styled(Button)`
     position: absolute;
@@ -70,7 +71,7 @@ const SettingsButton = styled(TurnsButton)`
 const Lobby = () => {
     const ratio = useSizeRatio();
     const { next, user, handleOpenModal, updateUser, setGameState, isMapHidden, isFinishedTurnsModal } = useProgress();
-    //мб перенести в отдельный стейт
+
     const lastCell = useMemo(() => {
         if (user.lastOpenedCell) {
             return user.lastOpenedCell
@@ -94,6 +95,14 @@ const Lobby = () => {
         return () => document.body.removeEventListener('touchmove', preventDefault);
     }, []);
 
+    useEffect(() => {
+        Promise.all([
+            preload.introReg(),
+            preload.reg(),
+            preload.sex(),
+            preload.lobby(),
+        ]).catch(console.error);
+    }, []);
 
     useEffect(() => {
         if (!user.seenStartInfo) {
@@ -168,7 +177,7 @@ const Lobby = () => {
             <ButtonStyled $ratio={ratio}  $top={(user.isTargeted ? 260 : 199) * ratio} type="transparent" onClick={() => next(SCREENS.RULES)}>
                 <img src={rules} alt="Правила"/>
             </ButtonStyled>
-            {!isMapHidden && <PathMap onCheckTurns={handleCheckTurns} isBlured={isUnfinishedModal} centerCellId={lastCell} cellIndex={cellIndex}/>}
+            {!isMapHidden && <PathMap onCheckTurns={handleCheckTurns} isBlured={isUnfinishedModal} centerCellId={lastCell} cellIndex={cellIndex} />}
             <NumberPicker isBlured={isUnfinishedModal} onChange={handleMakeTurn}/>
             {isUnfinishedModal && (
                 <UnfinishedModal lastOpenedCell={user.lastOpenedCell} onClose={handleClose}/>

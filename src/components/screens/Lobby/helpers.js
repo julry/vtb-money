@@ -1,4 +1,4 @@
-import { CELL_HEIGHT, CELL_WIDTH, CHARACTER_HEIGHT, CHARACTER_WIDTH, CULL_BUFFER, MAX_CELL_H, MAX_CELL_W, MAX_MARGIN_LEFT, MAX_MARGIN_TOP, PAN_PADDING } from "./constants";
+import {CELL_HEIGHT, CELL_WIDTH, CHARACTER_HEIGHT, CHARACTER_WIDTH, CULL_BUFFER, MAX_CELL_H, MAX_CELL_W, MAX_MARGIN_LEFT, MAX_MARGIN_TOP, PAN_PADDING, MAX_X} from './constants';
 
 export function getVisibleCells(
     spatialIndex,
@@ -47,16 +47,41 @@ export function getVisibleCells(
 }
 
 
-export function clampOffset(x, y, mapW, mapH, vw, vh, padding = PAN_PADDING) {
+export function clampOffset(
+    x,
+    y,
+    mapW,
+    mapH,
+    vw,
+    vh,
+    padding = PAN_PADDING,
+    clampBounds = null, // { top, bottom } в px слоя MapLayer
+) {
+    // --- X (как было) ---
     let minX = vw - mapW - padding.right;
     let maxX = padding.left;
-    let minY = vh - mapH - padding.bottom;
-    let maxY = padding.top;
 
     if (minX > maxX) {
         x = (minX + maxX) / 2;
     } else {
         x = Math.max(minX, Math.min(maxX, x));
+    }
+
+    // --- Y ---
+    let minY, maxY;
+
+    if (clampBounds && Number.isFinite(clampBounds.top) && Number.isFinite(clampBounds.bottom)) {
+        // topAllowed появляется на экране при: offset.y + clampBounds.top
+        // хотим, чтобы topAllowed не уходил выше padding.top
+        maxY = padding.top - clampBounds.top;
+
+        // bottomAllowed появляется при: offset.y + clampBounds.bottom
+        // хотим, чтобы bottomAllowed не уходил ниже vh - padding.bottom
+        minY = vh - padding.bottom - clampBounds.bottom;
+    } else {
+        // fallback — весь mapH
+        minY = vh - mapH - padding.bottom;
+        maxY = padding.top;
     }
 
     if (minY > maxY) {
@@ -65,6 +90,9 @@ export function clampOffset(x, y, mapW, mapH, vw, vh, padding = PAN_PADDING) {
         y = Math.max(minY, Math.min(maxY, y));
     }
 
+    if (clampBounds) {
+    console.log('clamp Y', { y, minY, maxY, top: clampBounds.top, bottom: clampBounds.bottom });
+}
     return { x, y };
 }
 
@@ -101,7 +129,7 @@ export function getCharacterStyle(cell) {
     width: CHARACTER_WIDTH,
     height: CHARACTER_HEIGHT,
     transition: 'left 0.4s ease, top 0.4s ease', // плавное перемещение
-    zIndex: 20,
+    zIndex: MAX_X + 1,
     pointerEvents: 'none',
   };
 }
