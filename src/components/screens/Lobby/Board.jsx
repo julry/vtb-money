@@ -6,7 +6,7 @@ import React, {
     useCallback,
 } from 'react';
 import styled from 'styled-components';
-import {CELL_HEIGHT, CELL_WIDTH, CULL_BUFFER, EXTRA_CELLS, GAME_CELLS, PAN_PADDING} from './constants';
+import {CELL_HEIGHT, CELL_WIDTH, CULL_BUFFER, EXTRA_CELLS, GAME_CELLS, PAN_PADDING, START_CELL_HEIGHT, START_CELL_WIDTH} from './constants';
 import characterSrc from '../../../assets/images/person/persStandLobby.webp';
 import characterFSrc from '../../../assets/images/person/persFStandLobby.webp';
 import characterInvest from '../../../assets/images/person/persInvest.webp';
@@ -27,6 +27,7 @@ import { CURRENT_WEEK } from '../../../contexts/ProgressProvider';
 import { useCharacterPath } from './useCharacterPath';
 import { useProgress } from '../../../hooks/useProgress';
 import { CellModal } from '../../shared/modals/CellModal';
+import { LockIcon } from './Lock';
 
 const Viewport = styled.div`
   position: relative;
@@ -43,12 +44,25 @@ const MapLayer = styled.div`
   left: 0;
   will-change: transform;
   transform: translate3d(0, 0, 0);
-  contain: layout paint;
+  contain: layout;
+  overflow: visible;
 `;
 
 const Person = styled.img`
   transform: rotate(25deg);
   object-fit: contain;
+`;
+
+const Shining = styled.div`
+    position: absolute;
+    width: 146px;
+    height: 123px;
+    background: linear-gradient(177.61deg, #A1CEFF -23.54%, rgba(196, 224, 255, 0.626532) 34.5%, rgba(255, 255, 255, 0) 94.35%);
+    left: ${({ $x }) => $x * CELL_WIDTH}px;
+    top: ${({ $y }) => $y * CELL_HEIGHT}px;
+    margin-left: ${({ $marginLeft }) => $marginLeft || 0}px;
+    margin-top: ${({ $marginTop }) => $marginTop || 0}px;
+    transform: rotate(25deg);
 `;
 
 export default function PathMap({
@@ -255,6 +269,22 @@ const { mapW, mapH, clampBounds } = useMemo(() => {
                                 />
                             ))
                         }
+                        {activeCell.id === cell.id && cell.shining &&(
+                            <Shining 
+                                $x={cell.x}
+                                $marginLeft={cell.shining.marginLeft} 
+                                $marginTop={cell.shining.marginTop} 
+                                $y={cell.y}
+                            />
+                        )}
+
+                        {user.progressWeek !== cell.week && cell.lock && (
+                            <LockIcon 
+                                x={cell.x}
+                                y={cell.y}
+                                {...cell.lock} 
+                            />
+                        )}
                         
                         <TileCell
                             id={cell.id}

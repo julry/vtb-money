@@ -64,6 +64,10 @@ export const GAME_CELLS = [
       height: START_CELL_HEIGHT,
       marginLeft: 0,
       marginTop: -25,
+      shining: {
+        marginLeft: -10,
+        marginTop: 10,
+      },
       separators: [
         {
           marginLeft: START_CELL_WIDTH - 22,
@@ -787,6 +791,10 @@ export const GAME_CELLS = [
       marginTop: 50,
       marginLeft: -320,
       week: 2,
+      lock: {
+        marginTop: 0,
+        marginLeft: -275,
+      },
       separators: [
       { marginLeft: -296, marginTop: 45 },
     ],

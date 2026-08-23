@@ -22,9 +22,10 @@ export const useGame = () => {
   const lastTimeRef = useRef(0);
   const keysRef = useRef({ left: false, right: false });
   const touchSideRef = useRef(null);
-  const currentCharSrcRef = useRef('');
+  const accumulatorRef = useRef(0);
+  const FIXED_DT = 1 / 60;
 
-  const itemPoolRef = useRef([]); 
+  const itemPoolRef = useRef([]);
 
   const heightRef = useRef(
     typeof window !== 'undefined' && window.innerWidth > MIN_MOCKUP_WIDTH
@@ -117,18 +118,20 @@ export const useGame = () => {
     const y = -height - 20;
     const speed = generateRandomNumber(160, 300);
     const rotation = generateRandomNumber(-12, 12);
-  
+
     const poolItem = getItem();
 
     poolItem.el.style.width = `${width}px`;
     poolItem.el.style.height = `${height}px`;
     poolItem.el.style.backgroundImage = `url(${template.img})`;
     poolItem.el.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${rotation}deg)`;
-   
+
     state.items.push({
       id: `item_${state.itemCounter++}`,
       x,
       y,
+      prevX: x,
+      prevY: y,
       rotation,
       width,
       height,
@@ -151,6 +154,8 @@ export const useGame = () => {
     state.player = {
       x: 29,
       y: startY,
+      prevX: 29,
+      prevY: startY,
       velocityX: 0,
       width: PLAYER_SIZE,
       height: PLAYER_HEIGHT,
@@ -168,7 +173,6 @@ export const useGame = () => {
     setStarted(true);
     setDisplayScore(0);
     setDisplayLives(3);
-    currentCharSrcRef.current = '';
   };
 
   /* ── Игровая логика ── */
@@ -177,41 +181,46 @@ export const useGame = () => {
     if (state.gameOver || !state.started || state.paused || !state.player) return;
 
     const player = state.player;
-    const scale = dt * 60; // нормализация к 60 fps
 
-    /* ввод — только горизонталь */
+    // сохраняем предыдущие позиции ПЕРЕД обновлением
+    player.prevX = player.x;
+    player.prevY = player.y;
+
+    // ввод
     if (keysRef.current.left || touchSideRef.current === 'left') {
       player.velocityX = -MOVE_SPEED;
     } else if (keysRef.current.right || touchSideRef.current === 'right') {
       player.velocityX = MOVE_SPEED;
     } else {
-      player.velocityX *= Math.pow(0.85, scale);
+      player.velocityX *= 0.85; // при fixed dt можно просто так
     }
 
-    player.x += player.velocityX * scale;
+    player.x += player.velocityX * dt * 60; // *60, если MOVE_SPEED был под 60 fps
 
-    // границы экрана
+    // границы
     if (player.x < 0) player.x = 0;
     if (player.x + player.width > widthRef.current) {
       player.x = widthRef.current - player.width;
     }
 
-    /* спавн предметов */
+    // спавн
     state.spawnTimer -= dt;
     if (state.spawnTimer <= 0) {
       spawnItem(state);
-      // интервал зависит от счёта (усложнение)
       const baseInterval = 0.9;
       const difficulty = Math.min(state.score * 0.0015, 0.5);
       state.spawnTimer = baseInterval - difficulty + Math.random() * 0.3;
     }
 
-    /* движение предметов вниз */
+    // предметы
     for (let i = state.items.length - 1; i >= 0; i--) {
       const it = state.items[i];
+
+      it.prevX = it.x;
+      it.prevY = it.y;
+
       it.y += it.speed * dt;
 
-      // улетел за низ экрана
       if (it.y > heightRef.current + 50) {
         releaseItem(it.item);
         state.items.splice(i, 1);
@@ -233,7 +242,7 @@ export const useGame = () => {
         collisionTop < it.y + it.height &&
         collisionBottom > it.y;
 
-        
+
       if (overlapX && overlapY) {
         if (it.isBad) {
           state.lives -= 1;
@@ -367,7 +376,7 @@ export const useGame = () => {
     initGame,
     gameOver,
     score: displayScore,
-    lives: displayLives,   
+    lives: displayLives,
     togglePause,
     forceGameOver,
   };
