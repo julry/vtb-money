@@ -9,7 +9,6 @@ import arrow from '../../../assets/images/arrowRight.webp';
 import field from '../../../assets/images/onboardingField.webp';
 import profile from '../../../assets/images/profile.webp';
 import rules from '../../../assets/images/rules.webp';
-import turns from '../../../assets/images/turns.webp';
 import shop from '../../../assets/images/shop.webp';
 import games from '../../../assets/images/games.webp';
 import { Modal } from "./Modal";

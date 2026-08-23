@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import {PERS_IMAGES, PERSON_HEIGHT, PERSON_WIDTH, TILE_SIZE, PERS_IMAGES_F} from './constants';
+import {PERS_IMAGES, PERSON_HEIGHT, PERSON_WIDTH, TILE_SIZE, PERS_IMAGES_F, TRASH_IMAGES, TREE_IMAGES} from './constants';
 import { useGame } from './useGame';
 import { useLayoutEffect, memo, useRef, useState, useCallback, useMemo } from 'react';
 import { BackHeaderGame } from '../../../shared/BackHeaderGame';
@@ -12,6 +12,7 @@ import { CURRENT_WEEK } from '../../../../contexts/ProgressProvider';
 import { EndModal } from '../../../shared/modals/EndModal';
 import { getPluralCoins } from '../../../../utils/getPluralCoins';
 import { SCREENS } from '../../../../constants/screens';
+import { useImagePreloader } from '../../../../hooks/useImagePreloader';
 
 const GameContainer = styled.div`
   position: relative;
@@ -66,8 +67,9 @@ export default function GameCrossRoad() {
     const [isRules, setIsRules] = useState(false);
     const { handleOpenModal, gameState, user, next, updateUser, finishCell, isFemale } = useProgress();
 
-    const finishGame = useCallback(({isFromGame, score}) => {
+    const finishGame = useCallback(({isFromGame, score, shouldShowModal = true}) => {
         let coins = 0;
+        const hasPlayedBefore = user.crossyroad?.hasPlayed;
         const newInfiniteCoins = [...(user.infiniteCoins ?? [])];
         const newGameInfo = { ...(user.crossyroad ?? {}), hasPlayed: true };
 
@@ -92,26 +94,29 @@ export default function GameCrossRoad() {
             }
         }
 
+        //TODO: нужно ?? sex message
+
         if (gameState?.id) {
             finishCell(gameState?.id, { coinsAdd: coins, score }, coins, {crossyroad: newGameInfo});
-        } else {
+        } else if (!hasPlayedBefore || coins > 0) {
             updateUser({ totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, crossyroad: newGameInfo })
         }
-        //TODO: нужно ?? sex message
-        const title = isFromGame ? 'Траты не обошли тебя стороной' : `Ты преодолел путь`;
-        const subTitle = `${isFromGame ? 'Но это не страшно:\nты ' : 'и '}заработал ${getPluralCoins(coins)}`;
+        if (shouldShowModal) {
+            const title = isFromGame ? 'Траты не обошли тебя стороной' : `Ты преодолел путь`;
+            const subTitle = `${isFromGame ? 'Но это не страшно:\nты ' : 'и '}заработал ${getPluralCoins(coins)}`;
 
-        const isGameMode = gameState?.isInfinite;
-        handleOpenModal({
-            Component: (
-                <EndModal 
-                    onClose={isGameMode ? resetGame : next(SCREENS.LOBBY)} 
-                    isGameMode={isGameMode} 
-                    title={title} 
-                    subTitle={subTitle} 
-                />
-            )
-        })
+            const isGameMode = gameState?.isInfinite;
+            handleOpenModal({
+                Component: (
+                    <EndModal 
+                        onClose={isGameMode ? resetGame : next(SCREENS.LOBBY)} 
+                        isGameMode={isGameMode} 
+                        title={title} 
+                        subTitle={subTitle} 
+                    />
+                )
+            })
+        }
     }, []);
 
     const {
@@ -160,6 +165,8 @@ export default function GameCrossRoad() {
 
     const images = useMemo(() => isFemale ? PERS_IMAGES_F : PERS_IMAGES, []);
 
+    useImagePreloader([...Object.values(images), ...TREE_IMAGES, ...TRASH_IMAGES]);
+
     const currentLaneIndex = Math.floor(
         (heightRef.current - playerYRef.current) / TILE_SIZE
     ) - 1;
@@ -169,6 +176,7 @@ export default function GameCrossRoad() {
             <BackHeaderGame
                 onRulesClick={handleToggleRules}
                 isHidden={isRules}
+                onExit={gameState?.isInfinite ? () => finishGame({score, shouldShowModal: false}) : undefined}
                 timerData={{ isStart: gameStarted, initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK], onFinish: die }}
                 currentPoints={score > 99 ? score : score > 9 ? `0${score}` : `00${score}`}
                 shouldShowCoinIcon={false}

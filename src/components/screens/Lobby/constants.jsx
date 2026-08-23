@@ -35,7 +35,7 @@ export const MAX_MARGIN_TOP = 130;
 export const MAX_CELL_W = START_CELL_WIDTH;
 export const MAX_CELL_H = START_CELL_HEIGHT;
 
-export const EXTRA_CELLS = 5;
+export const EXTRA_CELLS = 1;
 /** Доп. ячейки вокруг вьюпорта, чтобы при быстром драге не мелькало */
 export const CULL_BUFFER = 4;
 /** Как часто пересчитывать видимые плитки во время драга (ms) */
@@ -46,12 +46,10 @@ export const MAX_Y = 8;
 
 export const PAN_PADDING = {
     top: 120,
-    right: -250,
-    bottom: 250,
-    left: 40,
+    right: 0,
+    bottom: 200,
+    left: 70,
 };
-
-// export const PAN_PADDING_2 = {}
 
 //TODO: тексты просмотреть по фигме
 export const GAME_CELLS = [

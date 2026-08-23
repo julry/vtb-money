@@ -55,33 +55,36 @@ export function clampOffset(
     vw,
     vh,
     padding = PAN_PADDING,
-    clampBounds = null, // { top, bottom } в px слоя MapLayer
+    clampBounds = null, // { left, right, top, bottom }
 ) {
-    // --- X (как было) ---
-    let minX = vw - mapW - padding.right;
-    let maxX = padding.left;
+    let minX, maxX, minY, maxY;
+
+    if (
+        clampBounds &&
+        Number.isFinite(clampBounds.left) &&
+        Number.isFinite(clampBounds.right) &&
+        Number.isFinite(clampBounds.top) &&
+        Number.isFinite(clampBounds.bottom)
+    ) {
+        // X: leftAllowed появляется на экране при offset.x + clampBounds.left
+        maxX = padding.left - clampBounds.left;
+        minX = vw - padding.right - clampBounds.right;
+
+        // Y
+        maxY = padding.top - clampBounds.top;
+        minY = vh - padding.bottom - clampBounds.bottom;
+    } else {
+        // fallback — весь map
+        minX = vw - mapW - padding.right;
+        maxX = padding.left;
+        minY = vh - mapH - padding.bottom;
+        maxY = padding.top;
+    }
 
     if (minX > maxX) {
         x = (minX + maxX) / 2;
     } else {
         x = Math.max(minX, Math.min(maxX, x));
-    }
-
-    // --- Y ---
-    let minY, maxY;
-
-    if (clampBounds && Number.isFinite(clampBounds.top) && Number.isFinite(clampBounds.bottom)) {
-        // topAllowed появляется на экране при: offset.y + clampBounds.top
-        // хотим, чтобы topAllowed не уходил выше padding.top
-        maxY = padding.top - clampBounds.top;
-
-        // bottomAllowed появляется при: offset.y + clampBounds.bottom
-        // хотим, чтобы bottomAllowed не уходил ниже vh - padding.bottom
-        minY = vh - padding.bottom - clampBounds.bottom;
-    } else {
-        // fallback — весь mapH
-        minY = vh - mapH - padding.bottom;
-        maxY = padding.top;
     }
 
     if (minY > maxY) {
@@ -90,9 +93,6 @@ export function clampOffset(
         y = Math.max(minY, Math.min(maxY, y));
     }
 
-    if (clampBounds) {
-    console.log('clamp Y', { y, minY, maxY, top: clampBounds.top, bottom: clampBounds.bottom });
-}
     return { x, y };
 }
 
@@ -114,13 +114,13 @@ export function getCharacterStyle(cell) {
     (cell.x ?? 0) * CELL_WIDTH +
     (cell.marginLeft ?? 0) +
     (cell.width ?? CELL_WIDTH) / 2 -
-    CHARACTER_WIDTH / 4;
+    CHARACTER_WIDTH / 6;
 
   const top =
     (cell.y ?? 0) * CELL_HEIGHT +
     (cell.marginTop ?? 0) +
     (cell.height ?? CELL_HEIGHT) / 2 -
-    CHARACTER_HEIGHT + 30;
+    CHARACTER_HEIGHT + 10;
 
   return {
     position: 'absolute',

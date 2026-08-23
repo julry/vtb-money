@@ -18,13 +18,13 @@ const ImageWrapper = styled.div`
     }
 `;
 
-export const StartDoodleModal = () => {
+export const StartCatchModal = () => {
     const ratio = useSizeRatio();
 
     return (
-        <GameModal title={"Прыгай на платформы, избегай препятствий и поднимись на вершину"}>
+        <GameModal title={"Проверь свою реакцию и собери все предметы"}>
             <ImageWrapper $ratio={ratio}>
-                <img src={startImg} alt="" />
+                {/* <img src={startImg} alt="" /> */}
             </ImageWrapper>
         </GameModal>
     )

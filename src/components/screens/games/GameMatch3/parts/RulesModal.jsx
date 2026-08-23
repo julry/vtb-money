@@ -77,7 +77,6 @@ export const RulesMatch3Modal = ({onFinish}) => {
         } 
 
         handleTouchEnd(e);
-        console.log(onFinish);
         onFinish?.();
         closeModal();
     };

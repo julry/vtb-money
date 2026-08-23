@@ -2,11 +2,11 @@ import styled from "styled-components"
 import { Text } from "../Text"
 import { InfoModal } from "./InfoModal"
 import { useSizeRatio } from "../../../hooks/useSizeRatio";
-import money from '../../../assets/images/money.webp';
-import edu from '../../../assets/images/edu.webp';
-import cart from '../../../assets/images/cart.webp';
-import luck from '../../../assets/images/luck.webp';
-import play from '../../../assets/images/play.webp';
+import money from '../../../assets/images/lobby/moneyrect.webp';
+import edu from '../../../assets/images/lobby/quizrect.webp';
+import cart from '../../../assets/images/lobby/investrect.webp';
+import luck from '../../../assets/images/lobby/luckrect.webp';
+import play from '../../../assets/images/lobby/gamerect.webp';
 
 const ModalStyled = styled(InfoModal)`
     & > div {
@@ -47,12 +47,12 @@ const Card = styled.div`
 
 const CardIcon = styled.img`
     position: absolute;
-    top: calc(-1 * var(--spacing_x5));
+    top: ${({$ratio}) => $ratio * -28}px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 2;
-    width: ${({$ratio}) => $ratio * 53}px;
-    height: ${({$ratio}) => $ratio * 45}px;
+    width: ${({$ratio}) => $ratio * 65}px;
+    height: ${({$ratio}) => $ratio * 60}px;
 `;
 
 const cards = [

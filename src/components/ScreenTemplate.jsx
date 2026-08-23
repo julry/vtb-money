@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import { SizeRatioContextProvider } from '../contexts/SizeRatioContext';
 // import WebApp from '@twa-dev/sdk';
 // import { CookieInfo } from './shared/CookieInfo';
-import { useImagePreloader } from '../hooks/useImagePreloader';
-import { commonImages } from '../constants/preloads';
+
 import { useProgress } from '../hooks/useProgress';
 import { SCREENS } from '../constants/screens';
+import { Button } from './shared/Button';
 
 export const TARGET_WIDTH = 375;
 export const TARGET_HEIGHT = 677;
@@ -76,6 +76,34 @@ const Content = styled.div`
     }
 `;
 
+const CookieInfo = styled.div`
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: ${({$sizeRatio}) => $sizeRatio * 325}px;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    z-index: 100000;
+
+    background: rgba(255, 255, 255, 0.25);
+    border: 0.520833px solid rgba(0, 76, 218, 0.5);
+    box-shadow: 0.694444px 0.694444px 1.38889px rgba(1, 32, 103, 0.8), inset 1.38889px 1.38889px 1.38889px rgba(255, 255, 255, 0.4);
+    border-radius: 17px 17px 0px 0px;
+    backdrop-filter: blur(5px);
+    gap: ${({$sizeRatio}) => $sizeRatio * 10}px;
+    font-size: ${({$sizeRatio}) => $sizeRatio * 13}px;
+    color: var(--color-accent);
+    padding: ${({$sizeRatio}) => $sizeRatio * 15}px ${({$sizeRatio}) => $sizeRatio * 20}px ${({$sizeRatio}) => $sizeRatio * 18}px;
+
+    & button {
+        height: ${({$sizeRatio}) => $sizeRatio * 31}px;
+        min-height: ${({$sizeRatio}) => $sizeRatio * 31}px;
+    }
+`;
+
 export function ScreenTemplate(props) {
     const {currentScreen, openedModal} = useProgress();
     const [isShowCookies, setIsShowCookies] = useState(false);
@@ -86,13 +114,14 @@ export function ScreenTemplate(props) {
 
     useEffect(() => { 
         let cookieAgree;
+
         // if (WebApp.DeviceStorage) {
         //     cookieAgree = WebApp.DeviceStorage.getItem('vtb_cookie2026') === 'true';
         // } else {
-        //     cookieAgree = localStorage.getItem('vtb_cookie2026') === 'true';
+            cookieAgree = localStorage.getItem('vtb_money_cookie2026') === 'true';
         // }
 
-        // if (cookieAgree) return;
+        if (cookieAgree) return;
 
         setIsShowCookies(true);
     }, []);
@@ -102,11 +131,9 @@ export function ScreenTemplate(props) {
         // if (WebApp.DeviceStorage) {
         //     WebApp.DeviceStorage.setItem('vtb_cookie2026', 'true');
         // } else {
-        //     localStorage.setItem('vtb_cookie2026', 'true');
+            localStorage.setItem('vtb_cookie2026', 'true');
         // }
     }
-
-    useImagePreloader(commonImages);
 
     return (
         <SizeRatioContextProvider target={wrapperInnerRef} targetWidth={TARGET_WIDTH} targetHeight={TARGET_HEIGHT}>
@@ -118,9 +145,12 @@ export function ScreenTemplate(props) {
                             <AnimatePresence>
                             {openedModal?.isOpen && openedModal?.component}
                             </AnimatePresence>
-                            {/* {isShowCookies && 
-                                <CookieInfo onClose={handleCloseCookie} />
-                            } */}
+                            {isShowCookies && 
+                                <CookieInfo $sizeRatio={sizeRatio}>
+                                    <p>Мы используем куки.{'\n'}Играя, ты соглашаешься с этим</p>
+                                    <Button type="transparent" width={63 * sizeRatio} onClick={handleCloseCookie}>Окей</Button>
+                                </CookieInfo>
+                            }
                         </Content>
                     </WrapperInner>
                 </Wrapper>

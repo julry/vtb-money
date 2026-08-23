@@ -1,32 +1,63 @@
 import styled from "styled-components";
-import { Modal } from "./Modal";
-import { Block } from "../Block";
-import { Button } from "../Button";
+import { CommonModal } from "./CommonModal";
 import { useSizeRatio } from "../../../hooks/useSizeRatio";
+import { SCREENS } from "../../../constants/screens";
+import { useProgress } from "../../../hooks/useProgress";
+import { Title } from "../Title";
+import door from '../../../assets/images/door.webp';
 
-const ModalStyled = styled(Modal)`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: var(--font_sm);
+const TitleStyled = styled(Title)`
+    font-size: ${({$ratio}) => $ratio * 28}px;
 `;
 
-const ButtonWrapper= styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing_x4);
-    width: 100%;
-    padding-bottom: var(--spacing_x6);
-    margin-top: calc(var(--spacing_x5) - var(--spacing_x1)/2);
+const SubTitle = styled.p`
+    font-size: ${({$ratio}) => $ratio * 18}px;
+    font-weight: 400;
+    color: var(--color-accent);
+    text-align: center;
+    margin-top: var(--spacing_x2);
 `;
 
-export const SkipModal = ({ isOpen, onClose, onExit }) => {
+const Image = styled.img`
+    margin: ${({$ratio}) => $ratio * 19}px 0 ${({$ratio}) => $ratio * 12}px ${({$ratio}) => $ratio * 38}px;
+    width: ${({$ratio}) => $ratio * 218}px;
+    height: ${({$ratio}) => $ratio * 172}px;
+    object-fit: contain;
+`;
+
+//TODO: доработать после инфы как ведут себя игры
+
+export const SkipModal = ({ onClose }) => {
     const ratio = useSizeRatio();
+    const { next, gameState } = useProgress();
+    const isGameMode = gameState?.isInfinite;
+
+    const handleClose = () => {
+        onClose?.();
+        next(SCREENS.LOBBY)
+    }
 
     return (
-    <ModalStyled isOpen={isOpen}>
-    </ModalStyled>
-);
-
+        <CommonModal 
+            btnText={'Выйти'} 
+            onClose={handleClose} 
+            secondBtnText={'Продолжить игру'} 
+            secondBtnColor="var(--color-accent)"
+        >
+            <TitleStyled $ratio={ratio}>
+                Хочешь вернуться на главный экран?
+            </TitleStyled>
+            {isGameMode ? (
+                <SubTitle>
+                    Не переживай, заработанные коины сохранятся
+                </SubTitle>
+            ): (
+                <SubTitle>
+                    Прогресс не сохранится
+                </SubTitle>
+            )}
+            
+            <Image $ratio={ratio} src={door} />
+        </CommonModal>
+    )
 }

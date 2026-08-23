@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { useSizeRatio } from "../../../hooks/useSizeRatio";
-import picture from '../../../assets/images/minigamecell.webp'; 
 import { Block } from "../Block";
 import { Modal } from "./Modal";
 import { Title } from "../Title";

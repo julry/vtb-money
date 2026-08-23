@@ -6,9 +6,19 @@ import React, {
     useCallback,
 } from 'react';
 import styled from 'styled-components';
-import {CELL_HEIGHT, CELL_WIDTH, CULL_BUFFER, GAME_CELLS, PAN_PADDING} from './constants';
-import characterSrc from '../../../assets/images/person/persStand.webp';
-import characterFSrc from '../../../assets/images/person/persFStand.webp';
+import {CELL_HEIGHT, CELL_WIDTH, CULL_BUFFER, EXTRA_CELLS, GAME_CELLS, PAN_PADDING} from './constants';
+import characterSrc from '../../../assets/images/person/persStandLobby.webp';
+import characterFSrc from '../../../assets/images/person/persFStandLobby.webp';
+import characterInvest from '../../../assets/images/person/persInvest.webp';
+import characterFInvest from '../../../assets/images/person/persFInvest.webp';
+import characterGame from '../../../assets/images/person/persGame.webp';
+import characterFGame from '../../../assets/images/person/persFGame.webp';
+import characterQuiz from '../../../assets/images/person/persQuiz.webp';
+import characterFQuiz from '../../../assets/images/person/persFQuiz.webp';
+import characterLuck from '../../../assets/images/person/persLuck.webp';
+import characterFLuck from '../../../assets/images/person/persFLuck.webp';
+import characterBonus from '../../../assets/images/person/persBonus.webp';
+import characterFBonus from '../../../assets/images/person/persFBonus.webp';
 import { buildSpatialIndex, getCharacterStyle, getVisibleCells } from './helpers';
 import { useMapPan } from './useMapPan';
 import { SeparatorCell } from './SeparatorCell';
@@ -52,6 +62,7 @@ export default function PathMap({
     const mapLayerRef = useRef(null);
     const [activeCell, setActiveCell] = useState(cells[cellIndex]);
     const [viewportSize, setViewportSize] = useState({ w: 0, h: 0 });
+    const [personSrc, setPersonSrc] = useState(isFemale ? characterFSrc : characterSrc);
 
     const currentCell = cells[cellIndex];
 
@@ -59,75 +70,120 @@ export default function PathMap({
         const currCell = cells[index];
         setActiveCell(currCell);
         setGameState(currCell);
-
         openCell(currCell.id, {week: currCell.week});
         setTimeout(() => {
             handleOpenModal({
                 Component: <CellModal cell={currCell}/>,
             })
-        }, 300)
+        }, 800)
     }, []);
 
+
+    useEffect(() => {
+        const currCell = cells?.find(cell => cell.id === user.lastOpenedCell);
+
+        if (!currCell) {
+            setPersonSrc(isFemale ? characterFSrc : characterSrc)
+        }
+
+        if (currCell?.type === 'minigame') {
+            setPersonSrc(isFemale ? characterFGame : characterGame);
+            return;
+        }
+
+        if (currCell?.type === 'investment') {
+            setPersonSrc(isFemale ? characterFInvest : characterInvest);
+            return;
+        }
+
+        if (currCell?.type === 'bonus') {
+            setPersonSrc(isFemale ? characterFBonus : characterBonus);
+            return;
+        }
+
+        if (currCell?.type === 'quiz') {
+            setPersonSrc(isFemale ? characterFQuiz : characterQuiz);
+            return;
+        }
+        if (currCell?.type === 'luck') {
+            setPersonSrc(isFemale ? characterFLuck : characterLuck);
+            return;
+        }
+
+    }, [user.lastOpenedCell]);
 
     const { animatedCell } = useCharacterPath(cells, cellIndex, onComplete);
 
     const spatialIndex = useMemo(() => buildSpatialIndex(cells), [cells]);
 
-const EXTRA_CELLS = 1; // уже есть в constants
 
 const { mapW, mapH, clampBounds } = useMemo(() => {
     const progressWeek = user?.progressWeek ?? CURRENT_WEEK;
 
-    let maxX = 0;
+    let minXAll = Infinity;
+    let maxXAll = -Infinity;
     let minYAll = Infinity;
     let maxYAll = -Infinity;
 
-    // пиксельные границы клеток текущей недели (с учётом marginTop / height)
-    let weekTop = Infinity;      // самый верхний пиксель
-    let weekBottom = -Infinity;  // самый нижний пиксель
+    let weekLeft = Infinity;
+    let weekRight = -Infinity;
+    let weekTop = Infinity;
+    let weekBottom = -Infinity;
 
     for (const c of cells) {
+        const cellW = c.width ?? CELL_WIDTH;
         const cellH = c.height ?? CELL_HEIGHT;
+        const mLeft = c.marginLeft ?? 0;
         const mTop = c.marginTop ?? 0;
+
+        const pxLeft = c.x * CELL_WIDTH + mLeft;
+        const pxRight = pxLeft + cellW;
         const pxTop = c.y * CELL_HEIGHT + mTop;
         const pxBottom = pxTop + cellH;
 
-        if (c.x > maxX) maxX = c.x;
-        // для полной высоты слоя тоже учитываем margin
+        // полные границы карты
+        if (pxLeft < minXAll) minXAll = pxLeft;
+        if (pxRight > maxXAll) maxXAll = pxRight;
         if (pxTop < minYAll) minYAll = pxTop;
         if (pxBottom > maxYAll) maxYAll = pxBottom;
 
+        // границы текущей недели
         if (c.week === progressWeek) {
+            if (pxLeft < weekLeft) weekLeft = pxLeft;
+            if (pxRight > weekRight) weekRight = pxRight;
             if (pxTop < weekTop) weekTop = pxTop;
             if (pxBottom > weekBottom) weekBottom = pxBottom;
         }
     }
 
-    // fallback, если на неделе нет клеток
-    if (!Number.isFinite(weekTop)) {
+    // fallback
+    if (!Number.isFinite(weekLeft)) {
+        weekLeft = minXAll;
+        weekRight = maxXAll;
         weekTop = minYAll;
         weekBottom = maxYAll;
     }
 
-    const extraPx = EXTRA_CELLS * CELL_HEIGHT;
+    const extraX = EXTRA_CELLS * CELL_WIDTH;
+    const extraY = EXTRA_CELLS * CELL_HEIGHT;
 
-    // MapLayer покрывает все клетки (с запасом)
+    // MapLayer должен покрывать всё
+    const mapLeft = Math.min(0, minXAll);
     const mapTop = Math.min(0, minYAll);
+    const mapRight = maxXAll + 0.2 * CELL_WIDTH;
     const mapBottom = maxYAll + 0.2 * CELL_HEIGHT;
+
+    const mapW = mapRight - mapLeft;
     const mapH = mapBottom - mapTop;
-    const mapW = (maxX + 1.2) * CELL_WIDTH;
 
-    // разрешённая полоса = неделя ± EXTRA клеток (в пикселях)
-    const allowedTop = weekTop - extraPx;
-    const allowedBottom = weekBottom + extraPx;
-
-    // в координатах MapLayer (если mapTop < 0 — сдвигаем)
     return {
         mapW,
         mapH,
         clampBounds: {
-            top: allowedTop - mapTop,
-            bottom: allowedBottom - mapTop,
+            left:   (weekLeft - extraX) - mapLeft,
+            right:  (weekRight + extraX) - mapLeft,
+            top:    (weekTop - extraY) - mapTop,
+            bottom: (weekBottom + extraY) - mapTop,
         },
     };
 }, [cells, user?.progressWeek]);
@@ -171,6 +227,7 @@ const { mapW, mapH, clampBounds } = useMemo(() => {
             CULL_BUFFER
         );
     }, [spatialIndex, offset, viewportSize, cells]);
+
 
     //TODO: активные клетки доделать в том числе подсветку первой клетки
     return (
@@ -220,7 +277,7 @@ const { mapW, mapH, clampBounds } = useMemo(() => {
                     </React.Fragment>
                 ))}
                 <Person
-                    src={isFemale ? characterFSrc : characterSrc}          // путь к спрайту
+                    src={personSrc}          // путь к спрайту
                     alt=""
                     style={getCharacterStyle(animatedCell)}
                 />

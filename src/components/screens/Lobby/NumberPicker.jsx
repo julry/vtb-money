@@ -21,7 +21,7 @@ const PickerContainer = styled(Block)`
     user-select: none;
     z-index: 10;
     overflow: hidden;
-    ${({$isBlured}) => $isBlured ? 'filter: blur(5px)' : ''};
+    ${({$isBlured}) => $isBlured ? 'filter: blur(3px)' : ''};
 `;
 
 const PickerTitle = styled(Title)`

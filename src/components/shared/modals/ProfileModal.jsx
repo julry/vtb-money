@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import {motion} from 'framer-motion';
 import { Modal } from './Modal';
 import { useSizeRatio } from '../../../hooks/useSizeRatio';
-import { useState } from 'react';
 import { useProgress } from '../../../hooks/useProgress';
 import {Text} from '../Text';
 import {FlexRowWrapper} from '../ContentWrapper';

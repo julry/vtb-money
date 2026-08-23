@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import { useProgress } from "../../hooks/useProgress";
 import styled from "styled-components";
 import { useSizeRatio } from "../../hooks/useSizeRatio";
@@ -7,14 +7,12 @@ import { BackHeader } from "../shared/BackHeader";
 import { ShopCard } from "../shared/ShopCard";
 import { mapIdToImage } from "../../utils/mapItemIdToImage";
 import { Button } from "../shared/Button";
-import {Text} from '../shared/Text';
+import { Text } from '../shared/Text';
 import { Scrollbar } from "../shared/ScrollBar";
 import { CURRENT_WEEK } from "../../contexts/ProgressProvider";
-import {SCREENS} from '../../constants/screens';
-import { faculties, universities } from "../../constants/universities";
+import { SCREENS } from '../../constants/screens';
 import {ConfirmShopModal} from '../shared/modals/ConfirmShopModal';
 import { EmptyShopModal } from "../shared/modals/EmptyShopModal";
-import {SuccessShopModal} from '../shared/modals/SuccessShopModal';
 
 const Wrapper = styled.div`
     padding-top: ${({$ratio}) => $ratio * 64}px;

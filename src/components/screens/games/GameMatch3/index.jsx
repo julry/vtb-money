@@ -13,6 +13,8 @@ import { EndModal } from '../../../shared/modals/EndModal';
 import {WEEK_TO_TIMER, MAX_INFINITE} from '../constants';
 import { CURRENT_WEEK } from '../../../../contexts/ProgressProvider';
 import {SCREENS} from '../../../../constants/screens';
+import { useImagePreloader } from '../../../../hooks/useImagePreloader';
+import { COLORS } from './constants';
 
 const Wrapper = styled.div`
     height: 100%;
@@ -76,16 +78,19 @@ const GameMatch3 = () => {
     const { openedModal, handleOpenModal, user, gameState, finishCell, updateUser, next } = useProgress();
     const isFirstTime = !user['match-3']?.hasPlayed;
 
+    useImagePreloader(COLORS);
+    
     const { 
         score, selected, board, handleCellClick, 
         handleTouchStart, handleTouchEnd, showShuffle,
         handleSwap, setSelected, resetGame
     } = useGame({isFirstTime});
 
-    const handleFinish = () => {
+    const handleFinish = (shouldShowModal = true) => {
         let coins = 0;
-            const newInfiniteCoins = [...(user.infiniteCoins ?? [])];
-            const newGameInfo = { ...(user['match-3'] ?? {}), hasPlayed: true };
+        const hasPlayedBefore = user['match-3']?.hasPlayed;
+        const newInfiniteCoins = [...(user.infiniteCoins ?? [])];
+        const newGameInfo = { ...(user['match-3'] ?? {}), hasPlayed: true };
     
         if (gameState?.incomes?.length > 0) {
             let coinsIndex = 0;
@@ -110,17 +115,19 @@ const GameMatch3 = () => {
 
         if (gameState?.id) {
             finishCell(gameState?.id, { coinsAdd: coins, score }, coins, {'match-3': newGameInfo});
-        } else {
+        } else if (!hasPlayedBefore || coins > 0) {
             updateUser({ totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, 'match-3': newGameInfo })
         }
         
-        const isGameMode = gameState?.isInfinite;
+        if (shouldShowModal) {
+            const isGameMode = gameState?.isInfinite;
 
-        handleOpenModal({
-            Component: <EndModal title={"Время вышло!"} onClose={isGameMode ? resetGame : next(SCREENS.LOBBY)} isGameMode={isGameMode}  coins={coins}/>,
-        })
+            handleOpenModal({
+                Component: <EndModal title={"Время вышло!"} onClose={isGameMode ? resetGame : next(SCREENS.LOBBY)} isGameMode={isGameMode}  coins={coins}/>,
+            })
+        }
     }
-    //TODO: добавить выход в меню
+
     const { getSeconds, getMinutes } = useTimer({
         isStart: !openedModal?.isOpen, 
         initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK], 
@@ -164,7 +171,10 @@ const GameMatch3 = () => {
 
     return (
         <Wrapper $ratio={ratio}>
-            <BackHeaderGame onRulesClick={handleOpenRules}/>
+            <BackHeaderGame 
+                onRulesClick={handleOpenRules}
+                onExit={gameState?.isInfinite ? () => handleFinish(false) : undefined}
+            />
             <Board board={board} selected={selected} handleCellClick={handleCellClick} handleTouchStart={handleTouchStart} handleTouchEnd={handleTouchEnd} />
             <TimerWrapper $ratio={ratio}>
                 <TimerBlock $ratio={ratio}>

@@ -14,7 +14,7 @@ const loadRules        = () => import("../components/screens/RulesScreen");
 const loadGame2048     = () => import("../components/screens/games/Game2048");
 const loadGameMatch3   = () => import("../components/screens/games/GameMatch3");
 const loadGameRunner   = () => import("../components/screens/games/GameRunner");
-const loadGameDoodle   = () => import("../components/screens/games/GameDoodle");
+const loadGameCatch   = () => import("../components/screens/games/GameCatch");
 const loadGameCrossRoad = () => import("../components/screens/games/GameCrossRoad");
 
 export const screens = {
@@ -32,7 +32,7 @@ export const screens = {
   [SCREENS.GAME2048]:  React.lazy(loadGame2048),
   [SCREENS.GAMEMATCH3]:React.lazy(loadGameMatch3),
   [SCREENS.GAMERUNNER]:React.lazy(loadGameRunner),
-  [SCREENS.GAMEDOODLE]:React.lazy(loadGameDoodle),
+  [SCREENS.GAMECATCH]:React.lazy(loadGameCatch),
   [SCREENS.GAMECROSS]: React.lazy(loadGameCrossRoad),
 };
 
@@ -50,6 +50,6 @@ export const preload = {
   game2048:     loadGame2048,
   gameMatch3:   loadGameMatch3,
   gameRunner:   loadGameRunner,
-  gameDoodle:   loadGameDoodle,
+  gameCatch:   loadGameCatch,
   gameCrossRoad:loadGameCrossRoad,
 };

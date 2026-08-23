@@ -22,14 +22,6 @@ const ImageWrapper = styled.div`
     }
 `;
 
-const SubTitle = styled.p`
-    font-size: ${({$ratio}) => $ratio * 18}px;
-    font-weight: 400;
-    color: var(--color-accent);
-    text-align: center;
-    margin-top: var(--spacing_x2);
-`;
-
 export const ConfirmShopModal = ({itemId}) => {
     const [isLoading, setIsLoading] = useState(false);
     const ratio = useSizeRatio();

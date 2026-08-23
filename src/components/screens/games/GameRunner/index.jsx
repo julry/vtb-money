@@ -20,6 +20,8 @@ import {EndModal} from '../../../shared/modals/EndModal';
 import {getPluralCoins} from '../../../../utils/getPluralCoins';
 import { SCREENS } from "../../../../constants/screens";
 import {getDistance} from './helpers';
+import {useImagePreloader} from '../../../../hooks/useImagePreloader';
+import { trashImages } from "./constants";
 
 const Wrapper = styled.div`
     position: relative;
@@ -61,10 +63,13 @@ function GameRunner({ className }) {
     const sizeRatio = useSizeRatio();
     const { handleOpenModal, openedModal, user, gameState, next, finishCell, updateUser } = useProgress();
     
-    const onDie = useCallback((dist) => {
+    useImagePreloader(trashImages);
+
+    const onDie = useCallback((dist, shouldShowModal = true) => {
         let coins = 0;
-            const newInfiniteCoins = [...(user.infiniteCoins ?? [])];
-            const newGameInfo = { ...(user.runner ?? {}), hasPlayed: true };
+        const hasPlayedBefore = user.runner?.hasPlayed;
+        const newInfiniteCoins = [...(user.infiniteCoins ?? [])];
+        const newGameInfo = { ...(user.runner ?? {}), hasPlayed: true };
     
         if (gameState?.incomes?.length > 0) {
             let coinsIndex = 0;
@@ -89,22 +94,24 @@ function GameRunner({ className }) {
 
         if (gameState?.id) {
             finishCell(gameState?.id, { coinsAdd: coins, score: dist }, coins, {runner: newGameInfo });
-        } else {
+        } else if (!hasPlayedBefore || coins > 0) {
             updateUser({ totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, runner: newGameInfo })
         }
-        const isGameMode = gameState?.isInfinite;
 
-        handleOpenModal({
-            Component: (
-                <EndModal 
-                    title="Забег окончен!"
-                    isGameMode={isGameMode}
-                    onClose={isGameMode ? () => {} : next(SCREENS.LOBBY)}
-                    subTitle={`Ты заработал ${getPluralCoins(coins)}`} 
-                    coins={coins}
-                />
-            )
-        });
+        if (shouldShowModal) {
+            const isGameMode = gameState?.isInfinite;
+            handleOpenModal({
+                Component: (
+                    <EndModal 
+                        title="Забег окончен!"
+                        isGameMode={isGameMode}
+                        onClose={isGameMode ? () => {} : next(SCREENS.LOBBY)}
+                        subTitle={`Ты заработал ${getPluralCoins(coins)}`} 
+                        coins={coins}
+                    />
+                )
+            });
+        }
     }, []);
 
     const {
@@ -153,6 +160,7 @@ function GameRunner({ className }) {
                 currentPoints={getDistance(distance)}
                 shouldShowCoinIcon={false}
                 isHidden={isRules}
+                onExit={gameState?.isInfinite ? () => onDie(distance, false) : undefined}
                 isLarge
                 timerData={{
                     initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK],

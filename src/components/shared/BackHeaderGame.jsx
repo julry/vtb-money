@@ -5,7 +5,7 @@ import questionIcon from '../../assets/images/question.webp';
 import { useSizeRatio } from "../../hooks/useSizeRatio";
 import { useProgress } from "../../hooks/useProgress";
 import { useTimer } from "../../hooks/useTimer";
-import { CommonModal } from "./modals";
+import { CommonModal, SkipModal } from "./modals";
 import {CloseIcon} from './CloseIcon';
 import { SCREENS } from "../../constants/screens";
 
@@ -89,8 +89,8 @@ const InfoWrapper = styled.div`
     }
 `;
 
-export const BackHeaderGame = ({ isCenteredTimer, isHidden, isLarge, onBack, timerData, currentPoints, shouldShowCoinIcon = true, onRulesClick, scoreElementRef }) => {
-    const { next } = useProgress();
+export const BackHeaderGame = ({ isCenteredTimer, isHidden, isLarge, onExit, timerData, currentPoints, shouldShowCoinIcon = true, onRulesClick, scoreElementRef }) => {
+    const { handleOpenModal } = useProgress();
     const { getSeconds, getMinutes} = useTimer(timerData ?? {});
 
     const ratio = useSizeRatio();
@@ -100,9 +100,20 @@ export const BackHeaderGame = ({ isCenteredTimer, isHidden, isLarge, onBack, tim
         callback?.();
     }
 
+    const handleExitClick = () => {
+        handleOpenModal({
+            Component: <SkipModal onClose={onExit} />
+        })
+    }
     return (
         <>
-            <ExitButton $ratio={ratio} $isHidden={isHidden} onPointerDown={e => e?.stopPropagation} onClick={onButtonClick(() => next(SCREENS.LOBBY))} width={90}>
+            <ExitButton 
+                $ratio={ratio} 
+                $isHidden={isHidden} 
+                onPointerDown={e => e?.stopPropagation} 
+                onClick={onButtonClick(handleExitClick)} 
+                width={90}
+            >
                 <CloseIcon />
             </ExitButton>
             

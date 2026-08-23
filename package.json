@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@twa-dev/sdk": "8.0.2",
+    "@vkontakte/vk-bridge": "^3.0.2",
     "framer-motion": "^12.43.0",
     "ft-client": "0.4.1",
     "lodash": "4.18.1",

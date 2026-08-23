@@ -15,6 +15,7 @@ const ButtonStyled = styled(Button)`
     position: relative;
     z-index: 2;
     margin-top: auto;
+    ${({$color}) => $color !== undefined ? 'color:' + $color : ''};
 
     & + & {
         margin-top: var(--spacing_x2);
@@ -25,7 +26,7 @@ const ContentWrapper = styled(Block)`
     padding: ${({$ratio}) => $ratio * 25}px;
 `;
 
-export const CommonModal = ({onClose, customClose = false, children, buttonsDisabled, isDisabledAnimation, secondBtnText, onSecondBtnClick, btnText = 'Далее', ...props }) => {
+export const CommonModal = ({onClose, customClose = false, children, secondBtnColor, buttonsDisabled, isDisabledAnimation, secondBtnText, onSecondBtnClick, btnText = 'Далее', ...props }) => {
     const ratio = useSizeRatio();
     const { handleCloseModal } = useProgress();
 
@@ -47,7 +48,7 @@ export const CommonModal = ({onClose, customClose = false, children, buttonsDisa
                 {children}
                 <ButtonStyled disabled={buttonsDisabled} onClick={handleClickButton}>{btnText}</ButtonStyled>
                 {secondBtnText?.length > 0 && (
-                    <ButtonStyled disabled={buttonsDisabled} type="secondary" onClick={handleClickSecondBtn}>
+                    <ButtonStyled $color={secondBtnColor} disabled={buttonsDisabled} type="secondary" onClick={handleClickSecondBtn}>
                         {secondBtnText}
                     </ButtonStyled>
                 )}

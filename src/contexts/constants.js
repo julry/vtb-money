@@ -52,10 +52,8 @@ export const INITIAL_USER = {
     //Tickets
     bilets: 0,
     infiniteCoins: [0, 0, 0, 0],
-    game2048Infinite: [0, 0, 0, 0],
-    crossyroadInfinite: [0, 0, 0, 0],
-    match3Infinite: [0, 0, 0, 0],
     runner: GAME_COINS_INFO,
+    catchitems: GAME_COINS_INFO,
     2048: GAME_COINS_INFO,
     crossyroad: GAME_COINS_INFO,
     'match-3': GAME_COINS_INFO,
@@ -73,3 +71,8 @@ export const MAX_RETRIES = 3;
 export const RETRY_DELAY = 1000;
 export const BASE_LOCK_TIMEOUT = 5000;
 export const MAX_LOCK_TIMEOUT = 15000; 
+
+export const PLATFORMS = {
+    VK: 'vk',
+    TG: 'tg'
+}

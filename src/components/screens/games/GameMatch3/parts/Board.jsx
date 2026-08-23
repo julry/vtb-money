@@ -11,7 +11,6 @@ const Wrapper = styled.div`
     gap: var(--spacing_x1);
     aspect-ratio: 1;
     width: 100%;
-    /* height: ${({ $ratio }) => CONTAINER_SIZE * $ratio}px; */
     background: rgb(201 216 254);
     border-radius: var(--border-radius-lg);
     border: 0.5px solid var(--color-blue-light);

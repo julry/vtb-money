@@ -72,9 +72,10 @@ function Game2048() {
 
     const {startGame, restartGame, getTiles, moveTiles, score} = useGame(handleResultRef, handleResultRef, false);
 
-    function handleResult() {
+    function handleResult(shouldShowModal = true) {
         let coins = 0;
         const newInfiniteCoins = [...(user.infiniteCoins ?? [])];
+        const hasPlayedBefore = user['2048'].hasPlayed;
         const newGameInfo = {...(user['2048'] ?? {}), hasPlayed: true};
 
         if (gameState?.incomes?.length > 0) {
@@ -100,12 +101,14 @@ function Game2048() {
 
         if (gameState?.id) {
             finishCell(gameState?.id, {coinsAdd: coins, score}, coins, {2048: newGameInfo});
-        } else {
+        } else if (!hasPlayedBefore || coins > 0) {
             updateUser({totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, 2048: newGameInfo})
         }
 
-        const isGameMode = gameState?.isInfinite;
-        handleOpenModal({Component: <EndModal onClose={isGameMode ? restartGame : next(SCREENS.LOBBY)} title={"Ура, капитал собран!"} isGameMode={isGameMode} coins={coins}/>});
+        if (shouldShowModal) {
+            const isGameMode = gameState?.isInfinite;
+            handleOpenModal({Component: <EndModal onClose={isGameMode ? restartGame : next(SCREENS.LOBBY)} title={"Ура, капитал собран!"} isGameMode={isGameMode} coins={coins}/>});
+        }
     }
 
     useLayoutEffect(() => {
@@ -132,7 +135,7 @@ function Game2048() {
         <Wrapper $ratio={ratio}>
             <BackHeaderGame 
                 onRulesClick={() => handleOpenModal({Component: <RulesModal />, isBlurTransitionDisabled: true})}
-                onBack={() => handleOpenModal({Component: <CommonModal />})}
+                onExit={gameState?.isInfinite ? () => handleResult(false) : undefined}
                 isCenteredTimer
                 isLarge
                 timerData={{

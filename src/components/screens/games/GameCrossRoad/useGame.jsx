@@ -1,18 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import {
-    BOTTOM_BUFFER_ROWS,
-    CAMERA_SMOOTHING,
-    LANE_HEIGHT,
-    PERSON_HEIGHT,
-    PERSON_WIDTH,
-    SWIPE_THRESHOLD,
-    TAP_MAX_DURATION,
-    TAP_MAX_MOVE,
-    TILE_SIZE,
-    TOP_BUFFER_ROWS,
-} from './constants';
+import {BOTTOM_BUFFER_ROWS, CAMERA_SMOOTHING, LANE_HEIGHT, PERSON_HEIGHT, PERSON_WIDTH, SWIPE_THRESHOLD, TAP_MAX_DURATION, TAP_MAX_MOVE, TILE_SIZE, TOP_BUFFER_ROWS} from './constants';
 import { generateInitialLanes, generateLane } from './helpers';
-import { HEIGHT, WIDTH } from '../GameDoodle/constants';
+import {HEIGHT, WIDTH} from '../GameCatch/constants';
 import { MIN_MOCKUP_WIDTH } from '../../../ScreenTemplate';
 
 
@@ -268,6 +257,10 @@ export const useGame = ({ onDie }) => {
         }
         if (absDx > absDy && absDx > SWIPE_THRESHOLD) {
             movePlayer(dx > 0 ? 1 : -1, 0);
+        }
+
+        if (absDy > absDx && absDy > SWIPE_THRESHOLD && dy < 0) {
+            movePlayer(0, -1);
         }
     }, [movePlayer]);
 

@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { useSizeRatio } from "../../hooks/useSizeRatio";
+import { useImagePreloader } from "../../hooks/useImagePreloader";
 import { FlexWrapper } from "../shared/ContentWrapper";
 import { LogoOutlined } from "../shared/LogoOutlined";
 import {Block} from '../shared/Block';
@@ -8,32 +9,66 @@ import { Text } from "../shared/Text";
 import { Button } from "../shared/Button";
 import { useProgress } from "../../hooks/useProgress";
 import { useEffect } from "react";
+import bg from '../../assets/images/introBg.webp';
+import persons from '../../assets/images/startImg.webp';
 import { CURRENT_WEEK } from "../../contexts/ProgressProvider";
 import { preload } from "../../constants/screensComponents";
+import {MIN_MOCKUP_WIDTH} from '../ScreenTemplate';
+import {introImages, introImagesWaiting} from '../../constants/preloads';
 
-const ContentWrapper = styled(Block)`
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+const Wrapper = styled(FlexWrapper)`
+    background: linear-gradient(197.56deg, rgba(173, 207, 245, 0.75) 0%, rgba(95, 131, 255, 0.75) 50%, rgba(149, 141, 238, 0.75) 85.2%), #FFFFFF;
+`;
+
+const ContentWrapper = styled(FlexWrapper)`
     padding: ${({$ratio}) => $ratio * 25}px;
+    height: 100%;
+    flex: 1;
 `;
 
 const TitleStyled = styled(Title)`
     margin-bottom: calc(var(--spacing_x1) * 1.5);
+    @media screen and (min-height: 700px) and (max-width: ${MIN_MOCKUP_WIDTH}px) {
+        margin-bottom: calc(var(--spacing_x2) * 1.5);
+    }
 `;
 
-const ImageWrapper = styled.div`
-    display: flex;
-    justify-content: center;
-    width: ${({$ratio}) => $ratio * 261}px;
-    height: ${({$ratio}) => $ratio * 234}px;
+const ImageBackground = styled.img`
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+`;
 
-    & img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
+const Image = styled.img`
+    position: absolute;
+    bottom: ${({$ratio}) => $ratio * -4}px;
+    width: ${({$ratio}) => $ratio * 302}px;
+    height: ${({$ratio}) => $ratio * 453}px;
+    object-fit: contain;
+    z-index: 2;
+`;
+
+const TextStyled = styled(Text)`
+    width: ${({$ratio}) => $ratio * 290}px;
+    font-size: ${({$ratio}) => $ratio * 15}px;
+
+    @media screen and (min-height: 700px) and (max-width: ${MIN_MOCKUP_WIDTH}px){
+        width: ${({$ratio}) => $ratio * 290}px;
+        font-size: ${({$ratio}) => $ratio * 17}px;
     }
+`;
+
+const ButtonStyled = styled(Button)`
+    position: absolute;
+    bottom: ${({$ratio}) => $ratio * 81}px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    background: rgba(0, 48, 222, 0.7);
+    max-width: ${({$ratio}) => $ratio * 328}px;
+    backdrop-filter: blur(5px);
 `;
 
 const IntroScreen = () => {
@@ -44,25 +79,28 @@ const IntroScreen = () => {
         next();
     };
 
+    useImagePreloader(CURRENT_WEEK > 0 ? introImages : introImagesWaiting);
+
     //TODO: load картинок из introReg или waiting
     useEffect(() => {
-        preload.introReg();
+        preload.introReg();        
     }, []);
 
     return (
-        <FlexWrapper>
+        <Wrapper>
             <LogoOutlined />
            <ContentWrapper $ratio={ratio}>
                 <TitleStyled>
-                    Привет!{'\n'}Это «Ход капиталом» от ВТБ
+                    Привет!{'\n'}Это «Ход капиталом»{'\n'}от ВТБ
                 </TitleStyled>
-                <Text>
-                    Игра про логику, стратегическое мышление, риск и деньги.{'\n'}С каждым правильным шагом твой доход становится всё выше. Готов?
-                </Text>
-                <ImageWrapper  $ratio={ratio}></ImageWrapper>
-                <Button  onClick={handleClick}>Стартуем</Button>
+                <TextStyled $ratio={ratio}>
+                    Игра про логику, стратегическое мышление, риск и деньги. С каждым правильным шагом твой доход становится всё выше. Готов?
+                </TextStyled>
+                <Image $ratio={ratio} src={persons} alt="" />
+                <ImageBackground src={bg} alt="" />
            </ContentWrapper>
-        </FlexWrapper>
+            <ButtonStyled $ratio={ratio} onClick={handleClick}>Стартуем</ButtonStyled>
+        </Wrapper>
     )
 };
 

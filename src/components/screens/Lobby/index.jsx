@@ -97,10 +97,17 @@ const Lobby = () => {
 
     useEffect(() => {
         Promise.all([
-            preload.introReg(),
-            preload.reg(),
-            preload.sex(),
-            preload.lobby(),
+            preload.profile(),
+            preload.rules(),
+            preload.miniGames(),
+            preload.shop(),
+        ]).catch(console.error);
+        Promise.all([
+            preload.game2048(),
+            preload.gameCatch(),
+            preload.gameCrossRoad(),
+            preload.gameRunner(),
+            preload.gameMatch3(),
         ]).catch(console.error);
     }, []);
 
@@ -148,9 +155,6 @@ const Lobby = () => {
         });
     }
 
-    const handleCheckTurns = () => {
-    }
-
     return (
         <FlexWrapper>
             <BackHeader isShownExit={false} isShownCoins/>
@@ -177,7 +181,7 @@ const Lobby = () => {
             <ButtonStyled $ratio={ratio}  $top={(user.isTargeted ? 260 : 199) * ratio} type="transparent" onClick={() => next(SCREENS.RULES)}>
                 <img src={rules} alt="Правила"/>
             </ButtonStyled>
-            {!isMapHidden && <PathMap onCheckTurns={handleCheckTurns} isBlured={isUnfinishedModal} centerCellId={lastCell} cellIndex={cellIndex} />}
+            {!isMapHidden && <PathMap isBlured={isUnfinishedModal} centerCellId={lastCell} cellIndex={cellIndex} />}
             <NumberPicker isBlured={isUnfinishedModal} onChange={handleMakeTurn}/>
             {isUnfinishedModal && (
                 <UnfinishedModal lastOpenedCell={user.lastOpenedCell} onClose={handleClose}/>

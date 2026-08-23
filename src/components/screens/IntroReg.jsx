@@ -1,14 +1,14 @@
 import styled from "styled-components";
+import {useEffect} from 'react';
+import pic from '../../assets/images/introreg.webp';
 import { useSizeRatio } from "../../hooks/useSizeRatio";
+import { useProgress } from "../../hooks/useProgress";
 import { FlexWrapper } from "../shared/ContentWrapper";
 import { LogoOutlined } from "../shared/LogoOutlined";
 import {Block} from '../shared/Block';
 import { Title } from "../shared/Title";
 import { Text } from "../shared/Text";
 import { Button } from "../shared/Button";
-import pic from '../../assets/images/introreg.webp';
-import { useProgress } from "../../hooks/useProgress";
-import {useEffect} from 'react';
 import {preload} from '../../constants/screensComponents';
 
 const ContentWrapper = styled(Block)`

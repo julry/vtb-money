@@ -16,6 +16,8 @@ import {LogoOutlined} from '../shared/LogoOutlined';
 import { Block } from "../shared/Block";
 import { Button } from "../shared/Button";
 import {preload} from '../../constants/screensComponents';
+import { useImagePreloader } from '../../hooks/useImagePreloader';
+import { firstLobbyImages } from '../../constants/preloads';
 
 const BlockStyled = styled(Block)`
     margin-top: ${({$ratio}) => $ratio * 27}px;
@@ -78,21 +80,29 @@ const RadioButtonLabel = styled.label`
 `;
 
 const InputStyled = styled(Input)`
-    --inputMargin: ${({$isSmall}) => $isSmall ? 'var(--spacing_x4)' : 'var(--spacing_x5)'};
+    --inputMargin: ${({$isSmall}) => $isSmall ? 'var(--spacing_x2)' : 'var(--spacing_x4)'};
 
-    margin-top: ${({$marginTop}) => $marginTop ?? 'calc(1.5 * var(--inputMargin))'};
-
-    & + & {
-        margin-top: var(--inputMargin);
-    }
+    margin-bottom: ${({$marginTop}) => $marginTop ?? 'var(--inputMargin)'};
 
     transition: margin 0.25s;
 `;
 
-const SelectStyled = styled(Select)`
-    --inputMargin: ${({$isSmall}) => $isSmall ? 'var(--spacing_x4)' : 'var(--spacing_x5)'};
+const InputWithError = styled(Input)`
 
-    margin-top: var(--inputMargin);
+    margin-top: calc(1.5 * var(--spacing_x2));
+    margin-bottom: ${({$isSmall}) => $isSmall ? 'calc(0.8 * var(--spacing_x5))' : 'var(--spacing_x5)'};
+
+    transition: margin 0.25s;
+
+    & + & {
+        margin-top: 0;
+    }
+`;
+
+const SelectStyled = styled(Select)`
+    --inputMargin: ${({$isSmall}) => $isSmall ? 'var(--spacing_x2)' : 'var(--spacing_x4)'};
+
+    margin-bottom: var(--inputMargin);
 
     transition: margin 0.25s;
 `;
@@ -114,13 +124,15 @@ const Registration = () => {
     const [isNameCorrect, setIsNameCorrect] = useState(true);
     const [isSurnameCorrect, setIsSurnameCorrect] = useState(true);
     const [isEmailFieldCorrect, setIsEmailFieldCorrect] = useState(true);
+    const [promocode, setPromocode] = useState('');
     const [isAlreadyHas, setIsAlreadyHas] = useState(false);
 
+    useImagePreloader(CURRENT_WEEK > 0 ? firstLobbyImages : []);
+
     useEffect(() => {
-        //TODO: load картинок из лобби или waiting
         Promise.all([
             preload.sex(),
-            ...(CURRENT_WEEK > 0 ? [preload.lobby()] : [preload.waiting()]),
+            ...(CURRENT_WEEK > 0 ? [preload.lobby(), preload.profile(), preload.rules()] : [preload.waiting()]),
         ]).catch(console.error);
     }, []);
 
@@ -159,7 +171,8 @@ const Registration = () => {
             universityId: univ?.id,
             faculty,  
             facId: fac?.id,
-            isTargeted: !!fac.id && fac?.id !== 'other'
+            isTargeted: !!fac.id && fac?.id !== 'other',
+            promocode
         });
 
         // const regRes = await registrateUser({ 
@@ -245,7 +258,7 @@ const Registration = () => {
             <LogoOutlined />
             <BlockStyled $ratio={ratio}>
                 <Title>Регистрация</Title>
-                <InputStyled
+                <InputWithError
                     $isSmall={univ?.id === 'other' || fac?.id === 'other'}
                     type="text"
                     id="name"
@@ -258,7 +271,7 @@ const Registration = () => {
                     errorText={name.length < 2 ? 'Слишком короткое имя' : 'Принимаем только русские буквы'}
                 />
 
-                <InputStyled
+                <InputWithError
                     $isSmall={univ?.id === 'other' || fac?.id === 'other'}
                     type="text"
                     id="surname"
@@ -271,7 +284,7 @@ const Registration = () => {
                     errorText={surname.length < 2 ? 'Слишком короткая фамилия' : 'Принимаем только русские буквы'}
                 />
 
-                <InputStyled
+                <InputWithError
                     $isSmall={univ?.id === 'other' || fac?.id === 'other'}
                     isCorrect={isEmailFieldCorrect}
                     type="email"
@@ -309,7 +322,6 @@ const Registration = () => {
                     univ?.id !== undefined && univ?.id === 'other' && (
                         <InputStyled
                             $isSmall={univ?.id === 'other' || fac?.id === 'other'}
-                            $marginTop={'var(--spacing_x4)'}
                             isCorrect 
                             value={otherUniv}
                             placeholder="ВУЗ"
@@ -323,7 +335,6 @@ const Registration = () => {
                         <InputStyled
                             $isSmall={univ?.id === 'other' || fac?.id === 'other'}
                             isCorrect 
-                            $marginTop={'var(--spacing_x5)'}
                             value={otherFac}
                             placeholder="Факультет"
                             onChange={(e) => setOtherFac(e.target.value)}
@@ -331,6 +342,16 @@ const Registration = () => {
                         />
                     )
                 }
+                
+                <InputStyled
+                    isCorrect
+                    $isSmall
+                    type="text"
+                    id="promocode"
+                    value={promocode}
+                    onChange={(e) => setPromocode(e.target.value)}
+                    placeholder="Промокод"
+                />
                 
                 <RadioButtonLabel>
                         <InputRadioButton

@@ -1,15 +1,16 @@
-import { createContext, useEffect, useContext, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react';
 import { FTClient } from 'ft-client';
+import bridge from '@vkontakte/vk-bridge';
 import WebApp from '@twa-dev/sdk';
 import { uid } from 'uid';
 import { SCREENS, NEXT_SCREENS } from "../constants/screens";
-import { screens } from "../constants/screensComponents";
 import { getUrlParam } from "../utils/getUrlParam";
 import { useCallback } from 'react';
-import { BASE_LOCK_TIMEOUT, INITIAL_STATE, INITIAL_USER, MAX_LOCK_TIMEOUT, MAX_RETRIES, MAX_TURNS_PER_WEEK, RETRY_DELAY } from './constants';
+import {BASE_LOCK_TIMEOUT, INITIAL_STATE, INITIAL_USER, MAX_LOCK_TIMEOUT, MAX_RETRIES, MAX_TURNS_PER_WEEK, RETRY_DELAY, PLATFORMS} from './constants';
 import { ProgressContext } from './ProgressContext';
 import { GENDERS } from '../constants/genders';
-import turns from '../assets/images/turns.webp';
+import { useImagePreloader } from '../hooks/useImagePreloader';
+import {lobbyImagesF, lobbyImagesM, WEEK_TO_IMAGES} from '../constants/preloads';
 
 const getMoscowTime = (date) => {
     const dateNow = date ?? new Date();
@@ -51,6 +52,8 @@ export function ProgressProvider(props) {
     const [gameState, setGameState] = useState({});
     const [isMapHidden, setIsMapHidden] = useState(false);
     const [shopItems, setShopItems] = useState([]);
+    const [platform, setPlatform] = useState('');
+    const [preloadImages, setPreloadImages] = useState([]);
     const [tgError, setTgError] = useState({isError: false, message: ''});
     const [isFinishedTurnsModal, setFinishedTurnsModal] = useState(!user.lastOpenedCell && user.turns < 1);
 
@@ -58,7 +61,8 @@ export function ProgressProvider(props) {
     const clientShop = useRef();
     const recordId = useRef();
     const isDesktop = useRef(false);
-    const tgInfo = useRef();
+    const tgInfo = useRef({});
+    const vkInfo = useRef({});
 
     const setUserBdData = (record = {}) => {
         recordId.current = record?.id;
@@ -66,6 +70,16 @@ export function ProgressProvider(props) {
 
         setUserInfo(data);
     }
+
+    const getVkData = async () => {
+        try {
+            vkInfo.current.userInfo = await bridge.send('VKWebAppGetUserInfo');
+            vkInfo.current.launchParams = await bridge.send('VKWebAppGetLaunchParams');
+        }
+        catch (e) {
+            console.log('VK error', e)
+        }
+    };
 
     const initProject = async () => {
         setIsLoading(true);
@@ -89,8 +103,13 @@ export function ProgressProvider(props) {
             const {data = {}} = info ?? {};
 
             setIsFemale(data.gender === GENDERS.Female);
-            console.log('ProgressProvider initProject setFinishedTurnsModal', !data.lastOpenedCell && data.turns < 1);
             setFinishedTurnsModal(!data.lastOpenedCell && data.turns < 1);
+
+            if (CURRENT_WEEK > 0 && data.email) {
+                const weekImages = WEEK_TO_IMAGES[data?.progressWeek] ?? []; 
+
+                setPreloadImages([...(data.gender === GENDERS.Female ? lobbyImagesF : lobbyImagesM), ...weekImages])
+            }
 
             if (data.facId) {
                 updateShopItems(data.facId);
@@ -101,6 +120,7 @@ export function ProgressProvider(props) {
                 const newCoins = data.totalCoins + data.newWeekCoins;
                 const coinsKoefed = newCoins * data.coinsKoefs;
                 //TODO: пересмотреть концепцию выдачи ходов
+                // TODO: туда же при переключении недели добавить preload следующих weekImages
                 const newTurns = data.turns + MAX_TURNS_PER_WEEK;
                 const newWeekEnter = {...data.weekEnter, [`week${CURRENT_WEEK}`]: true}
                 const updatedData = {
@@ -138,6 +158,7 @@ export function ProgressProvider(props) {
                 setCurrentScreen(SCREENS.LOBBY);
             }
         } catch (e) {
+            console.log('error initProject', e);
             setTgError({isError: true, message: e.message});
         } finally {
             setIsLoading(false);
@@ -155,56 +176,73 @@ export function ProgressProvider(props) {
             API_SHOP_NAME
         );
 
+        
         initProject().catch((e) => console.log(e));
 
-        // if (WebApp) {
-        //     WebApp.ready();
-        //     WebApp.expand();
-        //     WebApp.lockOrientation();
-        // }
+        if (WebApp) {
+            WebApp.ready();
+            WebApp.expand();
+            WebApp.lockOrientation();
+        }
     }, []);
 
-    const loadRecord = () => {
+
+    useImagePreloader(preloadImages);
+
+    const loadRecord = async () => {
+        const isVk = bridge.isWebView() || bridge.isEmbedded();
         const webApp = window?.Telegram?.WebApp;
         let webAppInitData = webApp?.initData;
         let initData = WebApp.initData;
-
-        // return { data: INITIAL_USER };
+        
+        if (isVk) {
+            await getVkData();
+        }
 
         if (window?.location?.hostname === 'localhost' || !!getUrlParam('login')) {
             const login = getUrlParam('login') ?? DEV_ID;
             return client.current.findRecord('gameId', login);
         } 
 
-        return { data: INITIAL_USER };
+        const isVkDesktop = vkInfo?.launchParams?.vk_platform?.includes?.('desktop');
+        const isTgWebAppDesktop = WebApp?.platform?.toLowerCase()?.includes('web') || WebApp?.platform?.toLowerCase()?.includes('desktop');
+        const isTgWebDesktop = webApp?.platform?.toLowerCase()?.includes('web') || webApp?.platform?.toLowerCase()?.includes('desktop');
+        
 
-        if (
-            WebApp?.platform?.toLowerCase()?.includes('web') || WebApp?.platform?.toLowerCase()?.includes('desktop')
-            || webApp?.platform?.toLowerCase()?.includes('web') || webApp?.platform?.toLowerCase()?.includes('desktop')
-        ) {
-                isDesktop.current = true;
+        if (isVkDesktop || isTgWebAppDesktop || isTgWebDesktop) {
+            isDesktop.current = true;
 
-                return {};
+            return {};
         }
 
-    
-        if (webAppInitData) {
+        if (isVk && vkInfo) {
+            setPlatform(PLATFORMS.VK);
+
+            return client.current.findRecord('vkuserId', vkInfo.id);
+        } else if (webAppInitData) {
+            setPlatform(PLATFORMS.TG);
+
             return client.current.getTgRecord(webAppInitData);
         } else if (initData) {
+            setPlatform(PLATFORMS.TG);
+
             return client.current.getTgRecord(initData);
-        } else if (!window?.Telegram) {
-            console.error('Telegram не определен')
-
-            throw new Error('Telegram не определен')
-        } else if (!window?.Telegram?.WebApp) {
-            console.error('Webapp не определен')
-
-            throw new Error('Webapp не определен')
-        } else {
-            console.error('В WebApp нет данных пользователя')
-
-            throw new Error ('В WebApp нет данных пользователя');
         }
+
+        return { data: INITIAL_USER };
+        // } else if (!window?.Telegram) {
+        //     console.error('Telegram не определен')
+
+        //     throw new Error('Telegram не определен')
+        // } else if (!window?.Telegram?.WebApp) {
+        //     console.error('Webapp не определен')
+
+        //     throw new Error('Webapp не определен')
+        // } else {
+        //     console.error('В WebApp нет данных пользователя')
+
+        //     throw new Error ('В WebApp нет данных пользователя');
+        // }
     }
 
     const next = (customScreen) => {
@@ -599,7 +637,9 @@ export function ProgressProvider(props) {
         isFemale,
         setIsMapHidden,
         isMapHidden,
-        isFinishedTurnsModal
+        isFinishedTurnsModal,
+        platform,
+        isVkPlatform: platform === PLATFORMS.VK
     }
  
     return (

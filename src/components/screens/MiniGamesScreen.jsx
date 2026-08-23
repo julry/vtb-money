@@ -6,6 +6,7 @@ import numbers from '../../assets/images/2048/startImg.webp';
 import runner from '../../assets/images/runner/bg.webp';
 import collect from '../../assets/images/runner/collectEffect.webp';
 import pers from '../../assets/images/person/persJump.webp';
+import persF from '../../assets/images/person/persFJump.webp';
 import cross from '../../assets/images/cross/startImg.webp';
 import { FlexRowWrapper} from "../shared/ContentWrapper";
 import { useLayoutEffect } from "react";
@@ -60,7 +61,7 @@ const FlexRowWrapperStyled = styled(FlexRowWrapper)`
 `;
 
 const MiniGamesScreen = () => {
-    const { handleOpenModal, next, handleCloseModal, setGameState } = useProgress();
+    const { handleOpenModal, next, handleCloseModal, setGameState, isFemale } = useProgress();
     const ratio = useSizeRatio();
 
     const handleClick = (screen) => {
@@ -87,13 +88,13 @@ const MiniGamesScreen = () => {
                                 <GameInfo $ratio={ratio}>
                                     <Image src={runner} alt="" $width={196 * ratio} $height={157 * ratio}/>
                                     <Image src={collect} alt="" $left={'53%'} $zIndex={2} $width={102 * ratio} $height={80 * ratio}/>
-                                    <Image src={pers} alt="" $top={'65%'}  $zIndex={3} $width={72 * ratio} $height={144 * ratio}/>
+                                    <Image src={isFemale ? persF : pers} alt="" $top={'65%'}  $zIndex={3} $width={72 * ratio} $height={144 * ratio}/>
                                 </GameInfo>
                             </div>
                         </FlexRowWrapperStyled>
                         <FlexRowWrapperStyled $ratio={ratio}>
-                            <div>
-                                <Text>???</Text>
+                            <div onClick={() => handleClick(SCREENS.GAMECATCH)}>
+                                <Text>Ловля предметов</Text>
                                 <GameInfo $ratio={ratio}>
                                 </GameInfo>
                             </div>

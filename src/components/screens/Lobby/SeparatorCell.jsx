@@ -19,7 +19,7 @@ const SeparatorImg = styled.img`
     content-visibility: auto;
     transform: rotate(25deg);
     opacity: ${({$opacity}) => $opacity};
-    ${({ $isBlured }) => $isBlured ? 'filter: blur(5px)' : ''};
+    ${({ $isBlured }) => $isBlured ? 'filter: blur(3px)' : ''};
 `;
 
 export const SeparatorCell = memo(function SeparatorCell({ x, y, zIndex, marginLeft, opacity, marginTop, isBlured }) {

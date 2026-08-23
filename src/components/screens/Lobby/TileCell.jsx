@@ -19,7 +19,7 @@ const CellRoot = styled.div`
   contain-intrinsic-size: ${({ $width }) => $width}px ${({ $height }) => $height}px;
 
     opacity: ${({ $opacity }) => $opacity};
-    ${({ $isBlured }) => $isBlured ? 'filter: blur(5px)' : ''};
+    ${({ $isBlured }) => $isBlured ? 'filter: blur(3px)' : ''};
 `;
 
 const TileImg = styled.img`
@@ -61,7 +61,6 @@ export const TileCell = memo(function TileCell({
     isBlured,
     type,
 }) {
-    //TODO: переделать тени
     const getSvg = () => {
         switch (cellType) {
             case 'rect':

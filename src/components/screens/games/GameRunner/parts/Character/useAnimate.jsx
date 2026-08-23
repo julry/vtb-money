@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import female0 from '../../../../../../assets/images/person/persStart.webp';
-import female1 from '../../../../../../assets/images/person/persRunR.webp';
-import female2 from '../../../../../../assets/images/person/persRunL.webp';
-import female3 from '../../../../../../assets/images/person/persJump.webp';
+import female0 from '../../../../../../assets/images/person/persStartF.webp';
+import female1 from '../../../../../../assets/images/person/persFRunR.webp';
+import female2 from '../../../../../../assets/images/person/persFRunL.webp';
+import female3 from '../../../../../../assets/images/person/persFJump.webp';
 import male0 from '../../../../../../assets/images/person/persStart.webp';
 import male1 from '../../../../../../assets/images/person/persRunL.webp';
 import male2 from'../../../../../../assets/images/person/persRunR.webp';
 import male3 from '../../../../../../assets/images/person/persJump.webp';
 import { useProgress } from "../../../../../../hooks/useProgress";
-// import { SEX } from "../../../constants/sex";
+import {useImagePreloader} from '../../../../../../hooks/useImagePreloader';
+import { GENDERS } from "../../../../../../constants/genders";
 
 export const STAND_INDEX = 0;
 export const JUMP_INDEX = 3;
@@ -36,9 +37,11 @@ export function useAnimate(isPause, isJump) {
     
     isJumpRef.current = isJump;
 
-    const sexSource = SEX_TO_CHARACTER?.[user?.sex ?? 'Female'] ?? FEMALE_CHARACTER;
+    const sexSource = SEX_TO_CHARACTER?.[user?.sex ?? GENDERS.Female] ?? FEMALE_CHARACTER;
     const source = sexSource?.[index];
 
+    useImagePreloader(sexSource);
+    
     useEffect(() => {
         if (isJump) {
             setIndex(JUMP_INDEX);

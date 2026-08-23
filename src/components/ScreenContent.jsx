@@ -29,6 +29,8 @@ export function ScreenContent() {
 
     if (isLoading) return <Loading />
 
+    //TODO: прелоад shop по shopInfo 
+    
     return(
         <>
         {Screen && (
@@ -39,7 +41,7 @@ export function ScreenContent() {
             >
                 <DelayedSuspenseWithPrevious
                 fallback={<Loading />}
-                delay={500}          // ← теперь по умолчанию 500
+                delay={500} 
                 currentKey={currentScreen}
                 >
                 <Screen />

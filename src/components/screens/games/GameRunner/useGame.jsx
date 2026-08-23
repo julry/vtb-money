@@ -267,7 +267,6 @@ export const useGame = ({isFirstTry, onDie}) => {
 
                         if (charBox.x2 >= tBox.x1 && charBox.x1 <= tBox.x2 && charBox.y1 <= tBox.y2) {
                             hitTrashIdsRef.current.add(trash.id);
-                            console.log(distanceRef.current);
                             //TODO: ??? do we need it поменять subTitle когда добавится пол Ты заработал${sex === f ? 'a' : ''} ${getPluralCoins(gamePointRef.current ?? 0)}
                             onDie(distanceRef.current);
                         }

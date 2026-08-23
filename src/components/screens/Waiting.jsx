@@ -1,13 +1,15 @@
 import styled from "styled-components";
 import { useSizeRatio } from "../../hooks/useSizeRatio";
 import pic from '../../assets/images/waiting.webp';
-// import WebApp from "@twa-dev/sdk";
+import WebApp from "@twa-dev/sdk";
+import bridge from "@vkontakte/vk-bridge";
 import { FlexWrapper } from "../shared/ContentWrapper";
 import { LogoOutlined } from "../shared/LogoOutlined";
 import {Block} from '../shared/Block';
 import { Title } from "../shared/Title";
 import { Text } from "../shared/Text";
 import { Button } from "../shared/Button";
+import { useProgress } from "../../hooks/useProgress";
 
 const ContentWrapper = styled(Block)`
     position: absolute;
@@ -35,11 +37,20 @@ const ImageWrapper = styled.div`
 `;
 
 const WaitingGameScreen = () => {
+    const { isVkPlatform } = useProgress();
     const ratio = useSizeRatio();
 
     const handleClick = () => {
-        // WebApp?.close?.();
-        //TODO: добавить ВК
+        WebApp?.close?.();
+        if (isVkPlatform) {
+            bridge.send('VKWebAppClose', {
+                status: 'success',
+            })
+            .catch((error) => {
+                // Ошибка
+                console.log('Error close app', error);
+            });
+        }
     };
 
     return (
@@ -55,7 +66,7 @@ const WaitingGameScreen = () => {
                 <ImageWrapper  $ratio={ratio}>
                     <img src={pic} alt="" />
                 </ImageWrapper>
-                <Button>Перейти в бота</Button>
+                <Button onClick={handleClick}>Перейти в бота</Button>
            </ContentWrapper>
         </FlexWrapper>
     )

@@ -288,7 +288,6 @@ export const useGame = ({isRules = false, isFirstTime = false}) => {
     /* --- Инициализация --- */
     useEffect(() => {
         let b;
-        //TODO: заменить на первый раз и следующие 
         if (isRules || isFirstTime) {
             b = FIRST_GAME_BOARD;
         } else {

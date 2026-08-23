@@ -15,7 +15,6 @@ import { AnimatePresence } from 'framer-motion';
 import {MovingBlock} from '../shared/MovingBlock';
 import {SubscribeModal} from '../shared/modals/SubscribeModal';
 import { ItemsModal } from '../shared/modals/ItemsModal';
-import { GENDERS } from '../../constants/genders';
 
 const Wrapper = styled(FlexWrapper)`
     padding: calc(var(--spacing_x4) * 4) ${({ $ratio }) => 25 * $ratio}px ${({ $ratio }) => 45 * $ratio}px;
@@ -98,7 +97,8 @@ const TitleStyled = styled(Title)`
 `;
 
 const ProfileScreen = ({ onClose }) => {
-    const { user, next, isFemale, handleOpenModal, updateUser } = useProgress();
+
+    const { user, next, isFemale, handleOpenModal, updateUser, platform, isVkPlatform } = useProgress();
     const ratio = useSizeRatio();
     const linkRef = useRef();
     const [isSuccessCopy, setIsSuccessCopy] = useState(false);
@@ -134,7 +134,7 @@ const ProfileScreen = ({ onClose }) => {
             return;
         }
 
-        // if (CURRENT_WEEK > 4 || user.gameProgress[12]?.isCompleted) {
+        // if (CURRENT_WEEK > 4) {
         //     next(SCREENS.FINISH);
 
         //     return;
@@ -143,9 +143,22 @@ const ProfileScreen = ({ onClose }) => {
         next(SCREENS.LOBBY);
     }
 
-    //TODO: заменить аватар в зависомсти от пола
-    // isShownTickets = user.isTargeted;
-    // Убрать кнопку, если нет товаров (?)
+    const handleSubscribe = () => {
+        if (!platform) {
+            handleOpenModal({Component: <SubscribeModal />})
+
+            return;
+        }
+
+        let link = 'https://t.me/futru';
+
+        if (isVkPlatform) {
+            link = 'https://vk.ru/futuretoday';
+        }
+
+        window.open(link, '_blank');
+    }
+
     return (
         <Wrapper $ratio={ratio}>
             <BackHeader onBack={handleClose} isShownTickets={isTargeted}/>
@@ -192,7 +205,7 @@ const ProfileScreen = ({ onClose }) => {
                 </TextWrapper>
             </FullWidthDiv>
             <ButtonsWrapper $ratio={ratio}>
-                <ButtonStyled onClick={() => handleOpenModal({Component: <SubscribeModal />})}>Подписаться на канал</ButtonStyled>
+                <ButtonStyled onClick={handleSubscribe}>Подписаться на канал</ButtonStyled>
                 {isTargeted && <Button 
                     onClick={() => handleOpenModal({Component: <ItemsModal />})} 
                     disabled={user?.shop?.length < 1}
