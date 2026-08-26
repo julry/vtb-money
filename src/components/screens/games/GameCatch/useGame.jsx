@@ -56,6 +56,7 @@ export const useGame = () => {
   const [displayScore, setDisplayScore] = useState(0);
   const [displayLives, setDisplayLives] = useState(3);
   const [paused, setPaused] = useState(false);
+  const [gameId, setGameId] = useState(() => crypto.randomUUID());
 
   const forceGameOver = () => {
     const state = stateRef.current;
@@ -146,6 +147,7 @@ export const useGame = () => {
     const state = stateRef.current;
     lastTimeRef.current = 0;
 
+    setGameId(() => crypto.randomUUID());
     // очистка пула
     itemPoolRef.current.forEach(releaseItem);
 
@@ -379,5 +381,6 @@ export const useGame = () => {
     lives: displayLives,
     togglePause,
     forceGameOver,
+    gameId,
   };
 };

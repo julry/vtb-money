@@ -118,7 +118,6 @@ const Registration = () => {
     const [surname, setSurname] = useState('');
     const [email, setEmail] = useState('');
     const [isSending, setIsSending] = useState(false);
-    const [isNetworkError, setIsNetworkError] = useState(false);
     const [isAgreed, setIsAgreed] = useState(true);
     const [isMailsAgreed, setIsMailsAgreed] = useState(true);
     const [isNameCorrect, setIsNameCorrect] = useState(true);
@@ -136,7 +135,6 @@ const Registration = () => {
         ]).catch(console.error);
     }, []);
 
-     //TODO: че происходит на найденную почту или это на экран раньше спрашивают
     const handleClick = async () => {
         const isUnivPicked = univ?.id === 'other' ? !!otherUniv.length : !!(univ.name);
         const isFacPicked = (univ.id === 'other' || fac?.id === 'other') ? !!otherFac?.length : !!(fac.name);
@@ -146,19 +144,17 @@ const Registration = () => {
             return;
         }
 
-        setIsNetworkError(false);
-
         if (isSending) return;
         setIsSending(true);
 
-        // const hasEmail = await checkEmailRegistrated(email);
+        const hasEmail = await checkEmailRegistrated(email);
 
-        // if (hasEmail) {
-        //     setIsAlreadyHas(true);
-        //     setIsSending(false);
+        if (hasEmail) {
+            setIsAlreadyHas(true);
+            setIsSending(false);
 
-        //     return;
-        // }
+            return;
+        }
 
         const university = univ?.id === 'other' ? otherUniv?.trim() : univ?.name;
         const faculty = univ?.id === 'other' || fac?.id === 'other' ? otherFac?.trim() : fac?.name;
@@ -175,30 +171,11 @@ const Registration = () => {
             promocode
         });
 
-        // const regRes = await registrateUser({ 
-        //     name: name.trim(), 
-        //     surname: surname.trim(),
-        //     email: email.trim(), 
-        //     university, 
-        //     universityId: univ?.id, 
-        //     isAddsAgreed: isMailsAgreed,
-        //     faculty, 
-        //     facultyId: fac?.id,
-        //     isTargeted: !!fac?.isTargeted,
-        // });
-
         setIsSending(false);
-
-        //TODO: remove
-        // if (regRes?.isError) {
-        //     setIsNetworkError(true);
-        //     return;
-        // }
 
         next();
     }
 
-    //TODO: че происходит на другое
     const handlePickUniversity = (id, name) => {
         if (univ?.id === id) return;
 
@@ -286,7 +263,7 @@ const Registration = () => {
 
                 <InputWithError
                     $isSmall={univ?.id === 'other' || fac?.id === 'other'}
-                    isCorrect={isEmailFieldCorrect}
+                    isCorrect={!isAlreadyHas && isEmailFieldCorrect}
                     type="email"
                     id="email"
                     placeholder="E-mail"
@@ -294,7 +271,7 @@ const Registration = () => {
                     onChange={handleChange}
                     autoComplete="email"
                     onBlur={handleBlur}
-                    errorText={'Что-то это не похоже на почту'}
+                    errorText={isAlreadyHas ? 'Такая почта уже зарегистрирована' : 'Что-то это не похоже на почту'}
                 />
 
                 <SelectStyled
@@ -342,17 +319,19 @@ const Registration = () => {
                         />
                     )
                 }
-                
-                <InputStyled
-                    isCorrect
-                    $isSmall
-                    type="text"
-                    id="promocode"
-                    value={promocode}
-                    onChange={(e) => setPromocode(e.target.value)}
-                    placeholder="Промокод"
-                />
-                
+                {
+                    CURRENT_WEEK > 0 && (
+                        <InputStyled
+                            isCorrect
+                            $isSmall
+                            type="text"
+                            id="promocode"
+                            value={promocode}
+                            onChange={(e) => setPromocode(e.target.value)}
+                            placeholder="Промокод"
+                        />
+                    )
+                }
                 <RadioButtonLabel>
                         <InputRadioButton
                             type="checkbox"
@@ -393,27 +372,27 @@ const Registration = () => {
                                 rel="noreferrer"
                             >правилами проведения акции</a>.
                         </span>
-                    </RadioButtonLabel>
-                    <RadioButtonLabel>
-                        <InputRadioButton
-                            type="checkbox"
-                            value={isMailsAgreed}
-                            checked={isMailsAgreed}
-                            onChange={() => setIsMailsAgreed((prevAgreed) => !prevAgreed)}
-                        />
-                        <RadioIconStyled />
-                        <span>
-                            Хочу ловить{"\u00A0"}
-                            <a
-                                href={"https://fut.ru/adv_messages_agreement"}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                персональные стажировки от топ‑компаний в рекламной рассылке
-                            </a>.
-                        </span>
-                    </RadioButtonLabel>
-                    <Button mt={15 * ratio} onClick={handleClick}>Готово</Button>
+                </RadioButtonLabel>
+                <RadioButtonLabel>
+                    <InputRadioButton
+                        type="checkbox"
+                        value={isMailsAgreed}
+                        checked={isMailsAgreed}
+                        onChange={() => setIsMailsAgreed((prevAgreed) => !prevAgreed)}
+                    />
+                    <RadioIconStyled />
+                    <span>
+                        Хочу ловить{"\u00A0"}
+                        <a
+                            href={"https://fut.ru/adv_messages_agreement"}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            персональные стажировки от топ‑компаний в рекламной рассылке
+                        </a>.
+                    </span>
+                </RadioButtonLabel>
+                <Button mt={15 * ratio} onClick={handleClick}>Готово</Button>
             </BlockStyled>
         </FlexWrapper>
     )

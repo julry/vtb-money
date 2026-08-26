@@ -8,6 +8,7 @@ import collect from '../../assets/images/runner/collectEffect.webp';
 import pers from '../../assets/images/person/persJump.webp';
 import persF from '../../assets/images/person/persFJump.webp';
 import cross from '../../assets/images/cross/startImg.webp';
+import catchG from '../../assets/images/doodle/startImg.webp';
 import { FlexRowWrapper} from "../shared/ContentWrapper";
 import { useLayoutEffect } from "react";
 import { useProgress } from "../../hooks/useProgress";
@@ -96,6 +97,7 @@ const MiniGamesScreen = () => {
                             <div onClick={() => handleClick(SCREENS.GAMECATCH)}>
                                 <Text>Ловля предметов</Text>
                                 <GameInfo $ratio={ratio}>
+                                    <Image src={catchG} $width={144 * ratio} $height={115 * ratio} alt=""/>
                                 </GameInfo>
                             </div>
                             <div onClick={() => handleClick(SCREENS.GAME2048)}>

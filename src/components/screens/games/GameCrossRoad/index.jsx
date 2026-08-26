@@ -109,7 +109,7 @@ export default function GameCrossRoad() {
             handleOpenModal({
                 Component: (
                     <EndModal 
-                        onClose={isGameMode ? resetGame : next(SCREENS.LOBBY)} 
+                        onClose={isGameMode ? () => resetGame(true) : () => next(SCREENS.LOBBY)} 
                         isGameMode={isGameMode} 
                         title={title} 
                         subTitle={subTitle} 
@@ -136,7 +136,8 @@ export default function GameCrossRoad() {
         startGame,
         pauseGame,
         playerYRef,
-        heightRef
+        heightRef,
+        gameId
     } = useGame({onDie: finishGame});
 
     useLayoutEffect(() => {
@@ -176,8 +177,8 @@ export default function GameCrossRoad() {
             <BackHeaderGame
                 onRulesClick={handleToggleRules}
                 isHidden={isRules}
-                onExit={gameState?.isInfinite ? () => finishGame({score, shouldShowModal: false}) : undefined}
-                timerData={{ isStart: gameStarted, initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK], onFinish: die }}
+                onExit={() => finishGame({score, shouldShowModal: false})}
+                timerData={{ timerId: gameId, isStart: gameStarted, initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK], onFinish: die }}
                 currentPoints={score > 99 ? score : score > 9 ? `0${score}` : `00${score}`}
                 shouldShowCoinIcon={false}
             />

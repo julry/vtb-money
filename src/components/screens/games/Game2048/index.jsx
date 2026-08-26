@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo } from "react";
+import { Component, useEffect, useLayoutEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useProgress } from "../../../../hooks/useProgress";
 import { useSizeRatio } from "../../../../hooks/useSizeRatio";
@@ -13,6 +13,7 @@ import { EndModal } from "../../../shared/modals/EndModal";
 import { MAX_INFINITE, WEEK_TO_TIMER } from "../constants";
 import { CURRENT_WEEK } from "../../../../contexts/ProgressProvider";
 import { SCREENS } from "../../../../constants/screens";
+import { CommonEndModal } from "../../../shared/modals/CommonEndModal";
 
 const Wrapper = styled.div`
     height: 100%;
@@ -70,7 +71,7 @@ function Game2048() {
 
     const handleResultRef = useCallbackRef(handleResult);
 
-    const {startGame, restartGame, getTiles, moveTiles, score} = useGame(handleResultRef, handleResultRef, false);
+    const {startGame, restartGame, getTiles, moveTiles, score, gameId} = useGame(handleResultRef, handleResultRef, false);
 
     function handleResult(shouldShowModal = true) {
         let coins = 0;
@@ -107,7 +108,9 @@ function Game2048() {
 
         if (shouldShowModal) {
             const isGameMode = gameState?.isInfinite;
-            handleOpenModal({Component: <EndModal onClose={isGameMode ? restartGame : next(SCREENS.LOBBY)} title={"Ура, капитал собран!"} isGameMode={isGameMode} coins={coins}/>});
+            handleOpenModal({Component: <EndModal onClose={isGameMode ? restartGame : () => next(SCREENS.LOBBY)} title={"Ура, капитал собран!"} isGameMode={isGameMode} coins={coins}/>});
+        } else {
+            handleOpenModal({Component: <CommonEndModal coins={coins} />});
         }
     }
 
@@ -135,10 +138,11 @@ function Game2048() {
         <Wrapper $ratio={ratio}>
             <BackHeaderGame 
                 onRulesClick={() => handleOpenModal({Component: <RulesModal />, isBlurTransitionDisabled: true})}
-                onExit={gameState?.isInfinite ? () => handleResult(false) : undefined}
+                onExit={() => handleResult(false)}
                 isCenteredTimer
                 isLarge
                 timerData={{
+                    timerId: gameId,
                     initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK],
                     isStart: isGameActive,
                     onFinish: handleResult,

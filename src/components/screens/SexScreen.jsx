@@ -1,11 +1,12 @@
 import { useState } from "react";
-import persStart from '../../assets/images/person/persStart.webp';
-import female from '../../assets/images/person/persStartF.webp';
-import arrow from '../../assets/images/arrowLeft.webp';
+import persStart from '../../assets/images/person/persStand.webp';
+import female from '../../assets/images/person/persFStand.webp';
+import persShine from '../../assets/images/person/personStandShine.webp';
+import femaleShine from '../../assets/images/person/personFStandShine.webp';
 import styled from "styled-components";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useSizeRatio } from "../../hooks/useSizeRatio";
-import { FlexWrapper } from "../shared/ContentWrapper";
+import { FlexRowWrapper, FlexWrapper } from "../shared/ContentWrapper";
 import { LogoOutlined } from "../shared/LogoOutlined";
 import { Title } from "../shared/Title";
 import { Button } from "../shared/Button";
@@ -19,106 +20,91 @@ const CARDS = [
         id: 'female',
         alt: 'Женский',
         pic: female,
-        width: 206,
-        height: 391,
+        chosenPic: femaleShine,
+        width: 272,
+        height: 402,
+        x: -100,
+        xInitial: -110,
     },
     {
         id: 'men',
         alt: 'Мужской',
         pic: persStart,
-        width: 216,
-        height: 394,
+        chosenPic: persShine,
+        width: 252,
+        height: 402,
+        x: -160,
+        xInitial: -140,
+        y: '3%',
     },
 ];
 
-const Wrapper = styled.div`
+const Wrapper = styled(FlexRowWrapper)`
     width: 100%;
     position: relative;
-    height: ${({$ratio}) => $ratio * 422}px;
-    max-width:  375px;
-    display: flex;
-    align-items: center;
+    height: ${({$ratio}) => $ratio * 419}px;
+    margin-top: ${({$ratio}) => $ratio * 10}px;
+    margin-left: ${({$ratio}) => $ratio * -10}px;
+    justify-content: center;
+    max-width: 375px;
 `;
 
-const CardStyled = styled(motion.div)`
-    position: absolute;
-    width: 100%;
+const CardStyled = styled.div`
+    position: relative;
+    width: 50%;
+    height: 100%;
+    overflow: visible;
     display: flex;
     justify-content: center;
 `
 
-const Card = styled.img`
+const Card = styled(motion.img)`
+    position: absolute;
+    top: 0%;
+    left: 50%;
     width: ${({$width}) => $width}px;
     height: ${({$height}) => $height}px;
     object-fit: contain;
+    pointer-events: none;
 `;
-
-const Arrow = styled.img`
-    width: 100%;
-    height: 100%;
-    transform: scale(${({$isMirror}) => $isMirror ? '-1, 1' : 1});
-`;
-
-const ButtonSlider = styled.button`
-    position: absolute;
-    background-color: transparent;
-    outline: none;
-    top: 50%;
-    transform: translateY(-50%);
-    width: ${({$ratio}) => $ratio * 80}px;
-    height: ${({$ratio}) => $ratio * 80}px;
-    z-index: 10;
-`;
-
-const ButtonSliderLeft = styled(ButtonSlider)`
-    left: ${({$ratio}) => $ratio * 35}px;
-`
-const ButtonSliderRight = styled(ButtonSlider)`
-    right: ${({$ratio}) => $ratio * 35}px;
-`
 
 const TitleStyled = styled(Title)`
     margin-top: ${({$ratio}) => $ratio * 32}px;
 `;
 
+const ErrorText = styled.p`
+    position: absolute;
+    bottom:  0;
+    font-size: ${({$ratio}) => $ratio * 9}px;
+    color: #B90000;
+    opacity: ${({$isCorrect}) => $isCorrect ? 0 : 1};
+    transition: opacity 0.25s;
+`;
+
 const SexScreen = () => {
     const ratio = useSizeRatio();
     const { next, registrateUser } = useProgress();
-    const [[currentIndex, direction], setCurrentIndex] = useState([0, 0]);
+    const [isSending, setIsSending] = useState(false);
+    const [isNetworkError, setIsNetworkError] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState();
+    
 
-    const nextSlide = () => {
-        setCurrentIndex([(currentIndex + 1) % CARDS.length, 1]);
-    };
+    const handleClick = async () => {
+        if (currentIndex === undefined || isSending) {
+            return;
+        }
+        setIsSending(true);
+        setIsNetworkError(false);
 
-    const prevSlide = () => {
-        setCurrentIndex([(currentIndex - 1 + CARDS.length) % CARDS.length, -1]);
-    }
+        const res = await registrateUser({gender: currentIndex === 0 ? GENDERS.Female : GENDERS.Male});
 
-    const variants = {
-        enter: (direction) => ({
-            x: direction > 0 ? '100%' : '-100%',
-            opacity: 0
-        }),
-        center: {
-            x: 0,
-            opacity: 1,
-            transition: {
-                x: { type: 'spring', stiffness: 400, damping: 40 },
-                opacity: { duration: 0.3 }
-            }
-        },
-        exit: (direction) => ({
-            x: direction < 0 ? '100%' : '-100%',
-            opacity: 0,
-            transition: {
-                x: { duration: 0.3, ease: 'easeInOut' },
-                opacity: { duration: 0.2 }
-            }
-        })
-    };
+        setIsSending(false);
 
-    const handleClick = () => {
-        registrateUser({gender: currentIndex === 0 ? GENDERS.Female : GENDERS.Male});
+        if (res.isError) {
+            setIsNetworkError(true);
+
+            return;
+        }
 
         if (CURRENT_WEEK < 1) {
             next(SCREENS.WAITING);
@@ -129,36 +115,51 @@ const SexScreen = () => {
         next(SCREENS.LOBBY);
     }
 
+    const getAnimation = (card, index) => {
+        if (!(typeof currentIndex === 'number')) {
+            return {scale: 1, x: card.xInitial * ratio}
+        }
+
+        if (currentIndex === index) {
+            return {scale: 1.15, x: card.x * ratio}
+        }
+
+        if (currentIndex !== index) {
+           return {scale: 0.8, x: card.xInitial * ratio}
+        }
+    }
+
+    const handleChoosePers = (index) => {
+        if (isSending) {
+            return;
+        }
+
+        setCurrentIndex(index)
+    }
+
     return (
         <FlexWrapper>
             <LogoOutlined />
             <TitleStyled $ratio={ratio}>
                 Выбери игрового{'\n'}персонажа
             </TitleStyled>
-            <Wrapper  $ratio={ratio}>
-                <ButtonSliderLeft  $ratio={ratio} onClick={nextSlide} >
-                    <Arrow src={arrow} alt="" />
-                </ButtonSliderLeft>
-                <ButtonSliderRight  $ratio={ratio} onClick={prevSlide}>
-                        <Arrow src={arrow} alt="" $isMirror/>
-                </ButtonSliderRight>
-                <AnimatePresence initial={false} custom={direction} mode="wait">
-                    <CardStyled
-                        key={currentIndex}
-                        custom={direction}
-                        variants={variants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                    >
+            <Wrapper $ratio={ratio}>
+                {CARDS.map((card, index) => (
+                    (<CardStyled key={card.id} onClick={() => handleChoosePers(index)}>
                         <Card 
-                            $width={CARDS[currentIndex].width * ratio}
-                            $height={CARDS[currentIndex].height * ratio}
-                            src={CARDS[currentIndex].pic}
-                            alt={CARDS[currentIndex].alt}
+                            initial={{x: card.xInitial, y: card.y ?? 0}}
+                            $width={card.width * ratio}
+                            $height={card.height * ratio}
+                            src={currentIndex === index ? card.chosenPic : card.pic}
+                            alt={card.alt}
+                            animate={getAnimation(card, index)}
+                            transition={{duration: 0.25, ease: 'linear'}}
                         />
-                    </CardStyled>
-                </AnimatePresence>
+                    </CardStyled>)
+                ))}
+                {isNetworkError && (
+                    <ErrorText $ratio={ratio}>Что-то пошло не так, попробуй снова</ErrorText>
+                )}
             </Wrapper>
             <Button width={275 * ratio} onClick={handleClick}>Выбрать</Button>
         </FlexWrapper>

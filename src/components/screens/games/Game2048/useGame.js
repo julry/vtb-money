@@ -1,4 +1,4 @@
-import {useEffect, useReducer} from "react";
+import {useEffect, useReducer, useState} from "react";
 import isNil from "lodash/isNil";
 import isEqual from "lodash/isEqual";
 import flattenDeep from "lodash/flattenDeep";
@@ -300,6 +300,7 @@ function gameReducer(
 }
 
 export function useGame(onWin, onLose, isRules) {
+    const [gameId, setGameId] = useState(() => crypto.randomUUID());
     const [gameState, dispatch] = useReducer(gameReducer, initialState);
 
     const getEmptyCells = () => {
@@ -338,6 +339,7 @@ export function useGame(onWin, onLose, isRules) {
     const restartGame = () => {
         dispatch({type: ACTIONS.RESTART});
         startGame();
+        setGameId(() => crypto.randomUUID())
     }
 
     const hasMoves = () => {
@@ -396,6 +398,7 @@ export function useGame(onWin, onLose, isRules) {
         moveTiles,
         startGame,
         restartGame,
+        gameId,
     };
 
     useEffect(() => {

@@ -13,8 +13,8 @@ body {
   --color-blue-light: rgba(0, 76, 218, 0.5);
   --color-red: #FF4053;
   --color-blue: #00AAFF;
-  --color-purple: #6572FB;
-  --color-pink: #D4B7FF;
+  --color-purple: #479FFF;
+  --color-pink: #A171FF;
   --color-green: #04E061;
   --color-gray: #868686;
   --color-light-gray: #B4B4B4;
@@ -63,6 +63,10 @@ input {
 
 a {
   color: inherit;
+}
+
+b {
+  font-weight: 500;
 }
 
 a:visited {

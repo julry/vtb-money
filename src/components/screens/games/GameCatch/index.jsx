@@ -17,6 +17,7 @@ import { WEEK_TO_TIMER, MAX_INFINITE } from '../constants';
 import { CURRENT_WEEK } from '../../../../contexts/ProgressProvider';
 import { SCREENS } from '../../../../constants/screens';
 import { useImagePreloader } from '../../../../hooks/useImagePreloader';
+import { CommonEndModal } from '../../../shared/modals/CommonEndModal';
 
 const GameWrapper = styled.div`
   height: 100%;
@@ -81,7 +82,7 @@ export default function GameCatch() {
 
     const {
         containerRef, handlePointerDown, handlePointerMove, handlePointerUp,
-        worldRef, characterRef, togglePause, lives,
+        worldRef, characterRef, togglePause, lives, gameId,
         started, initGame, gameOver, score, paused, forceGameOver
     } = useGame();
 
@@ -150,13 +151,17 @@ export default function GameCatch() {
         if (shouldShowModal) {
             if (lives > 0) {
                 handleOpenModal({
-                    Component: <EndModal isGameMode={isGameMode} onClose={isGameMode ? initGame : next(SCREENS.LOBBY)} title={"Ура! Ты собрал\nвсе предметы"} subTitle={`и заработал ${getPluralCoins(coins)}`} />,
+                    Component: <EndModal isGameMode={isGameMode} onClose={isGameMode ? initGame : () => next(SCREENS.LOBBY)} title={"Ура! Ты собрал\nвсе предметы"} subTitle={`и заработал ${getPluralCoins(coins)}`} />,
                 })
             } else {
                 handleOpenModal({
-                    Component: <EndModal isGameMode={isGameMode} title={"О нет, жизни закончились!"} onClose={isGameMode ? initGame : next(SCREENS.LOBBY)} subTitle={`Ты успел заработать ${getPluralCoins(coins)}`} />,
+                    Component: <EndModal isGameMode={isGameMode} title={"О нет, жизни закончились!"} onClose={isGameMode ? initGame : () => next(SCREENS.LOBBY)} subTitle={`Ты успел заработать ${getPluralCoins(coins)}`} />,
                 })
             }
+        } else {
+            handleOpenModal({
+                Component: <CommonEndModal coins={coins} />
+            })
         }
         
     }
@@ -180,9 +185,10 @@ export default function GameCatch() {
     return (
         <GameWrapper>
             <BackHeaderGame
-                onExit={gameState?.isInfinite ? () => finishGame(false) : undefined}
+                onExit={() => finishGame(false)}
                 shouldShowCoinIcon={false}
                 timerData={{
+                    timerId: gameId,
                     initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK],
                     isStart: started && !paused && !gameOver, onFinish: forceGameOver
                 }}

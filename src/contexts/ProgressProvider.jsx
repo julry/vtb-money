@@ -9,8 +9,7 @@ import { useCallback } from 'react';
 import {BASE_LOCK_TIMEOUT, INITIAL_STATE, INITIAL_USER, MAX_LOCK_TIMEOUT, MAX_RETRIES, MAX_TURNS_PER_WEEK, RETRY_DELAY, PLATFORMS} from './constants';
 import { ProgressContext } from './ProgressContext';
 import { GENDERS } from '../constants/genders';
-import { useImagePreloader } from '../hooks/useImagePreloader';
-import {lobbyImagesF, lobbyImagesM, WEEK_TO_IMAGES} from '../constants/preloads';
+import { shopInfo } from '../constants/shopInfo';
 
 const getMoscowTime = (date) => {
     const dateNow = date ?? new Date();
@@ -22,7 +21,9 @@ const getMoscowTime = (date) => {
 }
 
 const getCurrentWeek = () => {
-    return 1;
+    if (getUrlParam('week')) {
+        return +getUrlParam('week');
+    }
 
     const today = getMoscowTime();
 
@@ -53,7 +54,6 @@ export function ProgressProvider(props) {
     const [isMapHidden, setIsMapHidden] = useState(false);
     const [shopItems, setShopItems] = useState([]);
     const [platform, setPlatform] = useState('');
-    const [preloadImages, setPreloadImages] = useState([]);
     const [tgError, setTgError] = useState({isError: false, message: ''});
     const [isFinishedTurnsModal, setFinishedTurnsModal] = useState(!user.lastOpenedCell && user.turns < 1);
 
@@ -63,6 +63,7 @@ export function ProgressProvider(props) {
     const isDesktop = useRef(false);
     const tgInfo = useRef({});
     const vkInfo = useRef({});
+    const userInfo = useRef({});
 
     const setUserBdData = (record = {}) => {
         recordId.current = record?.id;
@@ -93,7 +94,7 @@ export function ProgressProvider(props) {
             // }
 
             if (!info) {
-                setTgError({isError: true, message: ''});
+                setTgError({isError: true, message: 'Не найдена информация в базе, нужно пройти регистрацию через бота'});
             }
 
             tgInfo.current = info?.systemData ?? {};
@@ -104,12 +105,7 @@ export function ProgressProvider(props) {
 
             setIsFemale(data.gender === GENDERS.Female);
             setFinishedTurnsModal(!data.lastOpenedCell && data.turns < 1);
-
-            if (CURRENT_WEEK > 0 && data.email) {
-                const weekImages = WEEK_TO_IMAGES[data?.progressWeek] ?? []; 
-
-                setPreloadImages([...(data.gender === GENDERS.Female ? lobbyImagesF : lobbyImagesM), ...weekImages])
-            }
+            userInfo.current = data;
 
             if (data.facId) {
                 updateShopItems(data.facId);
@@ -118,14 +114,14 @@ export function ProgressProvider(props) {
             // check enter on new week
             if (data?.email && !data.weekEnter[`week${CURRENT_WEEK}`]) {
                 const newCoins = data.totalCoins + data.newWeekCoins;
-                const coinsKoefed = newCoins * data.coinsKoefs;
-                //TODO: пересмотреть концепцию выдачи ходов
+                const coinsKoefed = Math.round(newCoins * data.coinsKoefs);
+                // TODO: пересмотреть концепцию выдачи ходов
                 // TODO: туда же при переключении недели добавить preload следующих weekImages
-                const newTurns = data.turns + MAX_TURNS_PER_WEEK;
+                // const newTurns = data.turns + MAX_TURNS_PER_WEEK;
                 const newWeekEnter = {...data.weekEnter, [`week${CURRENT_WEEK}`]: true}
                 const updatedData = {
                     totalCoins: coinsKoefed,
-                    turns: newTurns,
+                    // turns: newTurns,
                     weekEnter: newWeekEnter,
                 };
 
@@ -155,7 +151,7 @@ export function ProgressProvider(props) {
                 setCurrentScreen(INITIAL_STATE.currentScreen);
                 return;
             } else {
-                setCurrentScreen(SCREENS.LOBBY);
+                setCurrentScreen(CURRENT_WEEK > 0 ? SCREENS.LOBBY : SCREENS.WAITING);
             }
         } catch (e) {
             console.log('error initProject', e);
@@ -175,8 +171,7 @@ export function ProgressProvider(props) {
             API_LINK,
             API_SHOP_NAME
         );
-
-        
+     
         initProject().catch((e) => console.log(e));
 
         if (WebApp) {
@@ -185,9 +180,6 @@ export function ProgressProvider(props) {
             WebApp.lockOrientation();
         }
     }, []);
-
-
-    useImagePreloader(preloadImages);
 
     const loadRecord = async () => {
         const isVk = bridge.isWebView() || bridge.isEmbedded();
@@ -270,6 +262,9 @@ export function ProgressProvider(props) {
 
     const updateUser = async (changed) => {
         setUserInfo(changed);
+        console.log('updateUser changed', changed);
+        userInfo.current = ({...userInfo.current, ...changed});
+        console.log('updateUser  userInfo.current',  userInfo.current);
 
         return patchData(changed);
     }
@@ -305,6 +300,7 @@ export function ProgressProvider(props) {
                 ...user.weekEnter,
                 [`week${CURRENT_WEEK}`]: true,
             },
+            ...(tgInfo?.current ?? {}),
             ...args,
         }
         
@@ -350,16 +346,12 @@ export function ProgressProvider(props) {
         setOpenedModal(prev => ({isOpen: false, isBlurTransitionDisabled: prev.isBlurTransitionDisabled}));
     }
 
-    const updateShopItems = async (facId, info) => {
+    const updateShopItems = async (facId) => {
         try {
             if (!clientShop?.current) {
                 return {};
             }
             const result = await clientShop?.current?.findRecord('id', facId ?? user.facId);
-
-            // await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // await clientShop.current.updateRecord(result.id, info);
 
             const { items } = result?.data ?? [];
 
@@ -592,23 +584,25 @@ export function ProgressProvider(props) {
     };
 
     const openCell = async (cellId, cellData = {}) => {
-        updateUser({lastOpenedCell: cellId, cells: [...(user.cells ?? []), {name: cellId, start: true, ...cellData}]});
+        const cells = [...userInfo.current.cells, {name: cellId, start: true, ...cellData}];
+        const turns = userInfo.current.turns - 1;
+
+        updateUser({turns, cells, lastOpenedCell: cellId});
     }
 
     const finishCell = async (cellId, cellData = {}, changedCoins = 0, additionalData) => {
-        const cells = [...(user.cells ?? [])];
-        let coins = Math.max(0, user.totalCoins + changedCoins);
-
-        const index = cells.findIndex(cell => cell.name === cellId);
-
+        let coins = Math.max(0, userInfo.current.totalCoins + changedCoins);
+        let newCells = [...userInfo.current.cells];
+        const index = newCells.findIndex(cell => cell.name === cellId);
         if (index !== -1) {
-            cells[index] = { ...cells[index], ...cellData, finish: true };
+            newCells[index] = { ...newCells[index], ...cellData, finish: true };
         }
 
-        if (user.turns < 1) {
+        updateUser({lastOpenedCell: null, totalCoins: coins, cells: newCells, ...additionalData});
+
+        if (userInfo.current.turns < 1) {
             setFinishedTurnsModal(true);
         }
-        updateUser({cells, lastOpenedCell: null, totalCoins: coins, ...additionalData});
     }
 
     const state = {

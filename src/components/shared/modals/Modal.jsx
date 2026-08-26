@@ -10,14 +10,16 @@ const Wrapper = styled(motion.div)`
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background-color: ${({$isLighten}) => $isLighten ? 'rgba(142, 196, 255, 0.4)' : 'transparent'};
 `;
 
-export const Modal = ({ isDisabledAnimation, ...props }) => (
+export const Modal = ({ isDisabledAnimation, isLighten, ...props }) => (
     <Wrapper
         {...props}
         initial={{
             opacity: isDisabledAnimation ? 1 : 0,
         }}
+        $isLighten={isLighten}
         animate={!isDisabledAnimation && { opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}

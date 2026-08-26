@@ -66,7 +66,7 @@ const ButtonStyled = styled(Button)`
     left: 50%;
     transform: translateX(-50%);
     z-index: 5;
-    background: rgba(0, 48, 222, 0.7);
+    background: rgba(0, 48, 222, 1);
     max-width: ${({$ratio}) => $ratio * 328}px;
     backdrop-filter: blur(5px);
 `;
@@ -91,7 +91,7 @@ const IntroScreen = () => {
             <LogoOutlined />
            <ContentWrapper $ratio={ratio}>
                 <TitleStyled>
-                    Привет!{'\n'}Это «Ход капиталом»{'\n'}от ВТБ
+                    Привет!{'\n'}Это «Ход вперёд»{'\n'}от ВТБ
                 </TitleStyled>
                 <TextStyled $ratio={ratio}>
                     Игра про логику, стратегическое мышление, риск и деньги. С каждым правильным шагом твой доход становится всё выше. Готов?

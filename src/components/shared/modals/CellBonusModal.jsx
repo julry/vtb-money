@@ -13,6 +13,7 @@ const BlockStyled = styled(Block)`
     flex-direction: column;
     position: relative;
     min-height: ${({$ratio}) => $ratio * 582}px;
+    max-height: ${({$ratio}) => $ratio * 582}px;
     padding: ${({$ratio}) => $ratio * 20}px ${({$ratio}) => $ratio * 23}px ${({$ratio}) => $ratio * 23}px;
     
     & button {
@@ -27,7 +28,8 @@ const TextWrapper = styled.div`
 
 const ImageWrapper = styled.div`
     width: 100%;
-    flex: 1;
+    height: stretch;
+    overflow: ${($overflow) => $overflow ?? 'hidden'};
 
     position: relative;
 
@@ -42,7 +44,7 @@ const ImageWrapper = styled.div`
 const Result = styled.div`
     width: calc(100% - ${({$ratio}) => $ratio * 46}px);
     position: absolute;
-    bottom:  ${({$ratio}) => $ratio * 91}px;
+    bottom:  ${({$ratio}) => $ratio * 81}px;
     left: 50%;
     display: flex;
     flex-direction: column;
@@ -63,25 +65,26 @@ export const CellBonusModal = ({cellInfo}) => {
     const { handleCloseModal, finishCell } = useProgress();
 
     const onClose = () => {
+        console.log('cellInfo.id', cellInfo.id);
         finishCell(cellInfo.id, {coinsAdd: cellInfo.income}, cellInfo.income);
         handleCloseModal();
     }
 
     return (
-        <Modal>
+        <Modal isLighten>
             <BlockStyled $ratio={ratio}>
                 <Title>{cellInfo.title}</Title>
                 <TextWrapper $ratio={ratio}>
                     <Text>{cellInfo.description}</Text>
                 </TextWrapper>
-                <ImageWrapper $ratio={ratio} $imgStyle={cellInfo.imgStyle ?? {}}>
+                <ImageWrapper $overflow={cellInfo.imgStyle?.overflow} $ratio={ratio} $imgStyle={cellInfo.imgStyle ?? {}}>
                     <img src={cellInfo.modalImage ?? picture} alt=""/>
                 </ImageWrapper>
                 <Result $ratio={ratio}>
                   <p>сразу</p>
                   <p>+{cellInfo.income}</p>
                 </Result>
-                <Button mt={40 * ratio} onClick={onClose}>далее</Button>
+                <Button mt={40 * ratio} onClick={onClose}>забрать</Button>
              </BlockStyled>
         </Modal>
     )

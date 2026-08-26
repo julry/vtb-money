@@ -22,17 +22,18 @@ const TextWrapper = styled.div`
 `;
 
 const AnswerBlock = styled.button`
-    background: ${({$isActive}) => $isActive ? '#D4B7FF' : '#6572FB'};
-    box-shadow: 0.694444px 0.694444px 2.08333px rgba(1, 32, 103, 0.6), inset 1.38889px 1.38889px 1.38889px rgba(255, 255, 255, 0.4);
+    background: ${({$isCorrect, $isAnswered}) => $isCorrect ? 'var(--color-pink)' : $isAnswered ? '#6572FB' : '#479FFF'};
+    box-shadow: ${({$isActive}) => $isActive ? ' 0px 0px 6px 2px #FFFFFF, inset 1.38889px 1.38889px 1.38889px rgba(255, 255, 255, 0.4), ' : ''}0.694444px 0.694444px 2.08333px rgba(1, 32, 103, 0.6), inset 1.38889px 1.38889px 1.38889px rgba(255, 255, 255, 0.4);
     width: 100%;
     min-height: ${({$ratio}) => $ratio * 60}px;
-    padding: ${({$ratio}) => $ratio * 5}px ${({$ratio}) => $ratio * 20}px;
+    padding: ${({$isSmall, $ratio}) => $ratio * ($isSmall ? 12 : 16)}px ${({$ratio, $isSmall}) => $ratio * ($isSmall ? 15 : 20)}px;
     display: flex;
     align-items: center;
     color: white;
     font-size: ${({$isSmall, $ratio}) => $isSmall ? $ratio * 12 : $ratio * 15}px;
     text-align: left;
-    border-radius:  ${({$ratio}) => $ratio * 15}px;
+    border-radius: ${({$ratio}) => $ratio * 15}px;
+    transition: background 0.3s;
 
     & + & {
         margin-top: ${({$ratio}) => $ratio * 10}px;
@@ -71,12 +72,16 @@ export const CellQuizModal = ({cellInfo}) => {
     const { handleCloseModal, finishCell } = useProgress();
 
     const handleChoose = () => {
+        if (!activeVariant) {
+            return;
+        }
+
         const isCorrect = activeVariant === cellInfo.correctAnswer;
 
         if (isAnswered) {
             setResultModal({
                 isOpen: true, 
-                color: isCorrect ? '#D4B7FF' : '#6572FB', 
+                color: isCorrect ? 'var(--color-pink)' : '#6572FB', 
                 income: isCorrect ? `+${cellInfo.income}` : 0
             })
 
@@ -96,7 +101,7 @@ export const CellQuizModal = ({cellInfo}) => {
     }
 
     return (
-        <Modal>
+        <Modal isLighten>
             <BlockStyled $ratio={ratio} $isBlured={resultModal?.isOpen}>
                 <Title>{cellInfo.title}</Title>
                 <TextWrapper $ratio={ratio}>
@@ -109,13 +114,15 @@ export const CellQuizModal = ({cellInfo}) => {
                             key={index}
                             onClick={() => handleClickAnswer(index + 1)}
                             $isActive={activeVariant === index + 1}
-                            $isSmall={isAnswered && cellInfo.answersInfo[index].length > 100}
+                            $isAnswered={isAnswered}
+                            $isCorrect={isAnswered && (index + 1) === cellInfo.correctAnswer}
+                            $isSmall={cellInfo?.isSmallAnswer && isAnswered}
                         >
                             {isAnswered ? cellInfo.answersInfo[index] : answer}
                         </AnswerBlock>
                     ))
                 }
-                <Button mt={'auto'} type={isAnswered ? 'secondary' : 'main'} onClick={handleChoose}>{isAnswered ? 'пропустить' : 'выбрать'}</Button>
+                <Button mt={'auto'} type={isAnswered ? 'secondary' : 'main'} onClick={handleChoose}>{isAnswered ? 'далее' : 'выбрать'}</Button>
              </BlockStyled>
              {resultModal?.isOpen && (
                 <ResultModal $ratio={ratio}>

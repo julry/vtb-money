@@ -4,7 +4,7 @@ import { BackHeaderGame } from '../../../shared/BackHeaderGame';
 import { useSizeRatio } from '../../../../hooks/useSizeRatio';
 import { Board } from './parts/Board';
 import { AnimatePresence, motion} from 'framer-motion';
-import {useEffect, useLayoutEffect} from 'react';
+import {Component, useEffect, useLayoutEffect} from 'react';
 import { StartMatch3Modal } from './parts/StartModal';
 import { RulesMatch3Modal } from './parts/RulesModal';
 import { useProgress } from '../../../../hooks/useProgress';
@@ -15,6 +15,7 @@ import { CURRENT_WEEK } from '../../../../contexts/ProgressProvider';
 import {SCREENS} from '../../../../constants/screens';
 import { useImagePreloader } from '../../../../hooks/useImagePreloader';
 import { COLORS } from './constants';
+import { CommonEndModal } from '../../../shared/modals/CommonEndModal';
 
 const Wrapper = styled.div`
     height: 100%;
@@ -83,7 +84,7 @@ const GameMatch3 = () => {
     const { 
         score, selected, board, handleCellClick, 
         handleTouchStart, handleTouchEnd, showShuffle,
-        handleSwap, setSelected, resetGame
+        handleSwap, setSelected, resetGame, gameId
     } = useGame({isFirstTime});
 
     const handleFinish = (shouldShowModal = true) => {
@@ -123,13 +124,18 @@ const GameMatch3 = () => {
             const isGameMode = gameState?.isInfinite;
 
             handleOpenModal({
-                Component: <EndModal title={"Время вышло!"} onClose={isGameMode ? resetGame : next(SCREENS.LOBBY)} isGameMode={isGameMode}  coins={coins}/>,
+                Component: <EndModal title={"Время вышло!"} onClose={isGameMode ? resetGame : () => next(SCREENS.LOBBY)} isGameMode={isGameMode} coins={coins}/>,
+            })
+        } else {
+            handleOpenModal({
+                Component: <CommonEndModal coins={coins} />
             })
         }
     }
 
     const { getSeconds, getMinutes } = useTimer({
         isStart: !openedModal?.isOpen, 
+        timerId: gameId,
         initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK], 
         onFinish: handleFinish
     });
@@ -173,7 +179,7 @@ const GameMatch3 = () => {
         <Wrapper $ratio={ratio}>
             <BackHeaderGame 
                 onRulesClick={handleOpenRules}
-                onExit={gameState?.isInfinite ? () => handleFinish(false) : undefined}
+                onExit={() => handleFinish(false)}
             />
             <Board board={board} selected={selected} handleCellClick={handleCellClick} handleTouchStart={handleTouchStart} handleTouchEnd={handleTouchEnd} />
             <TimerWrapper $ratio={ratio}>

@@ -22,6 +22,7 @@ import { SCREENS } from "../../../../constants/screens";
 import {getDistance} from './helpers';
 import {useImagePreloader} from '../../../../hooks/useImagePreloader';
 import { trashImages } from "./constants";
+import {CommonEndModal} from '../../../shared/modals/CommonEndModal';
 
 const Wrapper = styled.div`
     position: relative;
@@ -98,19 +99,24 @@ function GameRunner({ className }) {
             updateUser({ totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, runner: newGameInfo })
         }
 
+        const isGameMode = gameState?.isInfinite;
+
         if (shouldShowModal) {
-            const isGameMode = gameState?.isInfinite;
             handleOpenModal({
                 Component: (
                     <EndModal 
                         title="Забег окончен!"
                         isGameMode={isGameMode}
-                        onClose={isGameMode ? () => {} : next(SCREENS.LOBBY)}
+                        onClose={isGameMode ? restartGame : () => next(SCREENS.LOBBY)}
                         subTitle={`Ты заработал ${getPluralCoins(coins)}`} 
                         coins={coins}
                     />
                 )
             });
+        } else {
+            handleOpenModal({
+                Component: <CommonEndModal coins={coins} />
+            })
         }
     }, []);
 
@@ -130,7 +136,10 @@ function GameRunner({ className }) {
         isCollected,
         isGameStartedRef,
         isRules,
-        handleOpenRules
+        handleOpenRules,
+        setIsRules,
+        gameId,
+        restartGame
     } = useGame({isFirstTry: !user.runner.hasPlayed, onDie});
 
     useLayoutEffect(() => {
@@ -160,9 +169,10 @@ function GameRunner({ className }) {
                 currentPoints={getDistance(distance)}
                 shouldShowCoinIcon={false}
                 isHidden={isRules}
-                onExit={gameState?.isInfinite ? () => onDie(distance, false) : undefined}
+                onExit={() => onDie(distance, false)}
                 isLarge
                 timerData={{
+                    timerId: gameId,
                     initialTime: WEEK_TO_TIMER[gameState?.week ?? CURRENT_WEEK],
                     isStart: isGameStartedRef.current,
                     onFinish: () => onDie(distanceRef),
@@ -170,7 +180,7 @@ function GameRunner({ className }) {
             />
             <AnimatePresence>
                 {isRules && !openedModal?.isOpen && (
-                    <RulesModal />
+                    <RulesModal onClick={() => setIsRules(false)}/>
                 )}
 
             </AnimatePresence>
@@ -213,6 +223,7 @@ function GameRunner({ className }) {
                 ref={characterRef}
                 isPause={!isGameStartedRef.current || isPaused}
                 ratio={sizeRatio}
+                gameId={gameId}
                 $ratio={sizeRatio}
                 isJump={isUp}
                 $isCollecting={isCollected}

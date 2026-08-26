@@ -115,7 +115,22 @@ const RulesScreen = () => {
                                 )
                             })
                         }
-                    >Розыгрыш</Button>
+                    >Розыгрыш
+                    </Button>
+                    <Button
+                        onClick={() =>
+                            handleOpenModal({
+                                Component: (
+                                    <RuleTextModal
+                                        title={"Написать\nв поддержку"}
+                                        text={rulesTexts.support}
+                                    />
+                                )
+                            })
+                        }
+                    >
+                        Написать в поддержку
+                    </Button>
                 </ButtonsWrapper>
             </Wrapper>
         </>

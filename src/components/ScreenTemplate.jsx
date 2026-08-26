@@ -3,7 +3,6 @@ import {AnimatePresence} from 'framer-motion';
 import styled from 'styled-components';
 import { SizeRatioContextProvider } from '../contexts/SizeRatioContext';
 // import WebApp from '@twa-dev/sdk';
-// import { CookieInfo } from './shared/CookieInfo';
 
 import { useProgress } from '../hooks/useProgress';
 import { SCREENS } from '../constants/screens';
@@ -147,7 +146,7 @@ export function ScreenTemplate(props) {
                             </AnimatePresence>
                             {isShowCookies && 
                                 <CookieInfo $sizeRatio={sizeRatio}>
-                                    <p>Мы используем куки.{'\n'}Играя, ты соглашаешься с этим</p>
+                                    <p>Мы используем <a href="https://fut.ru/cookie" target="_blank" rel="noreferrer">куки</a>.{'\n'}Играя, ты соглашаешься с этим</p>
                                     <Button type="transparent" width={63 * sizeRatio} onClick={handleCloseCookie}>Окей</Button>
                                 </CookieInfo>
                             }

@@ -42,7 +42,7 @@ const InfoBlock = styled.div`
 
 const InfoStyled = styled.div`
     height: ${({$ratio}) => $ratio * 60}px;
-    background: #D4B7FF;
+    background: var(--color-pink);
     flex: 1;
     display: flex;
     align-items: center;
@@ -59,7 +59,7 @@ export const CellMiniGameModal = ({cellInfo}) => {
     const incomes = [...cellInfo.incomes].reverse();
 
     return (
-        <Modal>
+        <Modal isLighten>
             <BlockStyled $ratio={ratio}>
                 <Title>{cellInfo.title}</Title>
                 <TextWrapper $ratio={ratio}>

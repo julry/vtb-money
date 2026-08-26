@@ -7,6 +7,7 @@ export const useGame = ({isRules = false, isFirstTime = false}) => {
     const [selected, setSelected] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [showShuffle, setShowShuffle] = useState(false);
+    const [gameId, setGameId] = useState(() => crypto.randomUUID());
 
     const boardRef = useRef([]);
     const touchStartRef = useRef(null);
@@ -302,16 +303,17 @@ export const useGame = ({isRules = false, isFirstTime = false}) => {
     }, [generateBoard, hasValidMoves]);
 
     const resetGame = useCallback(() => {
-            let b = generateBoard();
+        setGameId(() => crypto.randomUUID());
+        let b = generateBoard();
 
-            while (!hasValidMoves(b)) {
-                b = generateBoard();
-            }
+        while (!hasValidMoves(b)) {
+            b = generateBoard();
+        }
 
-            boardRef.current = b;
-            setBoard(b);
-            setScore(0);
+        boardRef.current = b;
+        setBoard(b);
+        setScore(0);
     }, []);
 
-    return { score, selected, board, handleCellClick, handleTouchStart, handleTouchEnd, showShuffle, handleSwap, setSelected, touchStartRef, resetGame }
+    return { score, selected, board, handleCellClick, handleTouchStart, handleTouchEnd, showShuffle, handleSwap, setSelected, touchStartRef, resetGame, gameId }
 }

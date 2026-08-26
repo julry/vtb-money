@@ -30,7 +30,7 @@ const SEX_TO_CHARACTER = {
     Male: MALE_CHARACTER
 }
 
-export function useAnimate(isPause, isJump) {
+export function useAnimate(isPause, isJump, gameId) {
     const { user } = useProgress(); 
     const [index, setIndex] = useState(STAND_INDEX);
     const isJumpRef = useRef(isJump);
@@ -42,6 +42,10 @@ export function useAnimate(isPause, isJump) {
 
     useImagePreloader(sexSource);
     
+    useEffect(() => {
+        setIndex(STAND_INDEX);
+    }, [gameId]);
+
     useEffect(() => {
         if (isJump) {
             setIndex(JUMP_INDEX);

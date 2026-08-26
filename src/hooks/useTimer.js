@@ -13,6 +13,11 @@ export const useTimer = ({ timerId, isStart, initialTime, reverse, onFinish, onS
     // Ref'ы для колбэков, чтобы избежать stale closures
     const onFinishRef = useRef(onFinish);
     const onStopRef = useRef(onStop);
+
+    useEffect(() => {
+        resetTimer();
+    }, [timerId])
+
     useEffect(() => { onFinishRef.current = onFinish; }, [onFinish]);
     useEffect(() => { onStopRef.current = onStop; }, [onStop]);
 
@@ -128,9 +133,23 @@ export const useTimer = ({ timerId, isStart, initialTime, reverse, onFinish, onS
         return seconds > 9 ? seconds : `0${seconds}`;
     }, [time]);
 
+    const resetTimer = useCallback(() => {
+        if ($interval.current) {
+            clearInterval($interval.current);
+            $interval.current = null;
+        }
+
+        $time.current = initialTime;
+        started.current = false;
+        $restart.current = false;
+        wasRunning.current = false;
+        setTime(initialTime);
+    }, [initialTime]);
+
     return {
         getSeconds,
         getMinutes,
-        time
+        time,
+        resetTimer
     };
 };

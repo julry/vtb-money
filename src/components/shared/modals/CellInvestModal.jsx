@@ -7,7 +7,6 @@ import { Title } from "../Title";
 import { Text } from "../Text";
 import { Button } from "../Button";
 import { useProgress } from "../../../hooks/useProgress";
-import { Scrollbar } from "../ScrollBar";
 import { FlexRowWrapper } from "../ContentWrapper";
 
 const BlockStyled = styled(Block)`
@@ -18,7 +17,7 @@ const BlockStyled = styled(Block)`
     padding: 0;
     max-height: calc(100% - ${({$ratio}) => $ratio * 80}px);
     overflow-x: visible;
-    max-width: ${({$ratio}) => $ratio * 339}px;
+    max-width: ${({$ratio}) => $ratio * 326}px;
     
     & button {
         position: relative;
@@ -31,7 +30,7 @@ const TitleStyled = styled(Title)`
 `;
 
 const TextWrapper = styled.div`
-    padding: ${({$ratio}) => $ratio * 10}px ${({$ratio}) => $ratio * 21}px ${({$ratio}) => $ratio * 10}px ${({$ratio}) => $ratio * 23}px;
+    padding: ${({$ratio}) => $ratio * 10}px ${({$ratio, $commonMarginH}) => $ratio * ($commonMarginH ?? 23)}px;
 `;
 
 const ImageWrapper = styled.div`
@@ -53,7 +52,7 @@ const Result = styled(FlexRowWrapper)`
     width: 100%;
     position: absolute;
     padding-left: ${({$ratio}) => $ratio * 23}px;
-    padding-right: ${({$ratio}) => $ratio * 21}px;
+    padding-right: ${({$ratio}) => $ratio * 23}px;
     top: ${({$ratio}) => $ratio * -80}px;
     left: 50%;
     gap: ${({$ratio}) => $ratio * 9}px;
@@ -82,7 +81,7 @@ const ButtonsWrapper = styled.div`
     margin-top: auto;
     width: 100%;
     padding-left: ${({$ratio}) => $ratio * 23}px;
-    padding-right: ${({$ratio}) => $ratio * 21}px;
+    padding-right: ${({$ratio}) => $ratio * 23}px;
     padding-bottom: ${({$ratio}) => $ratio * 23}px;
 `;
 
@@ -118,11 +117,11 @@ export const CellInvestModal = ({cellInfo}) => {
     };
 
     return (
-        <Modal>
+        <Modal isLighten>
             <BlockStyled $ratio={ratio}>
-                <Scrollbar offset={4 * ratio} top={30 * ratio} bottom={30 * ratio} additionalPadding={2}>
+                {/* <Scrollbar offset={4 * ratio} top={30 * ratio} bottom={30 * ratio} additionalPadding={2}> */}
                     <TitleStyled>{cellInfo.title}</TitleStyled>
-                    <TextWrapper $ratio={ratio}>
+                    <TextWrapper $ratio={ratio} $commonMarginH={cellInfo.commonMarginH}>
                         <Text>{cellInfo.description}</Text>
                     </TextWrapper>
                     <ImageWrapper $ratio={ratio} $imgStyle={cellInfo.imgStyle ?? {}}>
@@ -158,7 +157,7 @@ export const CellInvestModal = ({cellInfo}) => {
                         <Button disabled={isDisabled} onClick={onBuy}>купить</Button>
                         <Button type="secondary" mt={10 * ratio} onClick={onSkip}>пропустить</Button>
                     </ButtonsWrapper>
-                </Scrollbar>
+                {/* </Scrollbar> */}
              </BlockStyled>
         </Modal>
     )

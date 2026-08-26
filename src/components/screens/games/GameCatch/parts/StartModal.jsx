@@ -10,10 +10,10 @@ const ImageWrapper = styled.div`
 
     & img {
         position: absolute;
-        top: ${({$ratio}) => $ratio * 72}px;
-        left: ${({$ratio}) => $ratio * -25}px;
-        width: ${({$ratio}) => $ratio * 350}px;
-        height: ${({$ratio}) => $ratio * 301}px;
+        top: ${({$ratio}) => $ratio * 87}px;
+        left: ${({$ratio}) => $ratio * 5}px;
+        width: ${({$ratio}) => $ratio * 315}px;
+        height: ${({$ratio}) => $ratio * 251}px;
         object-fit: contain;
     }
 `;
@@ -24,7 +24,7 @@ export const StartCatchModal = () => {
     return (
         <GameModal title={"Проверь свою реакцию и собери все предметы"}>
             <ImageWrapper $ratio={ratio}>
-                {/* <img src={startImg} alt="" /> */}
+                <img src={startImg} alt="" />
             </ImageWrapper>
         </GameModal>
     )

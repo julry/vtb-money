@@ -128,8 +128,8 @@ export function getCharacterStyle(cell) {
     top: `${top}px`,
     width: CHARACTER_WIDTH,
     height: CHARACTER_HEIGHT,
-    transition: 'left 0.4s ease, top 0.4s ease', // плавное перемещение
-    zIndex: MAX_X + 1,
+    transition: 'left 0.4s ease, top 0.4s ease',
+    zIndex: 60,
     pointerEvents: 'none',
   };
 }

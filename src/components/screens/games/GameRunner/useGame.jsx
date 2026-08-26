@@ -11,9 +11,6 @@ import {
     DISTANCE_KOEF
 } from './constants';
 import { generateChunk } from './helpers';
-import { EndModal } from '../../../shared/modals/EndModal';
-import { getPluralCoins } from '../../../../utils/getPluralCoins';
-
 
 export const useGame = ({isFirstTry, onDie}) => {
     const sizeRatio = useSizeRatio();
@@ -21,6 +18,12 @@ export const useGame = ({isFirstTry, onDie}) => {
     const [gamePoint, setGamePoints] = useState(0);
     const [distance, setDistance] = useState(0);
     const { openedModal } = useProgress();
+    const [gameId, setGameId] = useState(() => crypto.randomUUID());
+    const gameIdRef = useRef(gameId);
+
+    useEffect(() => {
+        gameIdRef.current = gameId;
+    }, [gameId]);
 
     // State только для монтирования чанков и UI
     const [chunks, setChunks] = useState([]);
@@ -286,6 +289,57 @@ export const useGame = ({isFirstTry, onDie}) => {
         setIsRules(true);
     }
 
+    const restartGame = useCallback(() => {
+        // 1. Останавливаем игру
+        isGameStartedRef.current = false;
+        isJumpingRef.current = false;
+        isUpRef.current = false;
+
+        // 2. Чистим таймер сбора
+        if (collectTimeoutRef.current) {
+            clearTimeout(collectTimeoutRef.current);
+            collectTimeoutRef.current = null;
+        }
+
+        // 3. Сбрасываем mutable-состояние
+        charXRef.current = 0;
+        charYRef.current = 0;
+        jumpStartXRef.current = 0;
+        gamePointRef.current = 0;
+        distanceRef.current = 0;
+        chunksRef.current = [];
+        collectedRef.current = new Set();
+        hitTrashIdsRef.current = new Set();
+
+        // 4. Сбрасываем React-state (триггерит ре-рендер)
+        setChunks([]);
+        setCollectedIds(new Set());
+        setIsCollected(false);
+        setIsUp(false);
+        setGamePoints(0);
+        setDistance(0);
+        setIsRules(false); // или true, если хочешь снова показывать правила
+
+        // 5. Новый ID партии
+        const newId = crypto.randomUUID();
+        gameIdRef.current = newId;
+        setGameId(newId);
+
+        // 6. Сбрасываем визуальные transform'ы (чтобы не было "прыжка" при следующем старте)
+        if (itemsBoardRef.current) {
+            itemsBoardRef.current.style.transform = 'translate3d(0, 0, 0)';
+        }
+        if (bgRef.current) {
+            bgRef.current.style.backgroundPositionX = '0px';
+        }
+        if (roadRef.current) {
+            roadRef.current.style.backgroundPositionX = '0px';
+        }
+        if (characterRef.current) {
+            characterRef.current.style.transform = 'translate3d(0, 0, 0)';
+        }
+    }, []);
+
     return {
         wrapperRef,
         handleTapStart,
@@ -301,8 +355,11 @@ export const useGame = ({isFirstTry, onDie}) => {
         gamePoint,
         isGameStartedRef,
         handleOpenRules,
+        setIsRules,
         isRules,
         distance,
         distanceRef: distanceRef.current,
+        restartGame,
+        gameId,
     };
 };

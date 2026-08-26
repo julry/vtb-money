@@ -28,7 +28,7 @@ export const ConfirmShopModal = ({itemId}) => {
     const { handleOpenModal, buyItem, user } = useProgress();
 
    const handleBuy = async () => {
-        if (!itemId) return;
+        if (!itemId || isLoading) return;
         setIsLoading(true);
         const res = await buyItem(itemId, user.facId);
 

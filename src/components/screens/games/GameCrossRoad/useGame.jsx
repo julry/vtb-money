@@ -6,6 +6,8 @@ import { MIN_MOCKUP_WIDTH } from '../../../ScreenTemplate';
 
 
 export const useGame = ({ onDie }) => {
+    const [gameId, setGameId] = useState(() => crypto.randomUUID());
+
     const heightRef = useRef(
         typeof window !== 'undefined' && window.innerWidth > MIN_MOCKUP_WIDTH
             ? HEIGHT
@@ -122,6 +124,7 @@ export const useGame = ({ onDie }) => {
 
     const resetGame = useCallback((shouldStart) => {
         const SAFE_PAD = getSafePad();
+        setGameId(() => crypto.randomUUID());
         const newLanes = generateInitialLanes(widthRef.current, heightRef.current, SAFE_PAD);
         syncLanes(newLanes);
         const startY = heightRef.current - TILE_SIZE;
@@ -336,6 +339,7 @@ export const useGame = ({ onDie }) => {
                             pRect.y < laneY + LANE_HEIGHT - 2 &&
                             pRect.y + pRect.h > laneY + 4
                         ) {
+                            setGameStarted(false);
                             die(true);
                         }
                     }
@@ -371,6 +375,7 @@ export const useGame = ({ onDie }) => {
         startGame,
         pauseGame,
         playerYRef,
-        heightRef
+        heightRef,
+        gameId,
     };
 };

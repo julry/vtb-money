@@ -33,9 +33,9 @@ const ImageStyled = styled(Image)`
     object-fit: contain;
 `;
 
-export function Character({isPause, isJump, ...rest}, ref) {
+export function Character({isPause, isJump, gameId, ...rest}, ref) {
     const sizeRatio = useSizeRatio();
-    const source = useAnimate(isPause, isJump);
+    const source = useAnimate(isPause, isJump, gameId);
 
     return (
         <WrapperStyled ref={ref} $ratio={sizeRatio} {...rest}>

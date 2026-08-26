@@ -11,7 +11,7 @@ import turns from '../../../assets/images/turns.webp';
 import shop from '../../../assets/images/shop.webp';
 import games from '../../../assets/images/games.webp';
 import PathMap from './Board';
-import {useMemo, useEffect, useState} from 'react';
+import {useMemo, useEffect, useState, useCallback} from 'react';
 import NumberPicker from "./NumberPicker";
 import { GAME_CELLS } from "./constants";
 import {UnfinishedModal} from './UnfinishedModal';
@@ -21,6 +21,7 @@ import { SettingsModal } from "../../shared/modals/SettingsModal";
 import { OnBoardingModal } from "../../shared/modals/OnboardingModal";
 import { FinishedTurnsModal } from "./FinishedTurnsModal";
 import { preload } from "../../../constants/screensComponents";
+import {useCharacterPath} from './useCharacterPath';
 
 const ButtonStyled = styled(Button)`
     position: absolute;
@@ -70,9 +71,10 @@ const SettingsButton = styled(TurnsButton)`
 
 const Lobby = () => {
     const ratio = useSizeRatio();
-    const { next, user, handleOpenModal, updateUser, setGameState, isMapHidden, isFinishedTurnsModal } = useProgress();
+    const { next, user, handleOpenModal, openCell, setGameState, isMapHidden, isFinishedTurnsModal } = useProgress();
+    const [isUnfinishedModal, setIsUnfinishedModal] = useState(!!user.lastOpenedCell);
 
-    const lastCell = useMemo(() => {
+     const lastCell = useMemo(() => {
         if (user.lastOpenedCell) {
             return user.lastOpenedCell
         };
@@ -84,8 +86,25 @@ const Lobby = () => {
        return 'start-1';
     }, [user.cells, user.lastOpenedCell]);
 
+
     const [cellIndex, setCellIndex] = useState(GAME_CELLS.findIndex(({id}) => id === lastCell));
-    const [isUnfinishedModal, setIsUnfinishedModal] = useState(!!user.lastOpenedCell);
+    const [activeCell, setActiveCell] = useState(GAME_CELLS[cellIndex]);
+
+    const onComplete = useCallback((index) => {
+            const currCell = GAME_CELLS[index];
+            setActiveCell(currCell);
+            setGameState(currCell);
+            const isLuck = Math.random() >= 0.5;
+            openCell(currCell.id, {week: currCell.week, ...(currCell.type === 'luck' ? {isLuck} : {})});
+            setTimeout(() => {
+                handleOpenModal({
+                    Component: <CellModal cell={currCell} isLuck={isLuck}/>,
+                })
+            }, 800)
+        }, []);
+    
+
+    const { animatedCell, isAnimating } = useCharacterPath(GAME_CELLS, cellIndex, onComplete);
 
     useEffect(() => {
         const preventDefault = (e) => e.preventDefault();
@@ -96,19 +115,19 @@ const Lobby = () => {
     }, []);
 
     useEffect(() => {
-        Promise.all([
-            preload.profile(),
-            preload.rules(),
-            preload.miniGames(),
-            preload.shop(),
-        ]).catch(console.error);
-        Promise.all([
-            preload.game2048(),
-            preload.gameCatch(),
-            preload.gameCrossRoad(),
-            preload.gameRunner(),
-            preload.gameMatch3(),
-        ]).catch(console.error);
+        // Promise.all([
+        //     preload.profile(),
+        //     preload.rules(),
+        //     preload.miniGames(),
+        //     preload.shop(),
+        // ]).catch(console.error);
+        // Promise.all([
+        //     preload.game2048(),
+        //     preload.gameCatch(),
+        //     preload.gameCrossRoad(),
+        //     preload.gameRunner(),
+        //     preload.gameMatch3(),
+        // ]).catch(console.error);
     }, []);
 
     useEffect(() => {
@@ -139,12 +158,11 @@ const Lobby = () => {
     }
 
     const handleMakeTurn = (number) => {
-        if (user.turns < 1) {
+        if (user.lastOpenedCell || isAnimating || user.turns < 1) {
             return;
         }
 
-        updateUser({turns: user.turns - 1});
-        setCellIndex(prev => prev + number)
+        setCellIndex(prev => prev + number);
     }
 
     const handleOpenTurnInfo = () => {
@@ -181,7 +199,15 @@ const Lobby = () => {
             <ButtonStyled $ratio={ratio}  $top={(user.isTargeted ? 260 : 199) * ratio} type="transparent" onClick={() => next(SCREENS.RULES)}>
                 <img src={rules} alt="Правила"/>
             </ButtonStyled>
-            {!isMapHidden && <PathMap isBlured={isUnfinishedModal} centerCellId={lastCell} cellIndex={cellIndex} />}
+            {!isMapHidden && (
+                <PathMap 
+                    animatedCell={animatedCell}
+                    activeCell={activeCell}
+                    isBlured={isUnfinishedModal} 
+                    centerCellId={lastCell} 
+                    cellIndex={cellIndex} 
+                />
+            )}
             <NumberPicker isBlured={isUnfinishedModal} onChange={handleMakeTurn}/>
             {isUnfinishedModal && (
                 <UnfinishedModal lastOpenedCell={user.lastOpenedCell} onClose={handleClose}/>

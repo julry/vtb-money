@@ -25,12 +25,9 @@ const Image = styled.img`
     object-fit: contain;
 `;
 
-//TODO: доработать после инфы как ведут себя игры
-
 export const SkipModal = ({ onClose }) => {
     const ratio = useSizeRatio();
-    const { next, gameState } = useProgress();
-    const isGameMode = gameState?.isInfinite;
+    const { next } = useProgress();
 
     const handleClose = () => {
         onClose?.();
@@ -47,16 +44,9 @@ export const SkipModal = ({ onClose }) => {
             <TitleStyled $ratio={ratio}>
                 Хочешь вернуться на главный экран?
             </TitleStyled>
-            {isGameMode ? (
-                <SubTitle>
-                    Не переживай, заработанные коины сохранятся
-                </SubTitle>
-            ): (
-                <SubTitle>
-                    Прогресс не сохранится
-                </SubTitle>
-            )}
-            
+            <SubTitle>
+                Не переживай, заработанные коины сохранятся
+            </SubTitle>
             <Image $ratio={ratio} src={door} />
         </CommonModal>
     )

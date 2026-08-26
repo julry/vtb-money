@@ -197,7 +197,14 @@ const NumberPicker = ({ value = 3, onChange, isBlured, disabledPick, ...props })
     };
 
     return (
-        <PickerContainer $ratio={ratio} $isBlured={isBlured} {...props}>
+        <PickerContainer 
+            $ratio={ratio} 
+            $isBlured={isBlured} 
+            {...props}
+            onWheel={handleWheel}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+        >
             <Blur />
             <BlurRight />
             <PickerTitle>
@@ -206,17 +213,13 @@ const NumberPicker = ({ value = 3, onChange, isBlured, disabledPick, ...props })
                 вперед переместимся?
             </PickerTitle>
 
-            <PickerWrapper
-                onWheel={handleWheel}
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-            >
+            <PickerWrapper>
                 <Indicator>
                     <svg width="100%" height="100%" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g filter="url(#filter0_i_1025_11143)">
                         <path d="M8.84378 17.1875C9.64566 18.5764 11.6503 18.5764 12.4522 17.1875L19.9698 4.16667C20.7717 2.77778 19.7693 1.04167 18.1656 1.04167H3.13043C1.52667 1.04167 0.524327 2.77778 1.3262 4.16667L8.84378 17.1875Z" fill="#004CDA"/>
                         </g>
-                        <path d="M8.39258 17.4482C9.39495 19.1841 11.9009 19.1841 12.9033 17.4482L20.4209 4.42676C21.4229 2.69082 20.1704 0.520818 18.166 0.520508H3.13086C1.12629 0.520508 -0.12702 2.6907 0.875 4.42676L8.39258 17.4482Z" stroke="white" stroke-width="1.04167"/>
+                        <path d="M8.39258 17.4482C9.39495 19.1841 11.9009 19.1841 12.9033 17.4482L20.4209 4.42676C21.4229 2.69082 20.1704 0.520818 18.166 0.520508H3.13086C1.12629 0.520508 -0.12702 2.6907 0.875 4.42676L8.39258 17.4482Z" stroke="white" strokeWidth="1.04167"/>
                         <defs>
                         <filter id="filter0_i_1025_11143" x="0" y="0" width="22.3385" height="19.9653" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
                         <feFlood flood-opacity="0" result="BackgroundImageFix"/>

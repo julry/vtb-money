@@ -8,6 +8,7 @@ import { useTimer } from "../../hooks/useTimer";
 import { CommonModal, SkipModal } from "./modals";
 import {CloseIcon} from './CloseIcon';
 import { SCREENS } from "../../constants/screens";
+import { useEffect } from "react";
 
 const HeaderButton = styled(Button)`
     position: absolute;
@@ -91,7 +92,7 @@ const InfoWrapper = styled.div`
 
 export const BackHeaderGame = ({ isCenteredTimer, isHidden, isLarge, onExit, timerData, currentPoints, shouldShowCoinIcon = true, onRulesClick, scoreElementRef }) => {
     const { handleOpenModal } = useProgress();
-    const { getSeconds, getMinutes} = useTimer(timerData ?? {});
+    const { getSeconds, getMinutes } = useTimer(timerData ?? {});
 
     const ratio = useSizeRatio();
 
@@ -104,7 +105,8 @@ export const BackHeaderGame = ({ isCenteredTimer, isHidden, isLarge, onExit, tim
         handleOpenModal({
             Component: <SkipModal onClose={onExit} />
         })
-    }
+    };
+
     return (
         <>
             <ExitButton 
