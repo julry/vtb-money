@@ -6,7 +6,7 @@ import { uid } from 'uid';
 import { SCREENS, NEXT_SCREENS } from "../constants/screens";
 import { getUrlParam } from "../utils/getUrlParam";
 import { useCallback } from 'react';
-import {BASE_LOCK_TIMEOUT, INITIAL_STATE, INITIAL_USER, MAX_LOCK_TIMEOUT, MAX_RETRIES, MAX_TURNS_PER_WEEK, RETRY_DELAY, PLATFORMS} from './constants';
+import {BASE_LOCK_TIMEOUT, INITIAL_STATE, INITIAL_USER, MAX_LOCK_TIMEOUT, MAX_RETRIES, MAX_TURNS_PER_WEEK, RETRY_DELAY, PLATFORMS, DISCOUNT_KOEF} from './constants';
 import { ProgressContext } from './ProgressContext';
 import { GENDERS } from '../constants/genders';
 import { shopInfo } from '../constants/shopInfo';
@@ -400,8 +400,8 @@ export function ProgressProvider(props) {
         return { items: items, isClosed: false, recordId };
     }
 
-    const buyItem = async (itemId, facId) => {
-        const { id: userId } = user;
+    const buyItem = async (itemId, facId, hasSale) => {
+        const { gameId: userId } = user;
 
         // Максимальный таймаут 15 секунд
 
@@ -423,7 +423,7 @@ export function ProgressProvider(props) {
 
         if (item.isInfiniteAmount) {
             const newShop = [...(userInfo.current.shop ?? user.shop), item];
-            const newCoins = (userInfo.current.totalCoins ?? user.totalCoins) - item.cost;
+            const newCoins = (userInfo.current.totalCoins ?? user.totalCoins) - (hasSale ? Math.round(item.cost * DISCOUNT_KOEF) : item.cost);
             const newBilets = (userInfo.current.bilets ?? user.bilets) + (item.isTicket ? 1 : 0);
 
             await updateUser({shop: newShop, totalCoins: newCoins, bilets: newBilets});
@@ -590,10 +590,9 @@ export function ProgressProvider(props) {
             const purchasedItem = updatedItems.find(({ id }) => id === itemId);
 
             const newShop = [...user.shop, purchasedItem];
-            const newCoins = user.totalCoins - purchasedItem.cost;
+            const newCoins = user.totalCoins - (hasSale ? Math.round(item.cost * DISCOUNT_KOEF) : item.cost)
 
-
-            await updateUser({shop: newShop, totalCoins: newCoins});
+            await updateUser({shop: newShop, totalCoins: newCoins, hasSale: false, hasUsedSale: hasSale});
             //TODO: поменять на обычный amount по всему магаизну
             return { 
                 success: true, 

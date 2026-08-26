@@ -22,7 +22,7 @@ const ImageWrapper = styled.div`
     }
 `;
 
-export const ConfirmShopModal = ({itemId}) => {
+export const ConfirmShopModal = ({itemId, itemCost, costRef}) => {
     const [isLoading, setIsLoading] = useState(false);
     const ratio = useSizeRatio();
     const { handleOpenModal, buyItem, user } = useProgress();
@@ -30,7 +30,11 @@ export const ConfirmShopModal = ({itemId}) => {
    const handleBuy = async () => {
         if (!itemId || isLoading) return;
         setIsLoading(true);
-        const res = await buyItem(itemId, user.facId);
+        const res = await buyItem(itemId, user.facId, !!costRef?.current);
+
+        if (costRef) {
+            costRef.current = undefined;
+        }
 
         setIsLoading(false);
 
@@ -45,8 +49,11 @@ export const ConfirmShopModal = ({itemId}) => {
         }
    }
 
+   const isNotEnoughMoney = user.totalCoins < (costRef?.current ?? itemCost);
+   const isButtonDisabled = isLoading || isNotEnoughMoney;
+
     return (
-        <CommonModal customClose={true} buttonsDisabled={isLoading} onClose={handleBuy} btnText={'Купить'} isDisabledAnimation secondBtnText={'Назад'}>
+        <CommonModal customClose={true} buttonsDisabled={isButtonDisabled} onClose={handleBuy} btnText={'Купить'} isDisabledAnimation secondBtnText={'Назад'}>
             <Title $ratio={ratio}>
                 {'Ты точно хочешь купить это?'}
             </Title>

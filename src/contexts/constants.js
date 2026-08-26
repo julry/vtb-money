@@ -78,3 +78,5 @@ export const PLATFORMS = {
     VK: 'vk',
     TG: 'tg'
 }
+
+export const DISCOUNT_KOEF = 0.7;

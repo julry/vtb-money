@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useProgress } from "../../hooks/useProgress";
 import styled from "styled-components";
 import { useSizeRatio } from "../../hooks/useSizeRatio";
@@ -13,6 +13,8 @@ import { CURRENT_WEEK } from "../../contexts/ProgressProvider";
 import { SCREENS } from '../../constants/screens';
 import {ConfirmShopModal} from '../shared/modals/ConfirmShopModal';
 import { EmptyShopModal } from "../shared/modals/EmptyShopModal";
+import {DiscountShopModal} from '../shared/modals/DiscountShopModal';
+import {DISCOUNT_KOEF} from '../../contexts/constants';
 
 const Wrapper = styled.div`
     padding-top: ${({$ratio}) => $ratio * 64}px;
@@ -60,6 +62,7 @@ const WEEK_TO_DATE = {
 const ShopScreen = () => {
     const ratio = useSizeRatio();
     const { updateShopItems, shopItems, next, user, handleOpenModal } = useProgress();
+    const costRef = useRef();
    
     useEffect(() => {
        updateShopItems(user.facId).then(res => {
@@ -72,11 +75,23 @@ const ShopScreen = () => {
     }, []);
 
 
-    const handleClick = async (itemId) => {
+    const handleClick = async (item) => {
+        if (user.hasSale) {
+            handleOpenModal({
+                Component: <DiscountShopModal cost={Math.round(item.cost * DISCOUNT_KOEF)} costRef={costRef}/>,
+                nextOpenedModalProps: {
+                    component: <ConfirmShopModal itemId={item.id} costRef={costRef} itemCost={item.cost}/>,
+                }
+            });
+
+            return;
+        }
+
         handleOpenModal({
-            Component: <ConfirmShopModal itemId={itemId}/>,
+            Component: <ConfirmShopModal itemId={item.id}/>,
         })
     }
+
     return (
         <Wrapper $ratio={ratio}> 
             <BackHeader isShownCoins onBack={() => next(SCREENS.LOBBY)}/>
@@ -84,6 +99,7 @@ const ShopScreen = () => {
                 <TitleStyled>Магазин</TitleStyled>
                 <InnerWrapper $ratio={ratio}>
                     {shopItems.map((card) => {
+                        const isNotEnoughMoney = user.totalCoins < (user.hasSale ? Math.round(card.cost * DISCOUNT_KOEF) : card.cost);
                         //TODO: поменять на обычный amount
                         const isDisabled = card.week > CURRENT_WEEK || card.testAmount < 1;
                         return (
@@ -100,8 +116,8 @@ const ShopScreen = () => {
                                 cardInfo={{...card, src: mapIdToImage(card.id)}} 
                             />
                             <Button
-                                onClick={() => handleClick(card.id)}
-                                disabled={isDisabled || user.totalCoins < card.cost}
+                                onClick={() => handleClick(card)}
+                                disabled={isDisabled || isNotEnoughMoney}
                             >купить</Button>
                         </CardWrapper>
                     )
