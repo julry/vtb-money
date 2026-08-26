@@ -94,13 +94,31 @@ export default function GameCrossRoad() {
             }
         }
 
-        //TODO: нужно ?? sex message
-
         if (gameState?.id) {
             finishCell(gameState?.id, { coinsAdd: coins, score }, coins, {crossyroad: newGameInfo});
         } else if (!hasPlayedBefore || coins > 0) {
-            updateUser({ totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, crossyroad: newGameInfo })
+            const gameMetriks = {...(user.metrikaInfinity?.catchitems ?? {})};
+            const finalsScores = (gameMetriks.finalsScores ?? 0) + 1; 
+            const maxScore = Math.max(gameMetriks.maxScore ?? 0, score);
+            const weekScore = (gameMetriks[`week${CURRENT_WEEK}Score`] ?? 0) + coins;
+
+            const metrikaInfinity = {...gameMetriks, finalsScores, maxScore, [`week${CURRENT_WEEK}Score`]: weekScore };
+
+            updateUser({ 
+                totalCoins: coins + user.totalCoins, 
+                infiniteCoins: newInfiniteCoins, 
+                crossyroad: newGameInfo,
+                metrikaInfinity: {...user.metrikaInfinity, crossyroad: {...metrikaInfinity}}
+            })
+        } else {
+            const gameMetriks = {...(user.metrikaInfinity?.crossyroad ?? {})};
+            const finalsEmptyPoints = (gameMetriks.finalsEmptyPoints ?? 0) + 1;  
+            const maxScore = Math.max(gameMetriks.maxScore ?? 0, score);
+            const metrikaInfinity = {...gameMetriks, finalsEmptyPoints, maxScore };
+
+            updateUser({metrikaInfinity: {...user.metrikaInfinity, crossyroad: {...metrikaInfinity}}});
         }
+
         if (shouldShowModal) {
             const title = isFromGame ? 'Траты не обошли тебя стороной' : `Ты преодолел путь`;
             const subTitle = `${isFromGame ? 'Но это не страшно:\nты ' : 'и '}заработал ${getPluralCoins(coins)}`;

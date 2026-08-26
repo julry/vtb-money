@@ -51,6 +51,8 @@ export const INITIAL_USER = {
     shop: [],
     //Tickets
     bilets: 0,
+    hasSale: false,
+    hasUsedSale: false,
     infiniteCoins: [0, 0, 0, 0],
     runner: GAME_COINS_INFO,
     catchitems: GAME_COINS_INFO,

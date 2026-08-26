@@ -10,6 +10,7 @@ import {BASE_LOCK_TIMEOUT, INITIAL_STATE, INITIAL_USER, MAX_LOCK_TIMEOUT, MAX_RE
 import { ProgressContext } from './ProgressContext';
 import { GENDERS } from '../constants/genders';
 import { shopInfo } from '../constants/shopInfo';
+import {shopInfoTech} from '../constants/shopInfoTech';
 
 const getMoscowTime = (date) => {
     const dateNow = date ?? new Date();
@@ -103,6 +104,15 @@ export function ProgressProvider(props) {
 
             const {data = {}} = info ?? {};
 
+            const changedData = {};
+
+            //TODO: проверить referrals
+            // info.systemData?.referrals; ??
+            // info.systemData?.referrals; ??
+            if (!data.hasSale && data.referrals?.length >= 10 && !data.hasUsedSale) {
+                changedData.hasSale = true;
+            }
+
             setIsFemale(data.gender === GENDERS.Female);
             setFinishedTurnsModal(!data.lastOpenedCell && data.turns < 1);
             userInfo.current = data;
@@ -111,6 +121,7 @@ export function ProgressProvider(props) {
                 updateShopItems(data.facId);
             }
 
+            setUser(data);
             // check enter on new week
             if (data?.email && !data.weekEnter[`week${CURRENT_WEEK}`]) {
                 const newCoins = data.totalCoins + data.newWeekCoins;
@@ -118,14 +129,18 @@ export function ProgressProvider(props) {
                 // TODO: пересмотреть концепцию выдачи ходов
                 // TODO: туда же при переключении недели добавить preload следующих weekImages
                 // const newTurns = data.turns + MAX_TURNS_PER_WEEK;
-                const newWeekEnter = {...data.weekEnter, [`week${CURRENT_WEEK}`]: true}
-                const updatedData = {
-                    totalCoins: coinsKoefed,
-                    // turns: newTurns,
-                    weekEnter: newWeekEnter,
-                };
+                const newWeekEnter = {...data.weekEnter, [`week${CURRENT_WEEK}`]: true};
+                changedData.weekEnter = newWeekEnter;
+                changedData.totalCoins = coinsKoefed;
+                // const updatedData = {
+                //     totalCoins: coinsKoefed,
+                //     // turns: newTurns,
+                //     weekEnter: newWeekEnter,
+                // };
+            }
 
-                updateUser(updatedData);
+            if (Object.keys(changedData).length > 0) {
+                updateUser(changedData);
             }
 
             const urlScreen = getUrlParam('screen');
@@ -171,6 +186,12 @@ export function ProgressProvider(props) {
             API_LINK,
             API_SHOP_NAME
         );
+
+        // shopInfoTech.forEach(shop => {
+        //     const data = shopInfo.find(({id}) => id === shop.id);
+        //     console.log(shop.recId, data);
+        //     clientShop.current.patchRecord(shop.recId, data);
+        // });
      
         initProject().catch((e) => console.log(e));
 
@@ -262,9 +283,7 @@ export function ProgressProvider(props) {
 
     const updateUser = async (changed) => {
         setUserInfo(changed);
-        console.log('updateUser changed', changed);
         userInfo.current = ({...userInfo.current, ...changed});
-        console.log('updateUser  userInfo.current',  userInfo.current);
 
         return patchData(changed);
     }
@@ -351,6 +370,7 @@ export function ProgressProvider(props) {
             if (!clientShop?.current) {
                 return {};
             }
+
             const result = await clientShop?.current?.findRecord('id', facId ?? user.facId);
 
             const { items } = result?.data ?? [];
@@ -389,21 +409,27 @@ export function ProgressProvider(props) {
             console.log(`Попытка ${attempt} из ${MAX_RETRIES}`);
 
         const { isClosed, items, recordId, isError } = await updateShopItems(facId);
-        
-
+      
         if (isClosed || isError) {
-            console.log(`попали на isClosed ${isClosed} || isError ${isError}`,);
             return { isClosed: true, isError };
         }
 
         const itemIndex = items.findIndex(({ id }) => id === itemId);
         if (itemIndex === -1) {
-            console.log(`попали на itemIndex || isError`);
-
             return { isError: true, message: 'Товар не найден' };
         }
 
         const item = items[itemIndex];
+
+        if (item.isInfiniteAmount) {
+            const newShop = [...(userInfo.current.shop ?? user.shop), item];
+            const newCoins = (userInfo.current.totalCoins ?? user.totalCoins) - item.cost;
+            const newBilets = (userInfo.current.bilets ?? user.bilets) + (item.isTicket ? 1 : 0);
+
+            await updateUser({shop: newShop, totalCoins: newCoins, bilets: newBilets});
+
+            return {success: true, };
+        }
         
         if (item.testAmount < 1) {
             return { isEmpty: true };

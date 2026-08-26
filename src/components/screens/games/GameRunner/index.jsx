@@ -96,7 +96,26 @@ function GameRunner({ className }) {
         if (gameState?.id) {
             finishCell(gameState?.id, { coinsAdd: coins, score: dist }, coins, {runner: newGameInfo });
         } else if (!hasPlayedBefore || coins > 0) {
-            updateUser({ totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, runner: newGameInfo })
+            const gameMetriks = {...(user.metrikaInfinity?.runner ?? {})};
+            const finalsScores = (gameMetriks.finalsScores ?? 0) + 1; 
+            const maxScore = Math.max(gameMetriks.maxScore ?? 0, dist);
+            const weekScore = (gameMetriks[`week${CURRENT_WEEK}Score`] ?? 0) + coins;
+
+            const metrikaInfinity = {...gameMetriks, finalsScores, maxScore, [`week${CURRENT_WEEK}Score`]: weekScore };
+
+            updateUser({ 
+                totalCoins: coins + user.totalCoins, 
+                infiniteCoins: newInfiniteCoins,
+                runner: newGameInfo,
+                metrikaInfinity: {...user.metrikaInfinity, runner: {...metrikaInfinity}}
+            })
+        } else {
+            const gameMetriks = {...(user.metrikaInfinity?.runner ?? {})};
+            const finalsEmptyPoints = (gameMetriks.finalsEmptyPoints ?? 0) + 1; 
+            const maxScore = Math.max(gameMetriks.maxScore ?? 0, dist);
+            const metrikaInfinity = {...gameMetriks, finalsEmptyPoints, maxScore };
+
+            updateUser({metrikaInfinity: {...user.metrikaInfinity, runner: {...metrikaInfinity}}});
         }
 
         const isGameMode = gameState?.isInfinite;

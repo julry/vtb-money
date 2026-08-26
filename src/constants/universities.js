@@ -1,27 +1,27 @@
 export const universities = [
     {
         id: 'u1',
-        name: 'ФУ Москва',
+        name: 'Финансовый университет',
     },
     {
         id: 'u2',
-        name: 'НИУ ВШЭ Москва',
+        name: 'НИУ ВШЭ',
     },
     {
         id: 'u3',
-        name: 'МГИМО Москва',
+        name: 'МГИМО',
     },
     {
         id: 'u4',
-        name: 'МТУСИ Москва'
+        name: 'МТУСИ'
     },
     {
         id: 'u5',
-        name: 'РЭШ Москва',
+        name: 'РЭШ',
     },
     {
         id: 'u6',
-        name: 'СГЭУ Самара'
+        name: 'СГЭУ'
     },
     {
         id: 'other',
@@ -72,7 +72,7 @@ export const faculties = [
         short: 'ФГН',
     },
     {
-        id: 'f9',
+        id: 'sgeu1',
         university: 'u6',
         name: 'Институт экономики предприятий',
     },

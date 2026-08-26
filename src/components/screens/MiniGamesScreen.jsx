@@ -62,11 +62,18 @@ const FlexRowWrapperStyled = styled(FlexRowWrapper)`
 `;
 
 const MiniGamesScreen = () => {
-    const { handleOpenModal, next, handleCloseModal, setGameState, isFemale } = useProgress();
+    const { user, handleOpenModal, next, handleCloseModal, setGameState, updateUser, isFemale } = useProgress();
     const ratio = useSizeRatio();
 
-    const handleClick = (screen) => {
-        setGameState({isInfinite: true});
+    const handleClick = (screen, gameName) => {
+        if (gameName) {
+            const gameMetriks = {...(user.metrikaInfinity?.[gameName] ?? {})};
+            const enterTimes = (gameMetriks.enterTimes ?? 0) + 1;
+
+            updateUser({metrikaInfinity: {...user.metrikaInfinity, [gameName]: {...gameMetriks, enterTimes}}});
+            setGameState({isInfinite: true});
+        }
+        
         next(screen);
     }
 
@@ -78,13 +85,13 @@ const MiniGamesScreen = () => {
                     <ContentWrapper $ratio={ratio}>
                         <Title>Мини-игры</Title>
                         <FlexRowWrapperStyled $ratio={ratio}>
-                            <div onClick={() => handleClick(SCREENS.GAMEMATCH3)}>
+                            <div onClick={() => handleClick(SCREENS.GAMEMATCH3, 'match-3')}>
                                 <Text>Три в ряд</Text>
                                 <GameInfo $ratio={ratio}>
                                     <Image src={match3} alt=""/>
                                 </GameInfo>
                             </div>
-                            <div onClick={() => handleClick(SCREENS.GAMERUNNER)}>
+                            <div onClick={() => handleClick(SCREENS.GAMERUNNER, 'runner')}>
                                 <Text>Раннер</Text>
                                 <GameInfo $ratio={ratio}>
                                     <Image src={runner} alt="" $width={196 * ratio} $height={157 * ratio}/>
@@ -94,13 +101,13 @@ const MiniGamesScreen = () => {
                             </div>
                         </FlexRowWrapperStyled>
                         <FlexRowWrapperStyled $ratio={ratio}>
-                            <div onClick={() => handleClick(SCREENS.GAMECATCH)}>
+                            <div onClick={() => handleClick(SCREENS.GAMECATCH, 'catchitems')}>
                                 <Text>Ловля предметов</Text>
                                 <GameInfo $ratio={ratio}>
                                     <Image src={catchG} $width={144 * ratio} $height={115 * ratio} alt=""/>
                                 </GameInfo>
                             </div>
-                            <div onClick={() => handleClick(SCREENS.GAME2048)}>
+                            <div onClick={() => handleClick(SCREENS.GAME2048, '2048')}>
                                 <Text>2048</Text>
                                 <GameInfo $ratio={ratio}>
                                     <Image src={numbers} $top={'60%'} $width={212 * ratio} $height={183 * ratio} alt=""/>
@@ -108,7 +115,7 @@ const MiniGamesScreen = () => {
                             </div>
                         </FlexRowWrapperStyled>
                         <FlexRowWrapperStyled $ratio={ratio}>
-                            <div onClick={() => handleClick(SCREENS.GAMECROSS)}>
+                            <div onClick={() => handleClick(SCREENS.GAMECROSS, 'crossyroad')}>
                                 <Text>Crossy Road</Text>
                                 <GameInfo $ratio={ratio} >
                                     <Image src={cross} $width={131 * ratio} $height={124 * ratio} alt=""/>

@@ -143,7 +143,26 @@ export default function GameCatch() {
         if (gameState?.id) {
             finishCell(gameState?.id, { coinsAdd: coins, score }, coins, {catchitems: newGameInfo});
         } else if (!hasPlayedBefore || coins > 0){
-            updateUser({ totalCoins: coins + user.totalCoins, infiniteCoins: newInfiniteCoins, catchitems: newGameInfo })
+            const gameMetriks = {...(user.metrikaInfinity?.catchitems ?? {})};
+            const finalsScores = (gameMetriks.finalsScores ?? 0) + 1; 
+            const maxScore = Math.max(gameMetriks.maxScore ?? 0, score);
+            const weekScore = (gameMetriks[`week${CURRENT_WEEK}Score`] ?? 0) + coins;
+
+            const metrikaInfinity = {...gameMetriks, finalsScores, maxScore, [`week${CURRENT_WEEK}Score`]: weekScore };
+
+            updateUser({ 
+                totalCoins: coins + user.totalCoins,
+                infiniteCoins: newInfiniteCoins, 
+                catchitems: newGameInfo,
+                metrikaInfinity: {...user.metrikaInfinity, catchitems: {...metrikaInfinity}}
+             })
+        } else {
+            const gameMetriks = {...(user.metrikaInfinity?.catchitems ?? {})};
+            const finalsEmptyPoints = (gameMetriks.finalsEmptyPoints ?? 0) + 1; 
+            const maxScore = Math.max(gameMetriks.maxScore ?? 0, score);
+            const metrikaInfinity = {...gameMetriks, finalsEmptyPoints, maxScore };
+
+            updateUser({metrikaInfinity: {...user.metrikaInfinity, catchitems: {...metrikaInfinity}}});
         }
 
         const isGameMode = gameState?.isInfinite;

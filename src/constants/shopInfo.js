@@ -3,7 +3,7 @@ export const shopInfo = [
     id: 'fu1',
     facTitle: 'ФУ Москва - Финансовый факультет',
     items: [
-      { id: 32, title: 'Билет (участие в розыгрыше супер-приза)', cost: 3000, amount: null, week: 1, testAmount: null, isInfiniteAmount: true },
+      { id: 32, title: 'Билетик для розыгрыша', cost: 3000, amount: 'infinite', week: 1, testAmount: 'infinite', isInfiniteAmount: true, isTicket:  true },
       { id: 2, title: 'Шоколадный слиток золота', cost: 800, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 1, title: 'Шопер', cost: 950, amount: 4, week: 1, testAmount: 4, isInfiniteAmount: false },
       { id: 3, title: 'Книга\n«Атомные привычки» Д. Клир', cost: 1100, amount: 3, week: 1, testAmount: 3, isInfiniteAmount: false },
@@ -37,7 +37,7 @@ export const shopInfo = [
     id: 'fu2',
     facTitle: 'ФУ Москва - Факультет налогов, аудита и бизнес-анализа',
     items: [
-      { id: 32, title: 'Билет (участие в розыгрыше супер-приза)', cost: 3000, amount: null, week: 1, testAmount: null, isInfiniteAmount: true },
+      { id: 32, title: 'Билетик для розыгрыша', cost: 3000, amount: 'infinite', week: 1, testAmount: 'infinite', isInfiniteAmount: true, isTicket:  true  },
       { id: 2, title: 'Шоколадный слиток золота', cost: 800, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 1, title: 'Шопер', cost: 950, amount: 7, week: 1, testAmount: 7, isInfiniteAmount: false },
       { id: 3, title: 'Книга\n«Атомные привычки» Д. Клир', cost: 1100, amount: 4, week: 1, testAmount: 4, isInfiniteAmount: false },
@@ -72,7 +72,7 @@ export const shopInfo = [
     id: 'vshe1',
     facTitle: 'НИУ ВШЭ Москва - Факультет экономических наук',
     items: [
-      { id: 32, title: 'Билет (участие в розыгрыше супер-приза)', cost: 3000, amount: null, week: 1, testAmount: null, isInfiniteAmount: true },
+      { id: 32, title: 'Билетик для розыгрыша', cost: 3000, amount: 'infinite', week: 1, testAmount: 'infinite', isInfiniteAmount: true, isTicket:  true },
       { id: 2, title: 'Шоколадный слиток золота', cost: 800, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 1, title: 'Шопер', cost: 950, amount: 5, week: 1, testAmount: 5, isInfiniteAmount: false },
       { id: 3, title: 'Книга\n«Атомные привычки» Д. Клир', cost: 1100, amount: 3, week: 1, testAmount: 3, isInfiniteAmount: false },
@@ -107,7 +107,7 @@ export const shopInfo = [
     id: 'vshe2',
     facTitle: 'НИУ ВШЭ Москва - Международный институт экономики и финансов',
     items: [
-      { id: 32, title: 'Билет (участие в розыгрыше супер-приза)', cost: 3000, amount: null, week: 1, testAmount: null, isInfiniteAmount: true },
+      { id: 32, title: 'Билетик для розыгрыша', cost: 3000, amount: 'infinite', week: 1, testAmount: 'infinite', isInfiniteAmount: true, isTicket:  true },
       { id: 4, title: 'Антистресс с кнопочками', cost: 1250, amount: 3, week: 1, testAmount: 3, isInfiniteAmount: false },
       { id: 7, title: 'Сертификат на кофе 500 р.', cost: 1700, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 8, title: 'Картхолдер', cost: 1850, amount: 3, week: 1, testAmount: 3, isInfiniteAmount: false },
@@ -126,7 +126,7 @@ export const shopInfo = [
     id: 'vshe3',
     facTitle: 'НИУ ВШЭ Москва - Факультет мировой экономики и мировой политики',
     items: [
-      { id: 32, title: 'Билет (участие в розыгрыше супер-приза)', cost: 3000, amount: null, week: 1, testAmount: null, isInfiniteAmount: true },
+      { id: 32, title: 'Билетик для розыгрыша', cost: 3000, amount: 'infinite', week: 1, testAmount: 'infinite', isInfiniteAmount: true, isTicket:  true },
       { id: 2, title: 'Шоколадный слиток золота', cost: 800, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 1, title: 'Шопер', cost: 950, amount: 7, week: 1, testAmount: 7, isInfiniteAmount: false },
       { id: 3, title: 'Книга\n«Атомные привычки» Д. Клир', cost: 1100, amount: 6, week: 1, testAmount: 6, isInfiniteAmount: false },
@@ -161,7 +161,7 @@ export const shopInfo = [
     id: 'mgimo1',
     facTitle: 'МГИМО Москва - Международные экономические отношения',
     items: [
-      { id: 32, title: 'Билет (участие в розыгрыше супер-приза)', cost: 3000, amount: null, week: 1, testAmount: null, isInfiniteAmount: true },
+      { id: 32, title: 'Билетик для розыгрыша', cost: 3000, amount: 'infinite', week: 1, testAmount: 'infinite', isInfiniteAmount: true, isTicket:  true },
       { id: 2, title: 'Шоколадный слиток золота', cost: 800, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 1, title: 'Шопер', cost: 950, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 3, title: 'Книга\n«Атомные привычки» Д. Клир', cost: 1100, amount: 4, week: 1, testAmount: 4, isInfiniteAmount: false },
@@ -186,7 +186,7 @@ export const shopInfo = [
     id: 'resh',
     facTitle: 'РЭШ Москва - Все направления',
     items: [
-      { id: 32, title: 'Билет (участие в розыгрыше супер-приза)', cost: 3000, amount: null, week: 1, testAmount: null, isInfiniteAmount: true },
+      { id: 32, title: 'Билетик для розыгрыша', cost: 3000, amount: 'infinite', week: 1, testAmount: 'infinite', isInfiniteAmount: true, isTicket:  true },
       { id: 1, title: 'Шопер', cost: 950, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 3, title: 'Книга\n«Атомные привычки» Д. Клир', cost: 1100, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 4, title: 'Антистресс с кнопочками', cost: 1250, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
@@ -207,7 +207,7 @@ export const shopInfo = [
     id: 'fu3',
     facTitle: 'ФУ - Факультет экономики и бизнеса',
     items: [
-      { id: 32, title: 'Билет (участие в розыгрыше супер-приза)', cost: 3000, amount: null, week: 1, testAmount: null, isInfiniteAmount: true },
+      { id: 32, title: 'Билетик для розыгрыша', cost: 3000, amount: 'infinite', week: 1, testAmount: 'infinite', isInfiniteAmount: true, isTicket:  true },
       { id: 2, title: 'Шоколадный слиток золота', cost: 800, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 1, title: 'Шопер', cost: 950, amount: 3, week: 1, testAmount: 3, isInfiniteAmount: false },
       { id: 3, title: 'Книга\n«Атомные привычки» Д. Клир', cost: 1100, amount: 4, week: 1, testAmount: 4, isInfiniteAmount: false },
@@ -237,7 +237,7 @@ export const shopInfo = [
     id: 'sgeu1',
     facTitle: 'СГЭУ (Самара) - Институт экономики предприятий',
     items: [
-      { id: 32, title: 'Билет (участие в розыгрыше супер-приза)', cost: 3000, amount: null, week: 1, testAmount: null, isInfiniteAmount: true },
+      { id: 32, title: 'Билетик для розыгрыша', cost: 3000, amount: 'infinite', week: 1, testAmount: 'infinite', isInfiniteAmount: true, isTicket:  true },
       { id: 1, title: 'Шопер', cost: 950, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 4, title: 'Антистресс с кнопочками', cost: 1250, amount: 3, week: 1, testAmount: 3, isInfiniteAmount: false },
       { id: 5, title: 'Обложка на студенческий', cost: 1400, amount: 3, week: 1, testAmount: 3, isInfiniteAmount: false },
@@ -265,7 +265,7 @@ export const shopInfo = [
     id: 'mtusi1',
     facTitle: 'МТУСИ Москва - Факультет информационных технологий',
     items: [
-      { id: 32, title: 'Билет (участие в розыгрыше супер-приза)', cost: 3000, amount: null, week: 1, testAmount: null, isInfiniteAmount: true },
+      { id: 32, title: 'Билетик для розыгрыша', cost: 3000, amount: 'infinite', week: 1, testAmount: 'infinite', isInfiniteAmount: true, isTicket:  true },
       { id: 1, title: 'Шопер', cost: 950, amount: 3, week: 1, testAmount: 3, isInfiniteAmount: false },
       { id: 3, title: 'Книга\n«Атомные привычки» Д. Клир', cost: 1100, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
       { id: 4, title: 'Антистресс с кнопочками', cost: 1250, amount: 2, week: 1, testAmount: 2, isInfiniteAmount: false },
