@@ -5,11 +5,13 @@ import { useSizeRatio } from "../../hooks/useSizeRatio";
 import { Text } from "../shared/Text";
 import { Button } from "../shared/Button";
 import { useProgress } from "../../hooks/useProgress";
-import { RuleTextModal } from '../shared/modals/RuleTextModal';
 import { rulesTexts } from '../../constants/rulesTexts';
-import { RulePrizeModal } from "../shared/modals/RulePrizeModal";
-import { RuleIncomeModal } from '../shared/modals/RuleIncomeModal';
 import { SCREENS } from "../../constants/screens";
+import { lazy } from "react";
+
+const RulePrizeModal = lazy(() => import('./../shared/modals/RulePrizeModal').then((m) => ({ default: m.RulePrizeModal })));
+const RuleTextModal = lazy(() => import('./../shared/modals/RuleTextModal').then((m) => ({ default: m.RuleTextModal })));
+const RuleIncomeModal = lazy(() => import('./../shared/modals/RuleIncomeModal').then((m) => ({ default: m.RuleIncomeModal })));
 
 const Wrapper = styled.div`
     padding: ${({ $ratio }) => $ratio * 64}px ${({ $ratio }) => $ratio * 25}px;

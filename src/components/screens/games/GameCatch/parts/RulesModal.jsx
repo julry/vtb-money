@@ -48,7 +48,7 @@ export const RulesModal = () => {
         <Modal $ratio={ratio} isDisabledAnimation onClick={handleCloseModal}>
             <MovingBlock $top={75} onClose={handleCloseModal}>
                 <p>
-                    Тапай на левую или правую часть экрана, чтобы двигать корзинку влево или вправо, и лови полезные предметы, избегая опасных 
+                    Тапай на левую или правую часть экрана, чтобы двигать корзинку влево или вправо, и лови полезные активы, избегая ненужных трат
                 </p>
             </MovingBlock>
             <AreasWrapper $ratio={ratio}>

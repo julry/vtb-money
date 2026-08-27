@@ -24,6 +24,10 @@ const BlockStyled = styled(Block)`
 
 const TextWrapper = styled.div`
     padding: ${({ $ratio }) => $ratio * 10}px 0 ${({ $ratio }) => $ratio * 10}px;
+
+    & ${Text} {
+        line-height: 110%;
+    }
 `;
 
 const ImageWrapper = styled.div`
@@ -90,7 +94,6 @@ export const CellLuckModal = ({ cellInfo }) => {
     const ratio = useSizeRatio();
     const { user } = useProgress();
     const isLuck = user.cells?.find(({ name }) => name === cellInfo.id)?.isLuck;
-    // const isLuck = true;
 
     const description = isLuck ? cellInfo.luckDescription : cellInfo.badluckDescription;
     const additional = isLuck ? cellInfo.luckAdditional : cellInfo.badluckAdditional;

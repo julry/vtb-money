@@ -1,8 +1,8 @@
 import { useState } from "react";
 import persStart from '../../assets/images/person/persStand.webp';
 import female from '../../assets/images/person/persFStand.webp';
-import persShine from '../../assets/images/person/personStandShine.webp';
-import femaleShine from '../../assets/images/person/personFStandShine.webp';
+import persShine from '../../assets/images/person/persStandShine.webp';
+import femaleShine from '../../assets/images/person/persFStandShine.webp';
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { useSizeRatio } from "../../hooks/useSizeRatio";
@@ -21,21 +21,20 @@ const CARDS = [
         alt: 'Женский',
         pic: female,
         chosenPic: femaleShine,
-        width: 272,
-        height: 402,
-        x: -100,
-        xInitial: -110,
+        width: 231,
+        height: 410,
+        x: '-45%',
+        xInitial:'-45%',
     },
     {
         id: 'men',
         alt: 'Мужской',
         pic: persStart,
         chosenPic: persShine,
-        width: 252,
-        height: 402,
-        x: -160,
-        xInitial: -140,
-        y: '3%',
+        width: 231,
+        height: 410,
+        x: '-55%',
+        xInitial:'-55%',
     },
 ];
 
@@ -116,16 +115,17 @@ const SexScreen = () => {
     }
 
     const getAnimation = (card, index) => {
+        console.log('heelllo', currentIndex);
         if (!(typeof currentIndex === 'number')) {
-            return {scale: 1, x: card.xInitial * ratio}
+            return {scale: 1}
         }
 
         if (currentIndex === index) {
-            return {scale: 1.15, x: card.x * ratio}
+            return {scale: 1.04}
         }
 
         if (currentIndex !== index) {
-           return {scale: 0.8, x: card.xInitial * ratio}
+           return {scale: 0.85}
         }
     }
 

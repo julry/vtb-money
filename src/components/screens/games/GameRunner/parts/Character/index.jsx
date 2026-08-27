@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import {motion} from "framer-motion"
 import {useAnimate} from "./useAnimate";
-import {Image} from "../../../../../shared/Image";
 import { useSizeRatio } from "../../../../../../hooks/useSizeRatio";
 import { CHARACTER_SIZE, CHARACTER_SIZE_LG } from "../../constants";
 
@@ -24,7 +23,11 @@ const WrapperStyled = styled(motion.div)`
     }
 `;
 
-const ImageStyled = styled(Image)`
+const ImageStyled = styled(motion.img)`
+    pointer-events: none;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-drag: none;
     z-index: 3;
     width: 100%;
     height: 100%;
@@ -39,7 +42,7 @@ export function Character({isPause, isJump, gameId, ...rest}, ref) {
 
     return (
         <WrapperStyled ref={ref} $ratio={sizeRatio} {...rest}>
-            <ImageStyled src={source} $ratio={sizeRatio}/>
+            <ImageStyled src={source} $ratio={sizeRatio} fetchPriority="high"/>
         </WrapperStyled>
     );
 }

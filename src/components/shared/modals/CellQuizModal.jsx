@@ -10,6 +10,7 @@ import { useState } from "react";
 
 const BlockStyled = styled(Block)`
     display: flex;
+    line-height: 110%;
     flex-direction: column;
     position: relative;
     min-height: ${({$ratio}) => $ratio * 582}px;
@@ -122,7 +123,7 @@ export const CellQuizModal = ({cellInfo}) => {
                         </AnswerBlock>
                     ))
                 }
-                <Button mt={'auto'} type={isAnswered ? 'secondary' : 'main'} onClick={handleChoose}>{isAnswered ? 'далее' : 'выбрать'}</Button>
+                <Button mt={'auto'} onClick={handleChoose}>{isAnswered ? 'далее' : 'выбрать'}</Button>
              </BlockStyled>
              {resultModal?.isOpen && (
                 <ResultModal $ratio={ratio}>

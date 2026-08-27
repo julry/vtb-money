@@ -7,7 +7,7 @@ export const SubscribeModal = () => {
 
     return (
         <InfoModal title={'Подписаться\nна канал:'}>
-            <Button mt={ratio * 25}>Вконтакте</Button>
+            <Button mt={ratio * 25}>ВКонтакте</Button>
             <Button mt={ratio * 10}>Телеграм</Button>
         </InfoModal>
     )

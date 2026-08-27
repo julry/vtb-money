@@ -1,13 +1,13 @@
 import styled from "styled-components";
 import { useSizeRatio } from "../../../hooks/useSizeRatio"
-import { Button } from "../Button";
-import { InfoModal } from "./InfoModal"
 import { FlexRowWrapper } from "../ContentWrapper";
-import { useMemo } from "react";
+import {useMemo, lazy} from 'react';
 import { useProgress } from "../../../hooks/useProgress";
 import { ShopCard } from "../ShopCard";
 import { Text } from "../Text";
 import { mapIdToImage } from "../../../utils/mapItemIdToImage";
+
+const InfoModal = lazy(() => import('./InfoModal').then((m) => ({ default: m.InfoModal })));
 
 const InfoWrapper = styled.div`
     margin-top: ${({$ratio}) => $ratio * 29}px;
@@ -18,15 +18,6 @@ const InfoModalStyled = styled(InfoModal)`
         padding-bottom: 0;
     }
 `;
-
-const TEST_ITEMS = [
-        { "id": 1, "title": "Шопер", "cost": 800, "week": 1 },
-        { "id": 2, "title": "Шоколадный слиток золота", "cost": 950, "week": 1},
-        { "id": 2, "title": "Шоколадный слиток золота", "cost": 950, "week": 1},
-        { "id": 4, "title": "Антистресс с кнопочками", "cost": 1250, "amount": 1, "week": 1, "testAmount": 4 },
-        { "id": 5, "title": "Обложка на студенческий", "cost": 1400, "amount": 1, "week": 1, "testAmount": 2 },
-        { "id": 6, "title": "Бутылка для воды", "cost": 1550, "amount": 1, "week": 1, "testAmount": 3 },
-];
 
 function countDuplicatesById(arr) {
   // Сначала считаем количество

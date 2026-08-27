@@ -237,6 +237,7 @@ export default function GameCatch() {
                     <img
                         ref={characterRef}
                         src={picStart}
+                        fetchPriority="high"
                         alt=""
                         style={{
                             position: 'absolute',

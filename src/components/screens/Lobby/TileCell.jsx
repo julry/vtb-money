@@ -485,6 +485,7 @@ export const TileCell = memo(function TileCell({
                 draggable={false}
                 loading="lazy"
                 decoding="async"
+                fetchPriority="high"
             />
             {getSvg()}
         </CellRoot>

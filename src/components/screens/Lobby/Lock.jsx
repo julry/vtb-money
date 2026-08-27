@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import styled from 'styled-components';
-import { CELL_HEIGHT, CELL_WIDTH, MAX_X } from './constants';
+import { CELL_HEIGHT, CELL_WIDTH } from './constants';
 
 const Wrapper = styled.div`
   position: absolute;

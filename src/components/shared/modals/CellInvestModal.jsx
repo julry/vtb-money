@@ -13,6 +13,7 @@ const BlockStyled = styled(Block)`
     display: flex;
     flex-direction: column;
     position: relative;
+    line-height: 110%;
     min-height: ${({$ratio}) => $ratio * 582}px;
     padding: 0;
     max-height: calc(100% - ${({$ratio}) => $ratio * 80}px);
@@ -31,9 +32,14 @@ const TitleStyled = styled(Title)`
 
 const TextWrapper = styled.div`
     padding: ${({$ratio}) => $ratio * 10}px ${({$ratio, $commonMarginH}) => $ratio * ($commonMarginH ?? 23)}px;
+
+    & ${Text} {
+        line-height: 110%;
+    }
 `;
 
 const ImageWrapper = styled.div`
+    overflow: hidden;
     margin-top: ${({$imgStyle, $ratio}) => ($imgStyle?.marginTop ?? 0) * $ratio}px;
     margin-left: ${({$imgStyle, $ratio}) => (($imgStyle?.marginLeft ?? 0) + 23) * $ratio}px;
     margin-bottom: ${({$imgStyle, $ratio}) => ($imgStyle?.marginBottom ?? 0) * $ratio}px;

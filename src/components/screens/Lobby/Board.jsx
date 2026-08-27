@@ -6,7 +6,7 @@ import React, {
     useCallback,
 } from 'react';
 import styled from 'styled-components';
-import { CELL_HEIGHT, CELL_WIDTH, CULL_BUFFER, EXTRA_CELLS, GAME_CELLS, PAN_PADDING, START_CELL_HEIGHT, START_CELL_WIDTH } from './constants';
+import { CELL_HEIGHT, CELL_WIDTH, CULL_BUFFER, EXTRA_CELLS, GAME_CELLS, PAN_PADDING, } from './constants';
 import characterSrc from '../../../assets/images/person/persStandLobby.webp';
 import characterFSrc from '../../../assets/images/person/persFStandLobby.webp';
 import characterInvest from '../../../assets/images/person/persInvest.webp';
@@ -309,6 +309,7 @@ export default function PathMap({
                 <Person
                     src={personSrc}          // путь к спрайту
                     alt=""
+                    fetchPriority="high"
                     style={getCharacterStyle(animatedCell)}
                 />
                 {children}

@@ -24,6 +24,9 @@ const BlockStyled = styled(Block)`
 
 const TextWrapper = styled.div`
     padding: ${({$ratio}) => $ratio * 10}px 0 ${({$ratio}) => $ratio * 10}px;
+    & ${Text} {
+        line-height: 110%;
+    }
 `;
 
 const ImageWrapper = styled.div`
@@ -65,7 +68,6 @@ export const CellBonusModal = ({cellInfo}) => {
     const { handleCloseModal, finishCell } = useProgress();
 
     const onClose = () => {
-        console.log('cellInfo.id', cellInfo.id);
         finishCell(cellInfo.id, {coinsAdd: cellInfo.income}, cellInfo.income);
         handleCloseModal();
     }
@@ -84,7 +86,7 @@ export const CellBonusModal = ({cellInfo}) => {
                   <p>сразу</p>
                   <p>+{cellInfo.income}</p>
                 </Result>
-                <Button mt={40 * ratio} onClick={onClose}>забрать</Button>
+                <Button mt={'auto'} onClick={onClose}>забрать</Button>
              </BlockStyled>
         </Modal>
     )

@@ -7,7 +7,6 @@ import { Select } from "../shared/Select";
 import { FlexWrapper } from "../shared/ContentWrapper";
 import { Input } from "../shared/Input";
 import { emailRegExp, russianRegExp } from "../../constants/regExp";
-import { SCREENS } from "../../constants/screens";
 
 import { useSizeRatio } from "../../hooks/useSizeRatio";
 
@@ -131,7 +130,7 @@ const Registration = () => {
     useEffect(() => {
         Promise.all([
             preload.sex(),
-            ...(CURRENT_WEEK > 0 ? [preload.lobby(), preload.profile(), preload.rules()] : [preload.waiting()]),
+            ...(CURRENT_WEEK > 0 ? [preload.lobby(), preload.profile(), preload.rules(), () => `import('../shared/modals/OnboardingModal')`] : [preload.waiting()]),
         ]).catch(console.error);
     }, []);
 

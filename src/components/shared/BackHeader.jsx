@@ -5,9 +5,10 @@ import ticket from '../../assets/images/ticket.webp';
 import { useSizeRatio } from "../../hooks/useSizeRatio";
 import { useProgress } from "../../hooks/useProgress";
 import { CloseIcon } from "./CloseIcon";
-import { Logo } from "./Logo";
-import { CoinsInfoModal } from "./modals/CoinsInfoModal";
 import { LogoOutlined } from "./LogoOutlined";
+import { lazy } from "react";
+
+const CoinsInfoModal = lazy(() => import("./modals/CoinsInfoModal").then((m) => ({ default: m.CoinsInfoModal })));
 
 const Header = styled.div`
     display: flex;

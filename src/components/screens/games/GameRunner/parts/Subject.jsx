@@ -35,7 +35,7 @@ export const Subject = memo(({ subject, isCollected }) => {
 
     return (
         <Wrapper $x={x} $y={y} $width={width} $height={height} $ratio={sizeRatio}>
-            <ImageStyled $w={sizes[0]} $h={sizes[1]} $ratio={sizeRatio} src={src} alt="" />
+            <ImageStyled $w={sizes[0]} $h={sizes[1]} $ratio={sizeRatio} src={src} alt="" fetchPriority="high"/>
         </Wrapper>
     );
 });

@@ -13,6 +13,12 @@ function preloadImage (src) {
     })
 }
 
+export function preloadImages (images) {
+    for (const image of images) {
+        preloadImage(image);
+    }
+};
+
 export function useImagePreloader(images) {
     const preloadedRef = useRef({})
 

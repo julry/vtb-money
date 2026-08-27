@@ -22,7 +22,7 @@ export const StartCatchModal = () => {
     const ratio = useSizeRatio();
 
     return (
-        <GameModal title={"Проверь свою реакцию и собери все предметы"}>
+        <GameModal title={"Проверь свою реакцию и собери все активы"}>
             <ImageWrapper $ratio={ratio}>
                 <img src={startImg} alt="" />
             </ImageWrapper>

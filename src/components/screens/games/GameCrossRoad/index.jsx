@@ -217,7 +217,7 @@ export default function GameCrossRoad() {
                     ))}
 
                     <PlayerDiv ref={playerRef} style={{zIndex: 15 - (currentLaneIndex % 10 === 9 ? -1 : currentLaneIndex % 10)}}>
-                        <img src={images[userImg]} alt="" />
+                        <img src={images[userImg]} alt="" fetchPriority="high"/>
                     </PlayerDiv>
                 </RotatedWorld>
             </GameContainer>

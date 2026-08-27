@@ -1,7 +1,9 @@
 import styled from "styled-components";
 import { useSizeRatio } from "../../../hooks/useSizeRatio";
 import picture from '../../../assets/images/emptyitem.webp';
-import { InfoModal } from "./InfoModal";
+import { lazy } from "react";
+
+const InfoModal = lazy(() => import('./InfoModal').then((m) => ({ default: m.InfoModal })));
 
 const ModalStyled = styled(InfoModal)`
     & > div {

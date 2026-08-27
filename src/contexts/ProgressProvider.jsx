@@ -9,8 +9,8 @@ import { useCallback } from 'react';
 import {BASE_LOCK_TIMEOUT, INITIAL_STATE, INITIAL_USER, MAX_LOCK_TIMEOUT, MAX_RETRIES, MAX_TURNS_PER_WEEK, RETRY_DELAY, PLATFORMS, DISCOUNT_KOEF} from './constants';
 import { ProgressContext } from './ProgressContext';
 import { GENDERS } from '../constants/genders';
-import { shopInfo } from '../constants/shopInfo';
-import {shopInfoTech} from '../constants/shopInfoTech';
+// import { shopInfo } from '../constants/shopInfo';
+// import {shopInfoTech} from '../constants/shopInfoTech';
 import { NewWeekModal } from '../components/shared/modals/NewWeekModal';
 
 const getMoscowTime = (date) => {

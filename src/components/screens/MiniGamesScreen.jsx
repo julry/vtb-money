@@ -10,12 +10,13 @@ import persF from '../../assets/images/person/persFJump.webp';
 import cross from '../../assets/images/cross/startImg.webp';
 import catchG from '../../assets/images/doodle/startImg.webp';
 import { FlexRowWrapper} from "../shared/ContentWrapper";
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { useProgress } from "../../hooks/useProgress";
 import { Title } from "../shared/Title";
 import { Modal } from "../shared/modals";
 import { Text } from "../shared/Text";
 import { SCREENS } from "../../constants/screens";
+import { preload } from "../../constants/screensComponents";
 
 const Wrapper = styled(Modal)`
     background: rgba(219, 237, 255, 0.4);
@@ -65,6 +66,32 @@ const MiniGamesScreen = () => {
     const { user, handleOpenModal, next, handleCloseModal, setGameState, updateUser, isFemale } = useProgress();
     const ratio = useSizeRatio();
 
+    useEffect(() => {
+        let idleId;
+        let timeoutId;
+
+        const run = () => {
+            Promise.all([
+                preload.game2048(),
+                preload.gameCatch(),
+                preload.gameCrossRoad(),
+                preload.gameRunner(),
+                preload.gameMatch3(),
+            ]).catch(console.error);
+        };
+
+        if ('requestIdleCallback' in window) {
+            idleId = requestIdleCallback(run, { timeout: 2000 });
+        } else {
+            timeoutId = setTimeout(run, 600);
+        }
+
+        return () => {
+            if (idleId) cancelIdleCallback(idleId);
+            if (timeoutId) clearTimeout(timeoutId);
+        };
+    }, []);
+
     const handleClick = (screen, gameName) => {
         if (gameName) {
             const gameMetriks = {...(user.metrikaInfinity?.[gameName] ?? {})};
@@ -102,7 +129,7 @@ const MiniGamesScreen = () => {
                         </FlexRowWrapperStyled>
                         <FlexRowWrapperStyled $ratio={ratio}>
                             <div onClick={() => handleClick(SCREENS.GAMECATCH, 'catchitems')}>
-                                <Text>Ловля предметов</Text>
+                                <Text>Ловля активов</Text>
                                 <GameInfo $ratio={ratio}>
                                     <Image src={catchG} $width={144 * ratio} $height={115 * ratio} alt=""/>
                                 </GameInfo>

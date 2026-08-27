@@ -7,9 +7,13 @@ import { Title } from "../Title";
 import { Text } from "../Text";
 import { Button } from "../Button";
 import { useProgress } from "../../../hooks/useProgress";
+import { SCREENS } from "../../../constants/screens";
+import { preload } from "../../../constants/screensComponents";
+import { useEffect } from "react";
 
 const BlockStyled = styled(Block)`
     position: relative;
+    line-height: 110%;
     padding: ${({$ratio}) => $ratio * 20}px ${({$ratio}) => $ratio * 23}px ${({$ratio}) => $ratio * 23}px;
     & button {
         position: relative;
@@ -18,8 +22,11 @@ const BlockStyled = styled(Block)`
 `;
 
 const TextWrapper = styled.div`
-    padding: ${({$ratio}) => $ratio * 10}px 0 ${({$ratio}) => $ratio * 3}px;
-    height: ${({$ratio}) => $ratio * 86}px;
+    padding: ${({$ratio}) => $ratio * 10}px 0 ${({$ratio}) => $ratio * 10}px;
+
+    & ${Text} {
+        line-height: 110%;
+    }
 `;
 
 const Image = styled.img`
@@ -52,11 +59,42 @@ const InfoStyled = styled.div`
     border-radius:  ${({$ratio}) => $ratio * 15}px;
 `;
 
+const GAME_PRELOAD_MAP = {
+    [SCREENS.GAME2048]: () => preload.game2048(),
+    [SCREENS.GAMECATCH]: () => preload.gameCatch(),
+    [SCREENS.GAMECROSS]: () => preload.gameCrossRoad(),
+    [SCREENS.GAMERUNNER]: () => preload.gameRunner(),
+    [SCREENS.GAMEMATCH3]: () => preload.gameMatch3(),
+};
+
 export const CellMiniGameModal = ({cellInfo}) => {
     const ratio = useSizeRatio();
     const { next } = useProgress();
 
     const incomes = [...cellInfo.incomes].reverse();
+
+    useEffect(() => {
+        const preloadFn = GAME_PRELOAD_MAP[cellInfo.screen];
+        if (!preloadFn) return;
+
+        let idleId;
+        let timeoutId;
+
+        const run = () => {
+            preloadFn().catch(console.error);
+        };
+
+        if ('requestIdleCallback' in window) {
+            idleId = requestIdleCallback(run, { timeout: 1500 });
+        } else {
+            timeoutId = setTimeout(run, 400);
+        }
+
+        return () => {
+            if (idleId) cancelIdleCallback(idleId);
+            if (timeoutId) clearTimeout(timeoutId);
+        };
+    }, [cellInfo.screen]);
 
     return (
         <Modal isLighten>
