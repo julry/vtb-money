@@ -103,14 +103,12 @@ export function ProgressProvider(props) {
 
             setUserBdData(info ?? {});
 
-            const {data = {}} = info ?? {};
+            const {data = {}, systemData = {}} = info ?? {};
 
             const changedData = {};
 
             //TODO: проверить referrals
-            // info.systemData?.referrals; ??
-            // info.systemData?.referrals; ??
-            if (!data.hasSale && data.referrals?.length >= 10 && !data.hasUsedSale) {
+            if (!data.hasSale && systemData.referralIds?.length >= 10 && !data.hasUsedSale) {
                 changedData.hasSale = true;
             }
 
