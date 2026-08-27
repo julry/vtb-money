@@ -129,7 +129,7 @@ const MiniGamesScreen = () => {
                         </FlexRowWrapperStyled>
                         <FlexRowWrapperStyled $ratio={ratio}>
                             <div onClick={() => handleClick(SCREENS.GAMECATCH, 'catchitems')}>
-                                <Text>Ловля активов</Text>
+                                <Text>Лови актив</Text>
                                 <GameInfo $ratio={ratio}>
                                     <Image src={catchG} $width={144 * ratio} $height={115 * ratio} alt=""/>
                                 </GameInfo>

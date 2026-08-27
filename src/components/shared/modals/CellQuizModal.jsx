@@ -82,7 +82,7 @@ export const CellQuizModal = ({cellInfo}) => {
         if (isAnswered) {
             setResultModal({
                 isOpen: true, 
-                color: isCorrect ? 'var(--color-pink)' : '#6572FB', 
+                color: isCorrect ? 'var(--color-pink)' : 'var(--color-purple)', 
                 income: isCorrect ? `+${cellInfo.income}` : 0
             })
 
