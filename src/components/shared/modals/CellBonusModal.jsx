@@ -29,7 +29,7 @@ const TextWrapper = styled.div`
 const ImageWrapper = styled.div`
     width: 100%;
     height: stretch;
-    overflow: ${($overflow) => $overflow ?? 'hidden'};
+    overflow: ${({$overflow}) => $overflow ?? 'hidden'};
 
     position: relative;
 

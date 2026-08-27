@@ -204,7 +204,6 @@ const Lobby = () => {
                     animatedCell={animatedCell}
                     activeCell={activeCell}
                     isBlured={isUnfinishedModal} 
-                    centerCellId={lastCell} 
                     cellIndex={cellIndex} 
                 />
             )}

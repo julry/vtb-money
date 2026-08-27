@@ -11,6 +11,7 @@ import { ProgressContext } from './ProgressContext';
 import { GENDERS } from '../constants/genders';
 import { shopInfo } from '../constants/shopInfo';
 import {shopInfoTech} from '../constants/shopInfoTech';
+import { NewWeekModal } from '../components/shared/modals/NewWeekModal';
 
 const getMoscowTime = (date) => {
     const dateNow = date ?? new Date();
@@ -113,8 +114,14 @@ export function ProgressProvider(props) {
                 changedData.hasSale = true;
             }
 
+            const hasMoveToNewWeek = (data.progressWeek + 1) === CURRENT_WEEK && data.turns === 0;
+
             setIsFemale(data.gender === GENDERS.Female);
-            setFinishedTurnsModal(!data.lastOpenedCell && data.turns < 1);
+
+            if (!hasMoveToNewWeek) {
+                setFinishedTurnsModal(!data.lastOpenedCell && data.turns < 1);
+            }
+
             userInfo.current = data;
 
             if (data.facId) {
@@ -123,9 +130,23 @@ export function ProgressProvider(props) {
 
             setUser(data);
             // check enter on new week
+
+            if (hasMoveToNewWeek) {
+                changedData.turns = MAX_TURNS_PER_WEEK;
+                changedData.progressWeek = CURRENT_WEEK;
+                changedData.cells = [...data.cells, {name: `start-${CURRENT_WEEK}`}];
+
+                handleOpenModal({
+                    Component: <NewWeekModal week={CURRENT_WEEK} />,
+                    blurSize: 5,
+                })
+            }
+
             if (data?.email && !data.weekEnter[`week${CURRENT_WEEK}`]) {
                 const newCoins = data.totalCoins + data.newWeekCoins;
                 const coinsKoefed = Math.round(newCoins * data.coinsKoefs);
+
+                
                 // TODO: пересмотреть концепцию выдачи ходов
                 // TODO: туда же при переключении недели добавить preload следующих weekImages
                 // const newTurns = data.turns + MAX_TURNS_PER_WEEK;
@@ -622,10 +643,25 @@ export function ProgressProvider(props) {
         if (index !== -1) {
             newCells[index] = { ...newCells[index], ...cellData, finish: true };
         }
+        
+        const isNewWeekStarted = userInfo.current.turns < 1 && userInfo.current.progressWeek < CURRENT_WEEK;
 
-        updateUser({lastOpenedCell: null, totalCoins: coins, cells: newCells, ...additionalData});
+        const newWeekData = {}
 
-        if (userInfo.current.turns < 1) {
+        if (isNewWeekStarted) {
+            newWeekData.progressWeek = userInfo.current.progressWeek + 1;
+            newWeekData.turns = MAX_TURNS_PER_WEEK;
+            newCells = [...newCells, {name: `start-${CURRENT_WEEK}`}];
+
+            handleOpenModal({
+                Component: <NewWeekModal week={userInfo.current.progressWeek + 1} />,
+                blurSize: 5,
+            })
+        }
+
+        updateUser({lastOpenedCell: null, totalCoins: coins, cells: newCells, ...additionalData, ...newWeekData});
+
+        if (userInfo.current.turns < 1 && !isNewWeekStarted) {
             setFinishedTurnsModal(true);
         }
     }

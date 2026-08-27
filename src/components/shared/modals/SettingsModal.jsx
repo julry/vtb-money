@@ -10,6 +10,12 @@ export const SettingsModal = () => {
     const ratio = useSizeRatio();
     const { user, updateUser } = useProgress();
 
+    const handleResetProgress = (aimWeek) => {
+        const newCells = user.cells.filter(({week}) => week <= aimWeek);
+
+        return updateUser({cells: newCells, progressWeek: aimWeek});
+    }
+
     return (
         <InfoModal>
             <Text>Модальное окно для теста, в приложении его <b>НЕ БУДЕТ</b></Text>
@@ -47,6 +53,13 @@ export const SettingsModal = () => {
                 disabled={doneButtons.includes(4)}
             >
                 Убрать фикс на последней клетке*
+            </Button>
+            <Button
+                mt={10 * ratio}
+                onClick={() => handleResetProgress(1).then(() => setDoneButtons(prev => [...prev, 5]))}
+                disabled={doneButtons.includes(5)}
+            >
+                Сбросить прогресс недель до 1
             </Button>
             <Text style={{ fontSize: 'var(--font_xs)' }}>*нужно перезайти в лобби или обновиться, чтобы отобразилось</Text>
         </InfoModal>
