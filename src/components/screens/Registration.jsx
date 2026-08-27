@@ -190,6 +190,7 @@ const Registration = () => {
     }
 
     const handleBlur = () => {
+        setIsAlreadyHas(false);
         setIsEmailFieldCorrect(!!email.match(emailRegExp));
     };
 

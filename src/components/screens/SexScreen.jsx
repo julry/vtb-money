@@ -14,6 +14,12 @@ import { useProgress } from "../../hooks/useProgress";
 import { SCREENS } from "../../constants/screens";
 import { CURRENT_WEEK } from "../../contexts/ProgressProvider";
 import { GENDERS } from "../../constants/genders";
+import {MIN_MOCKUP_WIDTH} from '../ScreenTemplate';
+
+const FlexWrapperStyled = styled(FlexWrapper)`
+    min-height: 100%;
+    padding-bottom: var(--spacing_x4);
+`;
 
 const CARDS = [
     {
@@ -46,6 +52,13 @@ const Wrapper = styled(FlexRowWrapper)`
     margin-left: ${({$ratio}) => $ratio * -10}px;
     justify-content: center;
     max-width: 375px;
+    flex: 1;
+    max-height: 60vh;
+    
+    @media screen and (min-height: 700px) and (max-width: ${MIN_MOCKUP_WIDTH}px) {
+         margin-top: ${({$ratio}) => $ratio * 40}px;
+         transform: scale(1.1);
+    }
 `;
 
 const CardStyled = styled.div`
@@ -59,7 +72,7 @@ const CardStyled = styled.div`
 
 const Card = styled(motion.img)`
     position: absolute;
-    top: 0%;
+    top: 50%;
     left: 50%;
     width: ${({$width}) => $width}px;
     height: ${({$height}) => $height}px;
@@ -69,6 +82,10 @@ const Card = styled(motion.img)`
 
 const TitleStyled = styled(Title)`
     margin-top: ${({$ratio}) => $ratio * 32}px;
+
+    @media screen and (min-height: 700px) and (max-width: ${MIN_MOCKUP_WIDTH}px) {
+        margin-top: ${({$ratio}) => $ratio * 82}px;
+    }
 `;
 
 const ErrorText = styled.p`
@@ -138,7 +155,7 @@ const SexScreen = () => {
     }
 
     return (
-        <FlexWrapper>
+        <FlexWrapperStyled>
             <LogoOutlined />
             <TitleStyled $ratio={ratio}>
                 Выбери игрового{'\n'}персонажа
@@ -147,7 +164,7 @@ const SexScreen = () => {
                 {CARDS.map((card, index) => (
                     (<CardStyled key={card.id} onClick={() => handleChoosePers(index)}>
                         <Card 
-                            initial={{x: card.xInitial, y: card.y ?? 0}}
+                            initial={{x: card.xInitial, y: card.y ?? '-50%'}}
                             $width={card.width * ratio}
                             $height={card.height * ratio}
                             src={currentIndex === index ? card.chosenPic : card.pic}
@@ -162,7 +179,7 @@ const SexScreen = () => {
                 )}
             </Wrapper>
             <Button width={275 * ratio} onClick={handleClick}>Выбрать</Button>
-        </FlexWrapper>
+        </FlexWrapperStyled>
     )
 };
 

@@ -218,19 +218,19 @@ export const OnBoardingModal = () => {
                             </FlexRowWrapperStyled>
                             <FlexRowWrapperStyled $ratio={ratio}>
                                 <img src={money} alt=""/>
-                                <p><b>бонусы</b> приносят разовыевыплаты </p>
+                                <p><b>бонусы</b> приносят разовые{'\n'}выплаты </p>
                             </FlexRowWrapperStyled>
                             <FlexRowWrapperStyled $ratio={ratio}>
                                 <img src={luck} alt=""/>
-                                <p><b>коты-в-мешке</b> могут принести как удачу, так и значительные затраты</p>
+                                <p><b>удача</b> может принести как удачу, так и значительные затраты</p>
                             </FlexRowWrapperStyled>
                             <FlexRowWrapperStyled $ratio={ratio}>
                                 <img src={play} alt=""/>
-                                <p><b>аркады</b> дают заработок за прохождение мини-игр</p>
+                                <p><b>мини-игры</b> дают заработок за прохождение мини-игр</p>
                             </FlexRowWrapperStyled>
                             <FlexRowWrapperStyled $ratio={ratio}>
                                 <img src={edu} alt=""/>
-                                <p><b>челленджи</b> челленджи проверяют твою смекалку и вознаграждают её</p>
+                                <p><b>вопросы на засыпку</b> проверяют твою смекалку и вознаграждают её</p>
                             </FlexRowWrapperStyled>
                         </InfoWrapper>
                     )}

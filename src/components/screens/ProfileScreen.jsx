@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useSizeRatio } from '../../hooks/useSizeRatio';
 import { BackHeader } from '../shared/BackHeader';
 import { useProgress } from '../../hooks/useProgress';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { SCREENS } from '../../constants/screens';
 import { Title } from '../shared/Title';
 import { Text } from '../shared/Text';
@@ -132,8 +132,8 @@ const ProfileScreen = ({ onClose }) => {
         }
     }
 
-    useLayoutEffect(() => {
-        if (!user.hasWatchedProfile) {
+    useEffect(() => {
+        // if (!user.hasWatchedProfile) {
             handleOpenModal(
                 {
                     Component: <ProfileModal linkRef={linkRef} refLink={refLink}/>,
@@ -141,7 +141,7 @@ const ProfileScreen = ({ onClose }) => {
                 }
             );
             updateUser({hasWatchedProfile: true});
-        }
+        // }
     }, []);
 
     const handleClose = () => {

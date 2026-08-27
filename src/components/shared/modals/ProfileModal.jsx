@@ -83,7 +83,7 @@ export const ProfileModal = ({linkRef, refLink}) => {
                     За каждого мы начислим коины, когда они зарегистрируются в игре
                 </p>
             </Description>
-            <InfoWrapper $top={linkRef?.current?.offsetTop} $left={linkRef?.current?.offsetLeft}>
+            <InfoWrapper $top={linkRef?.current?.offsetTop ?? 465 * ratio} $left={linkRef?.current?.offsetLeft ?? 25 * ratio}>
                 <FlexRowWrapper $gap={8 * ratio}>
                     <Subtite>Реферальная ссылка</Subtite>
                     <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -24,12 +24,17 @@ const ContentWrapper = styled(FlexWrapper)`
     padding: ${({$ratio}) => $ratio * 25}px;
     height: 100%;
     flex: 1;
+
+    @media screen and (min-height: 700px) and (max-width: ${MIN_MOCKUP_WIDTH}px) {
+       padding-top:  ${({$ratio}) => $ratio * 35}px;
+    }
 `;
 
 const TitleStyled = styled(Title)`
     margin-bottom: calc(var(--spacing_x1) * 1.5);
     @media screen and (min-height: 700px) and (max-width: ${MIN_MOCKUP_WIDTH}px) {
-        margin-bottom: calc(var(--spacing_x2) * 1.5);
+        margin-bottom: ${({$ratio}) => $ratio * 30}px;
+        font-size: ${({$ratio}) => $ratio * 38}px;
     }
 `;
 
@@ -48,6 +53,13 @@ const Image = styled.img`
     height: ${({$ratio}) => $ratio * 453}px;
     object-fit: contain;
     z-index: 2;
+
+    @media screen and (min-height: 700px) and (max-width: ${MIN_MOCKUP_WIDTH}px) {
+        width: ${({$ratio}) => $ratio * 302 * 1.2}px;
+        height: ${({$ratio}) => $ratio * 453 * 1.2}px;
+        max-width: 60vh;
+        max-height: 60vh;
+    }
 `;
 
 const TextStyled = styled(Text)`
@@ -55,8 +67,8 @@ const TextStyled = styled(Text)`
     font-size: ${({$ratio}) => $ratio * 15}px;
 
     @media screen and (min-height: 700px) and (max-width: ${MIN_MOCKUP_WIDTH}px){
-        width: ${({$ratio}) => $ratio * 290}px;
-        font-size: ${({$ratio}) => $ratio * 17}px;
+        width: 100%;
+        font-size: ${({$ratio}) => $ratio * 22}px;
     }
 `;
 
@@ -90,7 +102,7 @@ const IntroScreen = () => {
         <Wrapper>
             <LogoOutlined />
            <ContentWrapper $ratio={ratio}>
-                <TitleStyled>
+                <TitleStyled $ratio={ratio}>
                     Привет!{'\n'}Это «Ход вперёд»{'\n'}от ВТБ
                 </TitleStyled>
                 <TextStyled $ratio={ratio}>
