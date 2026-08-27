@@ -133,7 +133,7 @@ const ProfileScreen = ({ onClose }) => {
     }
 
     useEffect(() => {
-        // if (!user.hasWatchedProfile) {
+        if (!user.hasWatchedProfile) {
             handleOpenModal(
                 {
                     Component: <ProfileModal linkRef={linkRef} refLink={refLink}/>,
@@ -141,7 +141,7 @@ const ProfileScreen = ({ onClose }) => {
                 }
             );
             updateUser({hasWatchedProfile: true});
-        // }
+        }
     }, []);
 
     const handleClose = () => {
